@@ -1,0 +1,23 @@
+# 依賴
+node_modules
+dist
+dist-ssr
+
+# 環境變數
+.env
+.env.local
+.env.production
+
+# 編輯器
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# 日誌
+*.log
+
+# 測試覆蓋率
+coverage
+.nyc_output
