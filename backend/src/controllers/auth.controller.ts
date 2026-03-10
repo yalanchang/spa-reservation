@@ -1,10 +1,9 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
-import path from 'path'
-import fs from 'fs'
 import { queryOne, execute } from '../models/db'
 import { signToken } from '../utils/jwt'
 import type { User } from '../types'
+import { v2 as cloudinary } from 'cloudinary'
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -151,16 +150,22 @@ export const uploadAvatar = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`
+    // Cloudinary 直接回傳完整 URL
+    const avatarUrl = (req.file as any).path
 
-    // 刪除舊頭像
+    // 刪除舊頭像（Cloudinary 版本）
     const old = await queryOne<any>(
       'SELECT avatar FROM users WHERE id = ?',
       [req.user.userId]
     )
-    if (old?.avatar) {
-      const oldPath = path.join(__dirname, '../../public', old.avatar)
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
+    if (old?.avatar && old.avatar.includes('cloudinary')) {
+      // 從 URL 取得 public_id 並刪除
+      const publicId = old.avatar
+        .split('/')
+        .slice(-2)
+        .join('/')
+        .replace(/\.[^/.]+$/, '')
+      await cloudinary.uploader.destroy(publicId)
     }
 
     await execute(

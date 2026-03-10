@@ -8,8 +8,8 @@
   <div class="w-20 h-20 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center">
     <img
       v-if="avatarPreview || user?.avatar"
-      :src="avatarPreview || `http://localhost:3001${user?.avatar}`"
-      class="w-full h-full object-cover"
+      :src="avatarPreview || user?.avatar"
+            class="w-full h-full object-cover"
       alt="頭像"
     />
     <span v-else class="text-3xl text-primary-600">
