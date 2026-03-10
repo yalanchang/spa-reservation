@@ -142,7 +142,7 @@ const handleRegister = async () => {
     loading.value = true
     error.value = ''
     try {
-        const res = await apiClient.post('/auth/register', {
+        await apiClient.post('/auth/register', {
             name: form.value.name,
             email: form.value.email,
             phone: form.value.phone,

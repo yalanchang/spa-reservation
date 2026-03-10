@@ -244,7 +244,7 @@ onMounted(async () => {
   
   // 載入美容師列表
   try {
-    const response = await apiClient.get('/staff')
+    const response = await apiClient.get('/staff')as any
     if (response.success) {
       staffList.value = response.data || []
     }
@@ -264,7 +264,7 @@ watch([selectedDate, selectedStaff], async () => {
         serviceId: selectedService.value.id,
         staffId: selectedStaff.value
       }
-    })
+    }) as any
     if (response.success) {
       availableSlots.value = response.data || []
     }
@@ -298,7 +298,7 @@ const submitBooking = async () => {
       customerName: customerName.value,
       customerPhone: customerPhone.value,
       notes: notes.value
-    })
+    })as any
     
     if (response.success) {
       alert('預約成功！')
