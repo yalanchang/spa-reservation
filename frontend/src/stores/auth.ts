@@ -31,7 +31,6 @@ export const useAuthStore = defineStore('auth', {
     async login(email: string, password: string) {
       this.loading = true
       try {
-        // 直接使用 apiClient.post，不指定類型
         const response: any = await apiClient.post('/auth/login', {
           email,
           password

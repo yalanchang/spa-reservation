@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import axios from 'axios'
-import bcrypt from 'bcryptjs'
 import { queryOne, execute } from '../models/db'
 import { signToken } from '../utils/jwt'
 
