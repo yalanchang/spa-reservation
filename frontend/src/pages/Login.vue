@@ -112,10 +112,10 @@ const handleLogin = async () => {
 }
 
 const loginWithGoogle = () => {
-  window.location.href = 'http://localhost:3001/api/oauth/google'
+  window.location.href = `${import.meta.env.VITE_API_URL}/oauth/google`
 }
 
 const loginWithLINE = () => {
-  window.location.href = 'http://localhost:3001/api/oauth/line'
+  window.location.href = `${import.meta.env.VITE_API_URL}/oauth/line`
 }
 </script>
