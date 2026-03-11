@@ -118,7 +118,7 @@ export const lineCallback = async (req: Request, res: Response) => {
       
       const fakeEmail = `${nameSlug}.${Math.floor(Math.random() * 1000)}@line.user`
       const result = await execute(
-        `INSERT INTO users (name, email, line_id, avatar, role, is_active)   VALUES (?, ?, ?, ?, 'customer', 1, NULL)`,
+        `INSERT INTO users (name, email, line_id, avatar, role, is_active)   VALUES (?, ?, ?, ?, 'customer', 1)`,
         [name, fakeEmail, lineId, avatar]
       )
       user = await queryOne<any>('SELECT * FROM users WHERE id = ?', [(result as any).insertId])
