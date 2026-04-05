@@ -1,53 +1,55 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">個人資料</h1>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">個人資料</h1>
 
-    <div class="bg-white rounded-lg shadow-lg p-6">
-      <div class="flex items-center space-x-4 mb-6">
-        <div class="relative group">
-  <div class="w-20 h-20 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center">
-    <img
-      v-if="avatarPreview || user?.avatar"
-      :src="avatarPreview || user?.avatar"
-            class="w-full h-full object-cover"
-      alt="頭像"
-    />
-    <span v-else class="text-3xl text-primary-600">
-      {{ user?.name?.charAt(0) || 'U' }}
-    </span>
-  </div>
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        <div class="relative group self-center sm:self-auto flex-shrink-0">
+          <div class="w-20 h-20 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center">
+            <img
+              v-if="avatarPreview || user?.avatar"
+              :src="avatarPreview || user?.avatar"
+              class="w-full h-full object-cover"
+              alt="頭像"
+            />
+            <span v-else class="text-3xl text-primary-600">
+              {{ user?.name?.charAt(0) || 'U' }}
+            </span>
+          </div>
 
-  <div
-    v-if="avatarUploaded"
-    class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center"
-  >
-    <span class="text-white text-xs text-center">已更新</span>
-  </div>
+          <div
+            v-if="avatarUploaded"
+            class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center"
+          >
+            <span class="text-white text-xs text-center">已更新</span>
+          </div>
 
-  <label
-  v-else
-  :style="{ opacity: isHovering ? '1' : '0' }"
-  class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center transition cursor-pointer"
-  @mouseenter="isHovering = true"
-  @mouseleave="isHovering = false"
->
-  <span class="text-white text-xs text-center">更換頭像</span>
-  <input type="file" class="hidden" accept="image/*" @change="handleAvatarChange" />
-</label>
-</div>
+          <label
+            v-else
+            :style="{ opacity: isHovering ? '1' : '0' }"
+            class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center transition cursor-pointer"
+            @mouseenter="isHovering = true"
+            @mouseleave="isHovering = false"
+          >
+            <span class="text-white text-xs text-center">更換頭像</span>
+            <input type="file" class="hidden" accept="image/*" @change="handleAvatarChange" />
+          </label>
+        </div>
 
-        <div>
-          <h2 class="text-2xl font-semibold">{{ user?.name }}</h2>
-          <p class="text-gray-600">{{ user?.email }}</p>
+        <!-- 姓名 / Email / 角色 -->
+        <div class="text-center sm:text-left flex-1 min-w-0">
+          <h2 class="text-xl sm:text-2xl font-semibold truncate">{{ user?.name }}</h2>
+          <p class="text-gray-600 text-sm sm:text-base truncate">{{ user?.email }}</p>
           <span class="inline-block px-2 py-1 bg-primary-100 text-primary-600 text-sm rounded mt-2">
             {{ userRole }}
           </span>
         </div>
 
-        <div class="ml-auto">
+        <!-- 編輯按鈕 -->
+        <div class="flex justify-center sm:justify-end sm:ml-auto flex-shrink-0">
           <button
             v-if="!editMode"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+            class="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm sm:text-base"
             @click="startEdit"
           >
             編輯資料
@@ -60,14 +62,14 @@
         <h3 class="text-lg font-semibold mb-4">基本資料</h3>
 
         <!-- 檢視模式 -->
-        <div v-if="!editMode" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-if="!editMode" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm text-gray-600">姓名</label>
             <p class="font-medium">{{ user?.name }}</p>
           </div>
           <div>
             <label class="block text-sm text-gray-600">電子郵件</label>
-            <p class="font-medium">{{ user?.email }}</p>
+            <p class="font-medium break-all">{{ user?.email }}</p>
           </div>
           <div>
             <label class="block text-sm text-gray-600">電話</label>
@@ -80,13 +82,13 @@
         </div>
 
         <!-- 編輯模式 -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm text-gray-600 mb-1">姓名</label>
             <input
               v-model="editForm.name"
               type="text"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
           <div>
@@ -95,7 +97,7 @@
               :value="user?.email"
               type="email"
               disabled
-              class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-gray-400 cursor-not-allowed"
+              class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-gray-400 cursor-not-allowed text-sm sm:text-base"
             />
           </div>
           <div>
@@ -104,7 +106,7 @@
               v-model="editForm.phone"
               type="tel"
               placeholder="09xxxxxxxx"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
           <div>
@@ -113,28 +115,28 @@
               v-model="editForm.password"
               type="password"
               placeholder="輸入新密碼"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
 
           <!-- 訊息 -->
-          <div v-if="saveMessage" class="md:col-span-2">
+          <div v-if="saveMessage" class="sm:col-span-2">
             <p :class="saveSuccess ? 'text-green-600' : 'text-red-600'" class="text-sm">
               {{ saveMessage }}
             </p>
           </div>
 
           <!-- 按鈕 -->
-          <div class="md:col-span-2 flex gap-3 mt-2">
+          <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3 mt-2">
             <button
-              class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+              class="w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm sm:text-base disabled:opacity-50"
               :disabled="saving"
               @click="saveProfile"
             >
               {{ saving ? '儲存中...' : '儲存變更' }}
             </button>
             <button
-              class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              class="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm sm:text-base"
               @click="cancelEdit"
             >
               取消
@@ -151,28 +153,33 @@
           <LoadingSpinner />
         </div>
 
-        <div v-else-if="appointments.length === 0" class="text-center py-8 text-gray-500">
+        <div v-else-if="appointments.length === 0" class="text-center py-8 text-gray-500 text-sm">
           尚無預約紀錄
         </div>
 
-        <div v-else class="space-y-4">
+        <div v-else class="space-y-3 sm:space-y-4">
           <div
             v-for="apt in appointments"
             :key="apt.id"
-            class="border rounded-lg p-4"
+            class="border rounded-lg p-3 sm:p-4"
           >
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-semibold">{{ apt.service_name }}</div>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+              <!-- 左側資訊 -->
+              <div class="flex-1 min-w-0">
+                <div class="font-semibold text-sm sm:text-base">{{ apt.service_name }}</div>
                 <div class="text-sm text-gray-600 mt-1">
-                  {{ formatDate(apt.appointment_date) }} {{ apt.start_time?.slice(0,5) }}
+                  {{ formatDate(apt.appointment_date) }} {{ apt.start_time?.slice(0, 5) }}
                 </div>
                 <div class="text-sm text-gray-600">美容師：{{ apt.staff_name }}</div>
               </div>
-              <div class="text-right">
-                <div class="font-bold text-primary-600">NT$ {{ Number(apt.price).toLocaleString() }}</div>
+
+              <!-- 右側金額 + 狀態 -->
+              <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-0 flex-shrink-0">
+                <div class="font-bold text-primary-600 text-sm sm:text-base">
+                  NT$ {{ Number(apt.price).toLocaleString() }}
+                </div>
                 <span
-                  class="inline-block px-2 py-1 text-xs rounded mt-2"
+                  class="inline-block px-2 py-1 text-xs rounded sm:mt-2"
                   :class="statusClass(apt.status)"
                 >
                   {{ statusText(apt.status) }}

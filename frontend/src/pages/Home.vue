@@ -3,8 +3,9 @@
     <!-- Hero Section -->
     <section class="text-center py-12 bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl">
       <h1 class="text-4xl font-bold text-gray-900 mb-4">放鬆身心，煥發美麗</h1>
-      <p class="text-xl text-gray-600 mb-8">專業美容服務，為您打造專屬的美麗時光</p>
-      <router-link 
+      <p class="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8">
+  專業美容服務，為您打造專屬的美麗時光
+</p>      <router-link 
         to="/booking" 
         class="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-primary-700 transition"
       >
