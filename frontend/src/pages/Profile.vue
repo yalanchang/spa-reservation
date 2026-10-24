@@ -1,344 +1,216 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">個人資料</h1>
-
-    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-        <div class="relative group self-center sm:self-auto flex-shrink-0">
-          <div class="w-20 h-20 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center">
-            <img
-              v-if="avatarPreview || user?.avatar"
-              :src="avatarPreview || user?.avatar"
-              class="w-full h-full object-cover"
-              alt="頭像"
-            />
-            <span v-else class="text-3xl text-primary-600">
-              {{ user?.name?.charAt(0) || 'U' }}
-            </span>
+  <div class="max-w-5xl mx-auto md:grid md:grid-cols-[15rem_1fr] md:items-start md:gap-6">
+    <!-- 左側：會員資訊＋選單（手機上選單變成下拉） -->
+    <aside class="card-cute mb-6 md:mb-0">
+      <div class="flex items-center gap-4 border-b border-primary-50 p-5 md:flex-col md:text-center">
+        <div class="relative shrink-0">
+          <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-100 ring-4 ring-primary-50 md:h-20 md:w-20">
+            <img v-if="avatarPreview || user?.avatar" :src="avatarPreview || user?.avatar || ''" class="h-full w-full object-cover" alt="大頭貼" />
+            <span v-else class="text-3xl text-primary-600">{{ user?.name?.charAt(0) || 'U' }}</span>
           </div>
-
-          <div
-            v-if="avatarUploaded"
-            class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center"
-          >
-            <span class="text-white text-xs text-center">已更新</span>
+          <div v-if="avatarUploading" class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white">
+            <LoadingSpinner size="sm" />
           </div>
-
           <label
             v-else
-            :style="{ opacity: isHovering ? '1' : '0' }"
-            class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center transition cursor-pointer"
-            @mouseenter="isHovering = true"
-            @mouseleave="isHovering = false"
+            class="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/40 text-xs text-white opacity-0 transition hover:opacity-100"
           >
-            <span class="text-white text-xs text-center">更換頭像</span>
-            <input type="file" class="hidden" accept="image/*" @change="handleAvatarChange" />
+            更換
+            <input type="file" class="hidden" accept="image/jpeg,image/png,image/webp" @change="handleAvatarChange" />
           </label>
         </div>
-
-        <!-- 姓名 / Email / 角色 -->
-        <div class="text-center sm:text-left flex-1 min-w-0">
-          <h2 class="text-xl sm:text-2xl font-semibold truncate">{{ user?.name }}</h2>
-          <p class="text-gray-600 text-sm sm:text-base truncate">{{ user?.email }}</p>
-          <span class="inline-block px-2 py-1 bg-primary-100 text-primary-600 text-sm rounded mt-2">
-            {{ userRole }}
-          </span>
-        </div>
-
-        <!-- 編輯按鈕 -->
-        <div class="flex justify-center sm:justify-end sm:ml-auto flex-shrink-0">
-          <button
-            v-if="!editMode"
-            class="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm sm:text-base"
-            @click="startEdit"
-          >
-            編輯資料
-          </button>
-        </div>
-      </div>
-
-      <!-- 基本資料 -->
-      <div class="border-t pt-6">
-        <h3 class="text-lg font-semibold mb-4">基本資料</h3>
-
-        <!-- 檢視模式 -->
-        <div v-if="!editMode" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm text-gray-600">姓名</label>
-            <p class="font-medium">{{ user?.name }}</p>
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600">電子郵件</label>
-            <p class="font-medium break-all">{{ user?.email }}</p>
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600">電話</label>
-            <p class="font-medium">{{ user?.phone || '未填寫' }}</p>
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600">會員等級</label>
-            <p class="font-medium">{{ userRole }}</p>
-          </div>
-        </div>
-
-        <!-- 編輯模式 -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">姓名</label>
-            <input
-              v-model="editForm.name"
-              type="text"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
-            />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">電子郵件</label>
-            <input
-              :value="user?.email"
-              type="email"
-              disabled
-              class="w-full border rounded-lg px-3 py-2 bg-gray-50 text-gray-400 cursor-not-allowed text-sm sm:text-base"
-            />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">電話</label>
-            <input
-              v-model="editForm.phone"
-              type="tel"
-              placeholder="09xxxxxxxx"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
-            />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">新密碼（不改請留空）</label>
-            <input
-              v-model="editForm.password"
-              type="password"
-              placeholder="輸入新密碼"
-              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
-            />
-          </div>
-
-          <!-- 訊息 -->
-          <div v-if="saveMessage" class="sm:col-span-2">
-            <p :class="saveSuccess ? 'text-green-600' : 'text-red-600'" class="text-sm">
-              {{ saveMessage }}
-            </p>
-          </div>
-
-          <!-- 按鈕 -->
-          <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3 mt-2">
+        <div class="min-w-0 flex-1 md:w-full">
+          <p class="truncate font-bold text-cocoa">{{ user?.name }}</p>
+          <p class="truncate text-xs text-gray-500">{{ user?.email }}</p>
+          <div class="mt-2 flex flex-wrap items-center gap-2 md:justify-center">
+            <span class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-600">{{ roleLabel }}</span>
             <button
-              class="w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm sm:text-base disabled:opacity-50"
-              :disabled="saving"
-              @click="saveProfile"
+              v-if="user?.avatar && !avatarUploading"
+              type="button"
+              class="text-xs text-gray-400 hover:font-bold"
+              @click="removeAvatar"
             >
-              {{ saving ? '儲存中...' : '儲存變更' }}
-            </button>
-            <button
-              class="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm sm:text-base"
-              @click="cancelEdit"
-            >
-              取消
+              移除大頭貼
             </button>
           </div>
         </div>
       </div>
 
-      <!-- 預約紀錄 -->
-      <div class="border-t pt-6 mt-6">
-        <h3 class="text-lg font-semibold mb-4">預約紀錄</h3>
+      <!-- 手機：下拉選單 -->
+      <div class="p-4 md:hidden">
+        <label for="profile-tab-select" class="sr-only">切換頁面</label>
+        <select
+          id="profile-tab-select"
+          :value="tab"
+          class="profile-input"
+          @change="selectTab(($event.target as HTMLSelectElement).value)"
+        >
+          <option v-for="t in tabs" :key="t.value" :value="t.value">{{ t.label }}</option>
+        </select>
+      </div>
 
-        <div v-if="loading" class="text-center py-8">
-          <LoadingSpinner />
+      <nav class="hidden p-2 md:block" aria-label="個人資料選單">
+        <ul class="flex flex-col gap-1">
+          <li v-for="t in tabs" :key="t.value">
+            <button
+              type="button"
+              class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition"
+              :class="tab === t.value ? 'bg-primary-50 font-bold text-primary-600' : 'text-cocoa hover:font-bold'"
+              :aria-current="tab === t.value ? 'page' : undefined"
+              @click="selectTab(t.value)"
+            >
+              <component :is="t.icon" class="h-5 w-5 shrink-0" />
+              {{ t.label }}
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- 右側：內容 -->
+    <div class="min-w-0">
+      <div v-if="avatarError" class="mb-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm">
+        <ExclamationCircleIcon class="h-5 w-5 flex-shrink-0 text-red-500" />
+        <div class="min-w-0 flex-1">
+          <p class="font-medium text-red-800">大頭貼更新失敗：{{ avatarError.message }}</p>
+          <p v-if="avatarError.hint" class="mt-1 text-red-700">建議：{{ avatarError.hint }}</p>
         </div>
+        <button class="flex-shrink-0 text-red-400 hover:text-red-600" aria-label="關閉" @click="avatarError = null">
+          <XMarkIcon class="h-5 w-5" />
+        </button>
+      </div>
 
-        <div v-else-if="appointments.length === 0" class="text-center py-8 text-gray-500 text-sm">
-          尚無預約紀錄
-        </div>
-
-        <div v-else class="space-y-3 sm:space-y-4">
-          <div
-            v-for="apt in appointments"
-            :key="apt.id"
-            class="border rounded-lg p-3 sm:p-4"
-          >
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-              <!-- 左側資訊 -->
-              <div class="flex-1 min-w-0">
-                <div class="font-semibold text-sm sm:text-base">{{ apt.service_name }}</div>
-                <div class="text-sm text-gray-600 mt-1">
-                  {{ formatDate(apt.appointment_date) }} {{ apt.start_time?.slice(0, 5) }}
-                </div>
-                <div class="text-sm text-gray-600">美容師：{{ apt.staff_name }}</div>
-              </div>
-
-              <!-- 右側金額 + 狀態 -->
-              <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-0 flex-shrink-0">
-                <div class="font-bold text-primary-600 text-sm sm:text-base">
-                  NT$ {{ Number(apt.price).toLocaleString() }}
-                </div>
-                <span
-                  class="inline-block px-2 py-1 text-xs rounded sm:mt-2"
-                  :class="statusClass(apt.status)"
-                >
-                  {{ statusText(apt.status) }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="card-cute p-6 sm:p-8">
+        <h1 class="mb-6 text-xl font-bold text-cocoa">{{ currentTab.label }}</h1>
+        <ProfileOverview v-if="tab === 'overview'" />
+        <ProfileBasicInfo v-else-if="tab === 'basic'" />
+        <ProfilePreferences v-else-if="tab === 'preferences'" />
+        <ProfileCoupons v-else-if="tab === 'coupons'" />
+        <ProfileSecurity v-else />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import {
+  ExclamationCircleIcon,
+  XMarkIcon,
+  SparklesIcon,
+  UserIcon,
+  HeartIcon,
+  ShieldCheckIcon,
+  TicketIcon
+} from '@heroicons/vue/24/outline'
 import apiClient from '@/api/client'
+import { useAuthStore } from '@/stores/auth'
+import { useConfirm } from '@/composables/useConfirm'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import ProfileOverview from '@/components/profile/ProfileOverview.vue'
+import ProfileBasicInfo from '@/components/profile/ProfileBasicInfo.vue'
+import ProfilePreferences from '@/components/profile/ProfilePreferences.vue'
+import ProfileSecurity from '@/components/profile/ProfileSecurity.vue'
+import ProfileCoupons from '@/components/profile/ProfileCoupons.vue'
 
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
+const confirm = useConfirm()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
-const appointments = ref<any[]>([])
-const loading = ref(false)
-const isHovering = ref(false)
 
-const editMode = ref(false)
-const saving = ref(false)
-const saveMessage = ref('')
-const saveSuccess = ref(false)
+const tabs = [
+  { value: 'overview', label: '會員概況', icon: SparklesIcon },
+  { value: 'basic', label: '基本資料', icon: UserIcon },
+  { value: 'preferences', label: '美容偏好', icon: HeartIcon },
+  { value: 'coupons', label: '我的優惠券', icon: TicketIcon },
+  { value: 'security', label: '帳號安全', icon: ShieldCheckIcon }
+]
+
+// 分頁記在網址，重新整理或分享連結都會停在同一頁
+const tab = ref(tabs.some(t => t.value === route.query.tab) ? (route.query.tab as string) : 'overview')
+const currentTab = computed(() => tabs.find(t => t.value === tab.value) || tabs[0])
+// 從頁面內的連結改變網址（例如基本資料的「更換」信箱）時，分頁也要跟著切換
+watch(
+  () => route.query.tab,
+  (value) => {
+    tab.value = tabs.some(t => t.value === value) ? (value as string) : 'overview'
+  }
+)
+const selectTab = (value: string) => {
+  tab.value = value
+  router.replace({ query: value === 'overview' ? {} : { tab: value } })
+}
+
+const roleLabel = computed(() => ({ admin: '管理員', staff: '美容師' } as Record<string, string>)[user.value?.role || ''] || '一般會員')
+
+// ---- 大頭貼
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const AVATAR_MAX_MB = 10
 const avatarPreview = ref<string | null>(null)
-const avatarFile = ref<File | null>(null)
-const avatarUploaded = ref(false)
-
-const editForm = ref({
-  name: '',
-  phone: '',
-  password: ''
-})
-
-const userRole = computed(() => {
-  const roles: Record<string, string> = {
-    admin: '管理員',
-    staff: '美容師',
-    customer: '一般會員'
-  }
-  return roles[user.value?.role || ''] || '一般會員'
-})
-
-const startEdit = () => {
-  editForm.value = {
-    name: user.value?.name || '',
-    phone: user.value?.phone || '',
-    password: ''
-  }
-  saveMessage.value = ''
-  editMode.value = true
-}
-
-const cancelEdit = () => {
-  editMode.value = false
-  avatarPreview.value = null
-  avatarFile.value = null
-  saveMessage.value = ''
-}
+const avatarUploading = ref(false)
+const avatarError = ref<{ message: string; hint?: string } | null>(null)
 
 const handleAvatarChange = async (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0]
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  // 清空 input，才能再次選擇同一張圖片
+  input.value = ''
   if (!file) return
+
+  avatarError.value = null
+  if (!AVATAR_TYPES.includes(file.type)) {
+    avatarError.value = {
+      message: `不支援這種圖片格式（${file.name.split('.').pop()?.toUpperCase() || '未知'}）`,
+      hint: '請使用 JPG、PNG 或 WebP；iPhone 的 HEIC 照片可以先截圖或轉成 JPG'
+    }
+    return
+  }
+  if (file.size > AVATAR_MAX_MB * 1024 * 1024) {
+    avatarError.value = {
+      message: `圖片太大（${(file.size / 1024 / 1024).toFixed(1)}MB），上限 ${AVATAR_MAX_MB}MB`,
+      hint: '請壓縮圖片，或改用較小的照片後再試'
+    }
+    return
+  }
+
   avatarPreview.value = URL.createObjectURL(file)
+  avatarUploading.value = true
 
   const formData = new FormData()
   formData.append('avatar', file)
   try {
     await apiClient.post('/auth/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000
     })
     await authStore.fetchProfile()
-    avatarUploaded.value = true
-    setTimeout(() => {
-      avatarUploaded.value = false
-      isHovering.value = false 
-
-    }, 3000)
-  } catch (e) {
-    alert('上傳失敗，請稍後再試')
-  }
-}
-
-const saveProfile = async () => {
-  saving.value = true
-  saveMessage.value = ''
-  try {
-    // 上傳大頭照
-    if (avatarFile.value) {
-      const formData = new FormData()
-      formData.append('avatar', avatarFile.value)
-      await apiClient.post('/auth/avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-    }
-
-    // 更新資料
-    const payload: any = {
-      name: editForm.value.name,
-      phone: editForm.value.phone
-    }
-    if (editForm.value.password) {
-      payload.password = editForm.value.password
-    }
-
-    await apiClient.put('/auth/profile', payload)
-    await authStore.fetchProfile()
-
-    saveSuccess.value = true
-    saveMessage.value = '資料已更新成功！'
-    editMode.value = false
-    avatarFile.value = null
+    toast.success('大頭貼已更新')
   } catch (e: any) {
-    saveSuccess.value = false
-    saveMessage.value = e?.message || '更新失敗，請稍後再試'
+    avatarError.value = {
+      message: e?.message || '上傳失敗',
+      hint: e?.hint || '請稍後再試'
+    }
   } finally {
-    saving.value = false
+    avatarPreview.value = null
+    avatarUploading.value = false
   }
 }
 
-const statusClass = (status: string) => {
-  const classes: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-green-100 text-green-800',
-    completed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-red-100 text-red-800'
-  }
-  return classes[status] || 'bg-gray-100 text-gray-800'
-}
-
-const statusText = (status: string) => {
-  const texts: Record<string, string> = {
-    pending: '待確認',
-    confirmed: '已確認',
-    completed: '已完成',
-    cancelled: '已取消'
-  }
-  return texts[status] || status
-}
-
-const formatDate = (date: string) => {
-  const d = new Date(date)
-  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`
-}
-
-onMounted(async () => {
-  loading.value = true
+const removeAvatar = async () => {
+  const ok = await confirm({ title: '確定要移除大頭貼嗎？', confirmText: '移除' })
+  if (!ok) return
   try {
-    const response = await apiClient.get('/appointments/my')
-    appointments.value = response.data || []
-  } catch (error) {
-    console.error('Failed to load appointments:', error)
-  } finally {
-    loading.value = false
+    const res = await apiClient.delete('/auth/avatar') as any
+    authStore.setSession(authStore.token!, res.data)
+    toast.success('大頭貼已移除')
+  } catch (error: any) {
+    toast.error(error?.message || '移除失敗，請稍後再試')
   }
-})
+}
+
+onMounted(() => authStore.fetchProfile())
 </script>

@@ -1,86 +1,89 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">預約服務</h1>
-
-    <!-- 步驟指示器 -->
-    <div class="flex mb-8">
-      <div 
-        v-for="(step, index) in steps" 
-        :key="index"
-        class="flex-1 text-center"
-        :class="{
-          'text-primary-600 font-bold': currentStep === index,
-          'text-gray-400': currentStep < index
-        }"
-      >
-        <div class="relative">
-          <div 
-            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center border-2"
-            :class="{
-              'bg-primary-600 text-white border-primary-600': currentStep >= index,
-              'border-gray-300': currentStep < index
-            }"
-          >
-            <span v-if="currentStep > index">✓</span>
-            <span v-else>{{ index + 1 }}</span>
-          </div>
-       <div 
-  v-if="index < steps.length - 1"
-  class="absolute top-5 left-[calc(50%+24px)] right-[calc(-50%+24px)] h-0.5"
-  :class="currentStep > index ? 'bg-primary-600' : 'bg-gray-300'"
-></div>
-        </div>
-        <div class="mt-2 text-sm">{{ step }}</div>
-      </div>
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-8 text-center">
+      <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">BOOKING</p>
+      <h1 class="mt-2 text-3xl font-bold text-cocoa">預約服務</h1>
     </div>
 
-    <!-- 步驟 1: 選擇服務 -->
-    <div v-if="currentStep === 0" class="space-y-4">
-      <h2 class="text-xl font-semibold mb-4">選擇服務項目</h2>
-      
-      <div class="grid grid-cols-1 gap-4">
-        <div
-          v-for="service in services"
-          :key="service.id"
-          @click="selectedService = service"
-          class="border rounded-lg p-4 cursor-pointer transition"
-          :class="selectedService?.id === service.id 
-            ? 'border-primary-600 bg-primary-50 ring-2 ring-primary-600' 
-            : 'hover:border-gray-300'"
+    <!-- 步驟指示器 -->
+    <ol class="mb-10 flex items-start justify-center">
+      <template v-for="(step, index) in steps" :key="step">
+        <li class="flex w-20 flex-col items-center gap-1.5 text-center sm:w-24">
+          <span
+            class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition"
+            :class="currentStep >= index ? 'bg-primary-600 text-white' : 'border-2 border-gray-200 bg-white text-gray-400'"
+          >
+            <CheckIcon v-if="currentStep > index" class="h-4 w-4" />
+            <template v-else>{{ index + 1 }}</template>
+          </span>
+          <span
+            class="whitespace-nowrap text-sm"
+            :class="currentStep === index ? 'font-bold text-primary-600' : currentStep > index ? 'text-primary-600' : 'text-gray-400'"
+          >
+            {{ step }}
+          </span>
+        </li>
+        <li
+          v-if="index < steps.length - 1"
+          aria-hidden="true"
+          class="mt-[1.125rem] h-0.5 w-8 rounded-full sm:w-14"
+          :class="currentStep > index ? 'bg-primary-600' : 'bg-gray-200'"
+        ></li>
+      </template>
+    </ol>
+
+    <!-- 步驟 1: 選擇服務（一次只看一個分類，點了就進到選時間） -->
+    <div v-if="currentStep === 0">
+      <div class="mb-5 flex items-center justify-between gap-4">
+        <label for="booking-category" class="text-sm text-gray-500">療程分類</label>
+        <select
+          id="booking-category"
+          v-model="activeGroupId"
+          class="w-48 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-cocoa focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
-          <div class="flex justify-between items-start">
-            <div>
-              <h3 class="font-semibold text-lg">{{ service.name }}</h3>
-              <p class="text-gray-600 text-sm mt-1">{{ service.description }}</p>
-            </div>
-            <div class="text-right">
-              <div class="text-primary-600 font-bold"> NT$ {{ Number(service.price).toLocaleString() }}</div>
-             
-              <div class="text-sm text-gray-500">{{ service.duration }}分鐘</div>
-            </div>
-          </div>
-        </div>
+          <option v-for="group in serviceGroups" :key="group.id" :value="group.id">{{ group.name }}（{{ group.services.length }}）</option>
+        </select>
       </div>
 
-      <button
-        @click="currentStep = 1"
-        :disabled="!selectedService"
-        class="w-full mt-6 bg-primary-600 text-white py-3 rounded-lg disabled:opacity-50 hover:bg-primary-700"
-      >
-        下一步
-      </button>
+      <ul class="space-y-3">
+        <li v-for="service in activeGroup?.services" :key="service.id">
+          <button
+            type="button"
+            class="group flex w-full items-center gap-6 rounded-2xl border bg-white px-5 py-5 text-left transition-colors sm:px-7 sm:py-6"
+            :class="selectedService?.id === service.id ? 'border-primary-400' : 'border-transparent hover:border-primary-200'"
+            @click="chooseService(service)"
+          >
+            <div class="min-w-0 flex-1">
+              <p class="text-base font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">{{ service.name }}</p>
+              <p class="mt-1.5 text-sm text-gray-500">{{ service.duration }} 分鐘</p>
+            </div>
+            <p class="shrink-0 text-lg font-bold text-primary-600">
+              <span class="text-sm font-medium">NT$</span> {{ Number(service.price).toLocaleString() }}
+            </p>
+          </button>
+        </li>
+      </ul>
     </div>
 
     <!-- 步驟 2: 選擇時間 -->
-    <div v-if="currentStep === 1" class="space-y-4">
-      <h2 class="text-xl font-semibold mb-4">選擇預約時間</h2>
+    <div v-if="currentStep === 1" class="space-y-6 rounded-3xl bg-white p-6 sm:p-8">
+      <h2 class="text-xl font-semibold text-cocoa">選擇預約時間</h2>
+
+      <!-- 已選療程 -->
+      <div class="flex items-center justify-between gap-4 rounded-2xl bg-primary-50/60 px-5 py-4">
+        <div class="min-w-0">
+          <p class="truncate font-bold text-cocoa">{{ selectedService?.name }}</p>
+          <p class="mt-0.5 flex gap-3 text-sm text-gray-500"><span>{{ selectedService?.duration }} 分鐘</span><span>NT$ {{ Number(selectedService?.price).toLocaleString() }}</span></p>
+        </div>
+        <button type="button" class="shrink-0 text-sm font-medium text-primary-600 hover:text-primary-700" @click="currentStep = 0">更換</button>
+      </div>
       
       <!-- 美容師選擇 -->
       <div>
         <label class="block text-sm font-medium mb-2">選擇美容師</label>
         <select 
           v-model="selectedStaff"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
         >
           <option :value="null">任何美容師</option>
           <option v-for="staff in staffList" :key="staff.id" :value="staff.id">
@@ -96,37 +99,37 @@
           v-model="selectedDate"
           type="date"
           :min="minDate"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
         />
       </div>
 
       <!-- 可預約時段 -->
-      <div v-if="availableSlots.length" class="space-y-2">
-        <label class="block text-sm font-medium">可預約時段</label>
-        <div class="grid grid-cols-4 gap-2">
-          <button
-            v-for="slot in availableSlots"
-            :key="slot"
-            @click="selectedTime = slot"
-            class="p-2 border rounded-lg text-center hover:bg-gray-50 transition"
-            :class="selectedTime === slot ? 'bg-primary-600 text-white hover:bg-primary-700' : ''"
-          >
-            {{ slot }}
-          </button>
-        </div>
+      <p v-if="selectedDate && slotsLoaded && !availableSlots.length" class="rounded-2xl bg-primary-50/60 px-5 py-4 text-sm text-cocoa">
+        {{ slotMessage || '這天已經約滿，請換一天' }}
+      </p>
+      <div v-if="availableSlots.length">
+        <label for="booking-time" class="block text-sm font-medium mb-2">可預約時段</label>
+        <select
+          id="booking-time"
+          v-model="selectedTime"
+          class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
+        >
+          <option value="" disabled>請選擇時段（共 {{ availableSlots.length }} 個）</option>
+          <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
+        </select>
       </div>
 
-      <div class="flex gap-4 mt-6">
+      <div class="flex gap-4 pt-2">
         <button
           @click="currentStep = 0"
-          class="flex-1 border border-gray-300 py-3 rounded-lg hover:bg-gray-50"
+          class="btn-cute-outline flex-1"
         >
           上一步
         </button>
         <button
           @click="currentStep = 2"
           :disabled="!selectedTime"
-          class="flex-1 bg-primary-600 text-white py-3 rounded-lg disabled:opacity-50 hover:bg-primary-700"
+          class="btn-cute flex-1 disabled:opacity-50 disabled:pointer-events-none"
         >
           下一步
         </button>
@@ -134,19 +137,15 @@
     </div>
 
     <!-- 步驟 3: 確認資訊 -->
-    <div v-if="currentStep === 2" class="space-y-4">
-      <h2 class="text-xl font-semibold mb-4">確認預約資訊</h2>
-      
-      <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+    <div v-if="currentStep === 2" class="space-y-6 rounded-3xl bg-white p-6 sm:p-8">
+      <h2 class="text-xl font-semibold text-cocoa">確認預約資訊</h2>
+
+      <div class="space-y-3 rounded-2xl bg-primary-50/60 p-5">
         <div class="flex justify-between">
           <span class="text-gray-600">服務項目</span>
           <span class="font-medium">{{ selectedService?.name }}</span>
         </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">價格</span>
-          <span class="font-medium"> NT$ {{ Number(selectedService?.price).toLocaleString() }}</span>
-         
-        </div>
+
         <div class="flex justify-between">
           <span class="text-gray-600">日期</span>
           <span class="font-medium">{{ formatDate(selectedDate) }}</span>
@@ -159,45 +158,117 @@
           <span class="text-gray-600">時長</span>
           <span class="font-medium">{{ selectedService?.duration }}分鐘</span>
         </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">美容師</span>
+          <span class="font-medium">{{ staffList.find(s => s.id === selectedStaff)?.name || '由店家安排' }}</span>
+        </div>
+        <div class="space-y-2 border-t border-dashed border-primary-200 pt-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">原價</span>
+            <span class="font-medium">NT$ {{ Number(selectedService?.price).toLocaleString() }}</span>
+          </div>
+          <div v-if="coupon" class="flex justify-between text-primary-600">
+            <span>優惠碼 {{ coupon.code }}（{{ coupon.name }}）</span>
+            <span class="font-medium">－NT$ {{ coupon.discount.toLocaleString() }}</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="font-bold text-cocoa">應付金額</span>
+            <span class="text-2xl font-bold text-primary-600">NT$ {{ (Number(selectedService?.price) - (coupon?.discount || 0)).toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 優惠券：從券夾選，或輸入優惠碼 -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label for="coupon-select" class="block text-sm font-medium">優惠券 <span class="ml-1 text-xs text-gray-400">選填</span></label>
+          <router-link to="/coupons" class="text-xs font-medium text-primary-600 hover:text-primary-700">去領券中心</router-link>
+        </div>
+        <select
+          id="coupon-select"
+          :value="coupon?.code || ''"
+          class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
+          @change="selectCoupon(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="">{{ usableCoupons.length ? `不使用優惠券（有 ${usableCoupons.length} 張可用）` : '沒有可用的優惠券' }}</option>
+          <option v-for="c in usableCoupons" :key="c.code" :value="c.code">
+            {{ c.name }}（折 NT$ {{ c.discount.toLocaleString() }}）
+          </option>
+          <option v-if="coupon && !usableCoupons.some(c => c.code === coupon!.code)" :value="coupon.code">
+            {{ coupon.name }}（折 NT$ {{ coupon.discount.toLocaleString() }}）
+          </option>
+        </select>
+        <div v-if="!coupon" class="flex gap-2">
+          <input
+            id="coupon-code"
+            v-model.trim="couponInput"
+            placeholder="或輸入優惠碼"
+            aria-label="優惠碼"
+            class="w-full rounded-xl border border-gray-200 px-3 py-2.5 uppercase focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
+            @keydown.enter.prevent="applyCoupon()"
+          />
+          <button type="button" class="btn-cute-outline shrink-0 !px-5 !py-2.5" :disabled="!couponInput || couponChecking" @click="applyCoupon()">
+            <LoadingSpinner v-if="couponChecking" size="sm" />
+            <template v-else>套用</template>
+          </button>
+        </div>
       </div>
 
       <!-- 聯絡資訊 -->
-      <div class="space-y-3">
-        <input
-          v-model="customerName"
-          type="text"
-          placeholder="您的姓名"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          required
-        />
-        <input
-          v-model="customerPhone"
-          type="tel"
-          placeholder="聯絡電話"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          required
-        />
-        <textarea
-          v-model="notes"
-          placeholder="備註 (選擇性)"
-          rows="3"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        ></textarea>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            姓名 <span class="ml-1 text-xs text-red-500">必填</span>
+          </label>
+          <input
+            v-model="customerName"
+            type="text"
+            placeholder="您的姓名"
+            class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
+            :class="{ 'border-red-500': showErrors && !customerName.trim() }"
+          />
+          <p v-if="showErrors && !customerName.trim()" class="text-red-500 text-xs mt-1">請填寫姓名</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            聯絡電話 <span class="ml-1 text-xs text-red-500">必填</span>
+          </label>
+          <input
+            v-model="customerPhone"
+            type="tel"
+            placeholder="您的聯絡電話"
+            class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
+            :class="{ 'border-red-500': showErrors && phoneError }"
+          />
+          <p v-if="showErrors && phoneError" class="text-red-500 text-xs mt-1">{{ phoneError }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            備註 <span class="ml-1 text-xs text-gray-400">選填</span>
+          </label>
+          <textarea
+            v-model="notes"
+            placeholder="備註..."
+            rows="3"
+            class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
+          ></textarea>
+        </div>
       </div>
 
-      <div class="flex gap-4 mt-6">
+      <div class="flex gap-4 pt-2">
         <button
           @click="currentStep = 1"
-          class="flex-1 border border-gray-300 py-3 rounded-lg hover:bg-gray-50"
+          class="btn-cute-outline flex-1"
         >
           上一步
         </button>
         <button
           @click="submitBooking"
-          :disabled="loading || !customerName || !customerPhone"
-          class="flex-1 bg-primary-600 text-white py-3 rounded-lg disabled:opacity-50 hover:bg-primary-700"
+          :disabled="loading"
+          class="btn-cute flex-1 disabled:opacity-50 disabled:pointer-events-none"
         >
-          {{ loading ? '處理中...' : '確認預約' }}
+          <LoadingSpinner v-if="loading" size="sm" />
+          <template v-else>確認預約</template>
         </button>
       </div>
     </div>
@@ -209,11 +280,17 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useServicesStore } from '@/stores/services'
 import apiClient from '@/api/client'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { CheckIcon } from '@heroicons/vue/24/solid'
+import { isValidTaiwanPhone, normalizeTaiwanPhone } from '@/utils/phone'
 
 const authStore = useAuthStore()
 const servicesStore = useServicesStore()
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
 
 const steps = ['選擇服務', '選擇時間', '確認預約']
 const currentStep = ref(0)
@@ -221,6 +298,33 @@ const currentStep = ref(0)
 // 服務相關
 const services = computed(() => servicesStore.services)
 const selectedService = ref<any>(null)
+
+// 第 1 步：依分類分組
+const serviceGroups = computed(() => {
+  const groups: { id: number; name: string; services: any[] }[] = []
+  for (const s of services.value) {
+    let group = groups.find(g => g.id === s.category_id)
+    if (!group) {
+      group = { id: s.category_id, name: s.category_name || '其他', services: [] }
+      groups.push(group)
+    }
+    group.services.push(s)
+  }
+  return groups
+})
+
+const activeGroupId = ref<number | null>(null)
+const activeGroup = computed(() => serviceGroups.value.find(g => g.id === activeGroupId.value) || serviceGroups.value[0])
+// 分類載入後預設第一個
+watch(serviceGroups, (groups) => {
+  if (!groups.some(g => g.id === activeGroupId.value)) activeGroupId.value = groups[0]?.id ?? null
+}, { immediate: true })
+
+// 選了服務就直接進到選時間
+const chooseService = (service: any) => {
+  selectedService.value = service
+  currentStep.value = 1
+}
 
 // 美容師相關
 const staffList = ref<any[]>([])
@@ -234,13 +338,33 @@ const minDate = new Date().toISOString().split('T')[0]
 
 // 客戶資訊
 const customerName = ref(authStore.user?.name || '')
-const customerPhone = ref('')
+const customerPhone = ref(authStore.user?.phone || '')
 const notes = ref('')
 const loading = ref(false)
+const showErrors = ref(false)
+
+const phoneError = computed(() => {
+  if (!customerPhone.value.trim()) return '請填寫聯絡電話，方便我們聯繫您'
+  if (!isValidTaiwanPhone(customerPhone.value)) {
+    return '電話格式不正確：手機為 09 開頭共 10 碼，市話請加區碼（例如 02-2345-6789）'
+  }
+  return ''
+})
 
 // 載入資料
 onMounted(async () => {
   await servicesStore.fetchServices()
+
+  // 從服務介紹頁點「預約這個療程」過來時，直接帶入該服務
+  const presetId = Number(route.query.serviceId)
+  if (presetId) {
+    selectedService.value = services.value.find(s => s.id === presetId) || null
+    // 帶著療程過來就直接從選時間開始
+    if (selectedService.value) {
+      activeGroupId.value = selectedService.value.category_id
+      currentStep.value = 1
+    }
+  }
   
   // 載入美容師列表
   try {
@@ -251,27 +375,91 @@ onMounted(async () => {
   } catch (error) {
     console.error('Failed to load staff:', error)
   }
+
+  // 會員有設定指定美容師就先選好
+  const preferred = (authStore.user as any)?.preferred_staff_id
+  if (preferred && staffList.value.some(s => s.id === preferred)) {
+    selectedStaff.value = preferred
+  }
 })
 
 // 監聽日期變化，載入可預約時段
 watch([selectedDate, selectedStaff], async () => {
+  selectedTime.value = ''
+  availableSlots.value = []
+  slotsLoaded.value = false
+  slotMessage.value = ''
   if (!selectedDate.value || !selectedService.value) return
-  
+
   try {
     const response = await apiClient.get('/appointments/available', {
       params: {
         date: selectedDate.value,
         serviceId: selectedService.value.id,
-        staffId: selectedStaff.value
+        staffId: selectedStaff.value || undefined
       }
     }) as any
     if (response.success) {
       availableSlots.value = response.data || []
+      slotMessage.value = response.message || ''
     }
   } catch (error) {
     console.error('Failed to load available slots:', error)
+  } finally {
+    slotsLoaded.value = true
   }
 })
+
+const slotsLoaded = ref(false)
+const slotMessage = ref('')
+
+// ---- 優惠碼：先試算，送出預約時後端會再檢查一次
+const couponInput = ref('')
+const coupon = ref<{ code: string; name: string; discount: number } | null>(null)
+const couponChecking = ref(false)
+
+const myCoupons = ref<any[]>([])
+// 券夾裡這個療程能用的
+const usableCoupons = computed(() => myCoupons.value.filter(c => c.status === 'available' && c.discount !== null))
+
+const loadMyCoupons = async () => {
+  if (!authStore.isLoggedIn || !selectedService.value) return
+  try {
+    const res = await apiClient.get('/coupons/mine', { params: { serviceId: selectedService.value.id } }) as any
+    myCoupons.value = res.data || []
+  } catch {
+    myCoupons.value = []
+  }
+}
+
+const selectCoupon = (code: string) => {
+  if (code) applyCoupon(code)
+  else removeCoupon()
+}
+
+const applyCoupon = async (code = couponInput.value) => {
+  if (!code || !selectedService.value) return
+  couponChecking.value = true
+  try {
+    const res = await apiClient.post('/appointments/coupon', { code, serviceId: selectedService.value.id }) as any
+    coupon.value = res.data
+    toast.success(`已折抵 NT$ ${res.data.discount.toLocaleString()}`)
+  } catch (error: any) {
+    toast.warning(error?.message || '優惠碼無法使用')
+  } finally {
+    couponChecking.value = false
+  }
+}
+
+const removeCoupon = () => {
+  coupon.value = null
+  couponInput.value = ''
+}
+
+// 換療程後折扣金額會不同，要重新套用
+watch(selectedService, removeCoupon)
+// 進到確認頁才載入券夾
+watch(currentStep, (step) => { if (step === 2) loadMyCoupons() })
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('zh-TW', {
@@ -288,25 +476,32 @@ const submitBooking = async () => {
     return
   }
 
+  if (!customerName.value.trim() || phoneError.value) {
+    showErrors.value = true
+    toast.warning(!customerName.value.trim() ? '請填寫姓名' : phoneError.value)
+    return
+  }
+
   loading.value = true
   try {
     const response = await apiClient.post('/appointments', {
       serviceId: selectedService.value.id,
-      staffId: selectedStaff.value || 1,
+      staffId: selectedStaff.value || null,
+      couponCode: coupon.value?.code,
       date: selectedDate.value,
       time: selectedTime.value,
       customerName: customerName.value,
-      customerPhone: customerPhone.value,
+      customerPhone: normalizeTaiwanPhone(customerPhone.value),
       notes: notes.value
     })as any
     
     if (response.success) {
-      alert('預約成功！')
+      toast.success('預約成功！')
       router.push('/appointments')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Booking failed:', error)
-    alert('預約失敗，請稍後再試')
+    toast.error(error?.message || '預約失敗，請稍後再試')
   } finally {
     loading.value = false
   }

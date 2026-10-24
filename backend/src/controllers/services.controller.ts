@@ -3,17 +3,27 @@ import { query } from '../models/db'
 
 export const getServices = async (req: Request, res: Response): Promise<void> => {
   try {
+    // 一併帶出平均評分與心得數，給篩選排序與卡片顯示
     const services = await query(
-      `SELECT s.*, c.name as category_name 
+      `SELECT s.*, c.name as category_name,
+              r.average_rating, COALESCE(r.review_count, 0) AS review_count
        FROM services s
        JOIN service_categories c ON s.category_id = c.id
+       LEFT JOIN (
+         SELECT service_id, ROUND(AVG(rating), 1) AS average_rating, COUNT(*) AS review_count
+         FROM reviews GROUP BY service_id
+       ) r ON r.service_id = s.id
        WHERE s.is_active = 1
        ORDER BY s.sort_order, s.name`
     )
 
     res.json({
       success: true,
-      data: services
+      data: services.map((s: any) => ({
+        ...s,
+        average_rating: s.average_rating === null ? null : Number(s.average_rating),
+        review_count: Number(s.review_count)
+      }))
     })
   } catch (error) {
     console.error('Get services error:', error)

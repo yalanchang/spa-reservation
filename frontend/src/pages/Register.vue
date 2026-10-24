@@ -1,7 +1,8 @@
 <template>
     <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-center mb-6">建立帳號</h2>
+        <div class="card-cute p-8">
+            <h2 class="text-2xl font-bold text-center text-cocoa mb-1">建立帳號</h2>
+            <p class="text-center text-sm text-gray-500 mb-6">建立帳號，開始預約專屬放鬆時光</p>
 
             <form @submit.prevent="handleRegister" class="space-y-4">
                 <div>
@@ -84,11 +85,11 @@
                 </div>
 
                 <div v-if="error" class="text-red-500 text-sm">{{ error }}</div>
-                <div v-if="successMsg" class="text-green-600 text-sm">{{ successMsg }}</div>
 
                 <button type="submit" :disabled="loading || form.password !== form.confirmPassword"
-                    class="w-full bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 disabled:opacity-50 transition">
-                    {{ loading ? '註冊中...' : '建立帳號' }}
+                    class="btn-cute w-full py-2.5 disabled:opacity-50 disabled:pointer-events-none">
+                    <LoadingSpinner v-if="loading" size="sm" />
+                    <template v-else>建立帳號</template>
                 </button>
             </form>
 
@@ -104,8 +105,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api/client'
+import { useToast } from 'vue-toastification'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const router = useRouter()
+const toast = useToast()
 
 const form = ref({
     name: '',
@@ -117,7 +121,6 @@ const form = ref({
 
 const loading = ref(false)
 const error = ref('')
-const successMsg = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const passwordStrength = computed(() => {
@@ -165,9 +168,15 @@ const handleRegister = async () => {
             password: form.value.password
         }) as any
 
-        successMsg.value = '註冊成功！即將跳轉到登入頁...'
-        setTimeout(() => router.push('/login'), 1500)
+        toast.success('驗證碼已寄到你的信箱')
+        router.push({ path: '/verify-email', query: { email: form.value.email } })
     } catch (e: any) {
+        // 註冊過但還沒驗證：直接帶去輸入驗證碼
+        if (e?.code === 'EMAIL_NOT_VERIFIED') {
+            toast.info(e.message)
+            router.push({ path: '/verify-email', query: { email: form.value.email, resend: '1' } })
+            return
+        }
         error.value = e?.message || '註冊失敗，請稍後再試'
     } finally {
         loading.value = false

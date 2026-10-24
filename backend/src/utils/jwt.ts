@@ -7,6 +7,8 @@ export interface TokenPayload {
   userId: number
   email: string
   role: string
+  // 從後台登入頁登入才有，後台 API 只認這種 token
+  mfa?: boolean
 }
 
 export const signToken = (payload: TokenPayload): string => {
@@ -21,9 +23,4 @@ export const verifyToken = (token: string): TokenPayload | null => {
   } catch (error) {
     return null
   }
-}
-
-export default {
-  signToken,
-  verifyToken
 }

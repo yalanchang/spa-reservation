@@ -15,12 +15,6 @@ export const useServicesStore = defineStore('services', {
     loading: false
   }),
 
-  getters: {
-    getServicesByCategory: (state) => (categoryId: number) => {
-      return state.services.filter(s => s.category_id === categoryId)
-    }
-  },
-
   actions: {
     async fetchServices() {
       this.loading = true

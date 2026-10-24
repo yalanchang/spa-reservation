@@ -2,12 +2,16 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
-import path from 'path'
 import oauthRoutes from './routes/oauth.routes'
 import authRoutes from './routes/auth.routes'
 import servicesRoutes from './routes/services.routes'
 import appointmentsRoutes from './routes/appointments.routes'
+import reviewsRoutes from './routes/reviews.routes'
+import adminRoutes from './routes/admin.routes'
+import { warmUpMailer } from './utils/mailer'
 import staffRoutes from './routes/staff.routes'
+import siteRoutes from './routes/site.routes'
+import couponsRoutes from './routes/coupons.routes'
 
 dotenv.config()
 
@@ -23,7 +27,6 @@ app.use(cors({
 }))
 app.use(morgan('dev'))
 app.use(express.json())
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'))) 
 app.use(express.urlencoded({ extended: true }))
 
 // 路由
@@ -31,7 +34,11 @@ app.use('/api/auth', authRoutes)
 app.use('/api/oauth', oauthRoutes)
 app.use('/api/services', servicesRoutes)
 app.use('/api/appointments', appointmentsRoutes)
+app.use('/api/reviews', reviewsRoutes)
+app.use('/api/admin', adminRoutes)
 app.use('/api/staff', staffRoutes)
+app.use('/api/site', siteRoutes)
+app.use('/api/coupons', couponsRoutes)
 
 
 
@@ -53,6 +60,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 })
 
 app.listen(PORT, () => {
+  warmUpMailer()
   console.log(` 後端伺服器運行在 http://localhost:${PORT}`)
 })
 

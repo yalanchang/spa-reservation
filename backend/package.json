@@ -6,8 +6,14 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
+    "prestart": "node dist/scripts/migrate.js",
     "start": "node dist/app.js",
-    "db:init": "ts-node src/config/initDb.ts"
+    "db:init": "ts-node src/scripts/migrate.ts",
+    "set-role": "ts-node src/scripts/setRole.ts",
+    "migrate": "ts-node src/scripts/migrate.ts",
+    "demo:past": "ts-node src/scripts/demoPastAppointments.ts",
+    "reset-password": "ts-node src/scripts/resetPassword.ts",
+    "db:copy": "ts-node src/scripts/copyDb.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -19,20 +25,23 @@
     "@types/node": "^20.19.37",
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "express-validator": "^7.0.1",
-    "helmet": "^7.1.0",
+    "express": "^4.22.3",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
     "multer": "^2.1.1",
-    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.19.0",
+    "nodemailer": "^10.0.16",
     "nodemon": "^3.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17"
+  },
+  "overrides": {
+    "qs": "6.16.0"
+  }
 }

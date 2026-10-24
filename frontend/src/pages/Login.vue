@@ -1,7 +1,8 @@
 <template>
   <div class="max-w-md mx-auto">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <h2 class="text-2xl font-bold text-center mb-6">會員登入</h2>
+    <div class="card-cute p-8">
+      <h2 class="text-2xl font-bold text-center text-cocoa mb-1">會員登入</h2>
+      <p class="text-center text-sm text-gray-500 mb-6"></p>
 
 
 
@@ -15,7 +16,10 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+          <div class="mb-1 flex items-center justify-between">
+            <label class="block text-sm font-medium text-gray-700">密碼</label>
+            <router-link to="/forgot-password" class="text-sm text-primary-600 hover:underline">忘記密碼？</router-link>
+          </div>
           <div class="relative">
             <input v-model="form.password" :type="showPassword ? 'text' : 'password'" required
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10"
@@ -38,8 +42,9 @@
         <div v-if="error" class="text-red-500 text-sm">{{ error }}</div>
 
         <button type="submit" :disabled="loading"
-          class="w-full bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 disabled:opacity-50 transition">
-          {{ loading ? '登入中...' : '登入' }}
+          class="btn-cute w-full py-2.5 disabled:opacity-50 disabled:pointer-events-none">
+          <LoadingSpinner v-if="loading" size="sm" />
+          <template v-else>登入</template>
         </button>
       </form>
 
@@ -56,7 +61,7 @@
       <!-- 第三方登入 -->
       <div class="space-y-3 mb-6">
         <button
-          class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition"
+          class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg px-4 py-2 transition hover:font-bold"
           @click="loginWithGoogle">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4"
@@ -90,9 +95,12 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const form = ref({ email: '', password: '' })
 const loading = ref(false)
@@ -102,13 +110,18 @@ const showPassword = ref(false)
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
-  const success = await authStore.login(form.value.email, form.value.password)
-  if (success) {
-    router.push('/')
-  } else {
-    error.value = '帳號或密碼錯誤'
-  }
+  const result = await authStore.login(form.value.email, form.value.password)
   loading.value = false
+  if (result.ok) {
+    toast.success('登入成功')
+    router.push('/')
+  } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+    // 還沒驗證信箱：後端已重寄驗證碼，帶去驗證頁
+    toast.info(result.message || '請先完成信箱驗證')
+    router.push({ path: '/verify-email', query: { email: form.value.email } })
+  } else {
+    error.value = result.message || '帳號或密碼錯誤'
+  }
 }
 
 const loginWithGoogle = () => {

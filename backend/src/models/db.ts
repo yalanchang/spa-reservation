@@ -38,3 +38,20 @@ export const queryOne = async <T = any>(sql: string, params?: any[]): Promise<T 
 export const execute = async (sql: string, params?: any[]): Promise<any> => {
   return await getPool().execute(sql, params)
 }
+
+// 預約相關的「先檢查再寫入」要排隊進行，不然同時送出的兩筆會都通過檢查
+// 用 MySQL 的 GET_LOCK，同一時間只有一個請求能進到 fn
+export const withBookingLock = async <T>(fn: () => Promise<T>): Promise<T> => {
+  const connection = await getPool().getConnection()
+  try {
+    const [rows] = await connection.query("SELECT GET_LOCK('spa-booking', 10) AS locked")
+    if (!(rows as any)[0]?.locked) throw new Error('Booking lock timeout')
+    try {
+      return await fn()
+    } finally {
+      await connection.query("SELECT RELEASE_LOCK('spa-booking')")
+    }
+  } finally {
+    connection.release()
+  }
+}

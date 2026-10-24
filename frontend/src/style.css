@@ -7,18 +7,148 @@
     @apply antialiased;
   }
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-cream text-cocoa;
+    /* 滿版區塊用 100vw，避免出現橫向捲軸 */
+    overflow-x: clip;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-200;
+  /* 可愛按鈕：滑過微微浮起，按下會縮一下 */
+  .btn-cute {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-soft
+      transition duration-200 hover:font-bold active:scale-95;
   }
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-200;
+  .btn-cute-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-200 bg-white px-6 py-3 font-semibold text-primary-600
+      transition duration-200 hover:font-bold active:scale-95;
   }
-  .input-field {
-    @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  /* 滑過只加粗：用看不見的粗體文字先撐出寬度，旁邊的元素才不會跳動（元素要加 data-text） */
+  .hover-bold {
+    @apply inline-flex flex-col items-center hover:font-bold;
+  }
+  .hover-bold::after {
+    content: attr(data-text);
+    @apply pointer-events-none invisible h-0 select-none overflow-hidden font-bold;
+  }
+  /* 個人資料頁的表單 */
+  .profile-label {
+    @apply mb-1 block text-sm text-gray-600;
+  }
+  .profile-input {
+    @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-cocoa focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+  .profile-section-title {
+    @apply mb-3 font-bold text-cocoa;
+  }
+  .card-cute {
+    @apply rounded-3xl bg-white shadow-soft;
+  }
+
+  /* ---- 店家後台：灰藍色系，跟前台分開 ---- */
+  .admin-input {
+    @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500;
+  }
+  .admin-label {
+    @apply mb-1 block text-xs text-gray-500;
+  }
+  .admin-hint {
+    @apply mt-1 text-xs text-gray-400;
+  }
+  /* 輸入框前後帶單位（NT$、次、張） */
+  .admin-input-group {
+    @apply flex w-full items-center overflow-hidden rounded-md border border-gray-300 bg-white text-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500;
+  }
+  .admin-input-group > input {
+    @apply min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-gray-800 focus:outline-none focus:ring-0;
+  }
+  .admin-input-group > span {
+    @apply shrink-0 bg-gray-50 px-3 py-2 text-gray-500;
+  }
+  .admin-btn {
+    @apply inline-flex min-w-[4.5rem] items-center justify-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50;
+  }
+  .admin-btn-outline {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50;
+  }
+  .admin-link {
+    @apply text-sm text-blue-600 hover:text-blue-800;
+  }
+  .admin-panel {
+    @apply rounded-md border border-gray-200 bg-white;
+  }
+  .admin-table {
+    @apply w-full text-left text-sm;
+  }
+  .admin-table thead {
+    @apply border-b border-gray-200 bg-gray-50 text-xs text-gray-500;
+  }
+  .admin-table th {
+    @apply px-4 py-2.5 font-medium;
+  }
+  .admin-table td {
+    @apply px-4 py-3;
+  }
+  .admin-table tbody {
+    @apply divide-y divide-gray-100;
+  }
+  .admin-table tbody tr:hover {
+    @apply bg-gray-50;
+  }
+  .admin-tag {
+    @apply inline-block rounded px-2 py-0.5 text-xs font-medium;
   }
 }
+
+/* 捲動淡入（搭配 v-reveal） */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* 換頁動畫 */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Toast：白底卡片 */
+.Vue-Toastification__toast {
+  @apply bg-white text-gray-800 rounded-xl shadow-lg font-sans;
+  min-height: 56px;
+  padding: 14px 18px;
+}
+.Vue-Toastification__toast-body {
+  @apply text-sm font-medium;
+}
+.Vue-Toastification__toast--success .Vue-Toastification__icon { @apply text-green-500; }
+.Vue-Toastification__toast--error .Vue-Toastification__icon { @apply text-red-500; }
+.Vue-Toastification__toast--warning .Vue-Toastification__icon { @apply text-amber-500; }
+.Vue-Toastification__toast--info .Vue-Toastification__icon { @apply text-primary-500; }

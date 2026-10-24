@@ -1,0 +1,5 @@
+# 套件安裝目錄（各自在 backend、frontend 安裝，不放進 git）
+node_modules/
+
+# 系統檔
+.DS_Store
