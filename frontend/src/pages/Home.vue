@@ -34,7 +34,9 @@
         @mousemove="onMouseMove"
         @mouseleave="mouse = { x: 0, y: 0 }"
       >
-        <div class="container relative mx-auto grid items-center gap-10 px-6 sm:px-12 lg:grid-cols-2">
+        <div
+          class="container relative mx-auto grid items-center gap-10 px-6 sm:px-12 lg:grid-cols-[auto_auto] lg:justify-center lg:gap-20 xl:gap-28"
+        >
           <div class="text-center lg:text-left">
             <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">K-BEAUTY SPA</p>
             <h1 class="mt-5 text-4xl font-extrabold leading-tight text-cocoa sm:text-5xl">
@@ -49,8 +51,8 @@
           </div>
 
           <!-- 照片牌組：自動輪播，滑過展開、點擊切換 -->
-          <!-- 寬度跟著螢幕高度縮，照片加進度點不超出一個畫面 -->
-          <div class="relative mx-auto w-full max-w-md lg:max-w-[min(28rem,calc((100svh-13rem)*0.8))]">
+          <!-- 桌機兩欄靠中間；照片寬度跟著螢幕高度縮，照片加進度點不超出一個畫面 -->
+          <div class="relative mx-auto w-full max-w-md lg:w-[min(28rem,calc((100svh-13rem)*0.8))]">
             <div
               class="relative aspect-[4/5] w-full transition-transform duration-300 ease-out"
               :style="deckTilt"
