@@ -391,7 +391,12 @@ import AdminModal from '@/components/admin/AdminModal.vue'
 import { STATUS_LABELS, STATUS_CLASSES, formatDateWithWeekday } from '@/utils/appointmentStatus'
 import { downloadAppointmentsCsv } from '@/utils/adminExport'
 
-const SOURCE_LABELS: Record<string, string> = { online: '線上預約', phone: '電話', walk_in: '現場', line: 'LINE' }
+const SOURCE_LABELS: Record<string, string> = {
+  online: '線上預約',
+  phone: '電話預約',
+  walk_in: '現場預約',
+  line: 'LINE 預約'
+}
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
 // 表格裡的橫條：數字一定寫出來，長條只是輔助

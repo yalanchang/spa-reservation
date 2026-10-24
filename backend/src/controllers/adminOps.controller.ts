@@ -147,7 +147,7 @@ export const createAdminAppointment = async (req: Request, res: Response): Promi
     if (!customerName) return fail(res, 400, '請填寫顧客姓名')
     if (!isValidTaiwanPhone(customerPhone)) return fail(res, 400, '電話格式不正確')
     if (!isDate(date) || !isTime(time)) return fail(res, 400, '請選擇日期與時段')
-    if (!SOURCES.includes(source)) return fail(res, 400, '請選擇預約來源')
+    if (!SOURCES.includes(source)) return fail(res, 400, '請選擇預約管道')
 
     const service = await queryOne<any>('SELECT name, duration, price FROM services WHERE id = ? AND is_active = 1', [
       serviceId
@@ -187,10 +187,10 @@ export const createAdminAppointment = async (req: Request, res: Response): Promi
       )
       return staff
     })
-    if (!assigned) return fail(res, 400, '這個時段已經沒有空檔，請換一個時段')
+    if (!assigned) return fail(res, 400, '此時段已無空檔，請改選其他時段')
 
     await logAction(req, '代客預約', customerName, `${date} ${time.slice(0, 5)} ${service.name}`)
-    res.json({ success: true, message: member ? '預約已建立，並已連結到會員帳號' : '預約已建立' })
+    res.json({ success: true, message: member ? '預約已建立，並已歸入該會員的預約紀錄' : '預約已建立' })
   } catch (error) {
     serverError(res, 'Create admin appointment error', error)
   }
@@ -205,7 +205,12 @@ const STATUS_TEXT: Record<string, string> = {
   cancelled: '已取消',
   no_show: '未到店'
 }
-const SOURCE_TEXT: Record<string, string> = { online: '線上', phone: '電話', walk_in: '現場', line: 'LINE' }
+const SOURCE_TEXT: Record<string, string> = {
+  online: '線上預約',
+  phone: '電話預約',
+  walk_in: '現場預約',
+  line: 'LINE 預約'
+}
 
 const csvCell = (value: unknown) => {
   const s = value === null || value === undefined ? '' : String(value)
