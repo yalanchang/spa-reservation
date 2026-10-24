@@ -4,7 +4,13 @@ import { queryOne, execute } from '../models/db'
 import { signToken } from '../utils/jwt'
 import type { User } from '../types'
 import { uploadAvatarImage, deleteImageByUrl } from '../config/cloudinary'
-import { sendVerificationCode, checkVerificationCode, issueResetToken, consumeResetToken, MailError } from '../utils/verificationCode'
+import {
+  sendVerificationCode,
+  checkVerificationCode,
+  issueResetToken,
+  consumeResetToken,
+  MailError
+} from '../utils/verificationCode'
 
 // 登入成功的回應：發 token，回傳不含密碼的使用者資料
 const sessionResponse = (res: Response, user: any, message: string, mfa = false) => {
@@ -38,11 +44,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // 還沒驗證信箱：重寄驗證碼，前端導到驗證頁
     if (!Number(user.email_verified)) {
       // 寄信失敗也導到驗證頁，那裡可以再按重寄
-      const sent = await sendVerificationCode(user, 'register').then(() => true, () => false)
+      const sent = await sendVerificationCode(user, 'register').then(
+        () => true,
+        () => false
+      )
       res.status(403).json({
         success: false,
         code: 'EMAIL_NOT_VERIFIED',
-        message: sent ? '請先完成信箱驗證，驗證碼已寄到你的信箱' : '請先完成信箱驗證，驗證碼寄送失敗，請在下一頁按「重新寄送」'
+        message: sent
+          ? '請先完成信箱驗證，驗證碼已寄到你的信箱'
+          : '請先完成信箱驗證，驗證碼寄送失敗，請在下一頁按「重新寄送」'
       })
       return
     }
@@ -67,10 +78,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    const existingUser = await queryOne<any>(
-      'SELECT id, email_verified FROM users WHERE email = ?',
-      [email]
-    )
+    const existingUser = await queryOne<any>('SELECT id, email_verified FROM users WHERE email = ?', [email])
 
     if (existingUser && Number(existingUser.email_verified)) {
       res.status(400).json({ success: false, message: '此信箱已被註冊' })
@@ -81,10 +89,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     if (existingUser) {
       // 註冊過但還沒驗證（例如上次驗證信沒寄出去）：用這次填的資料覆蓋，再寄一次驗證碼
-      await execute(
-        'UPDATE users SET name = ?, password = ?, phone = ? WHERE id = ?',
-        [name, hashedPassword, phone || null, existingUser.id]
-      )
+      await execute('UPDATE users SET name = ?, password = ?, phone = ? WHERE id = ?', [
+        name,
+        hashedPassword,
+        phone || null,
+        existingUser.id
+      ])
     } else {
       await execute(
         `INSERT INTO users (name, email, password, phone, role, email_verified)
@@ -128,19 +138,15 @@ export const uploadAvatar = async (req: Request, res: Response): Promise<void> =
       avatarUrl = (await uploadAvatarImage(req.file.buffer)).secure_url
     } catch (error) {
       console.error('Cloudinary upload error:', error)
-      res.status(502).json({ success: false, message: '圖片儲存服務暫時無法使用', hint: '請稍後再試，若一直失敗請聯絡我們' })
+      res
+        .status(502)
+        .json({ success: false, message: '圖片儲存服務暫時無法使用', hint: '請稍後再試，若一直失敗請聯絡我們' })
       return
     }
 
-    const old = await queryOne<any>(
-      'SELECT avatar FROM users WHERE id = ?',
-      [req.user.userId]
-    )
+    const old = await queryOne<any>('SELECT avatar FROM users WHERE id = ?', [req.user.userId])
 
-    await execute(
-      'UPDATE users SET avatar = ? WHERE id = ?',
-      [avatarUrl, req.user.userId]
-    )
+    await execute('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, req.user.userId])
 
     // 資料庫已經換成新圖，才刪掉舊的；更新失敗時舊圖還在
     await deleteImageByUrl(old?.avatar)

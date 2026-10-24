@@ -5,7 +5,8 @@
 
       <form class="mt-6 space-y-4" @submit.prevent="submit">
         <p v-if="emailFromLink" class="text-center text-sm text-gray-500">
-          驗證碼已寄到 <span class="font-medium text-cocoa">{{ email }}</span>，請在 10 分鐘內輸入
+          驗證碼已寄到 <span class="font-medium text-cocoa">{{ email }}</span
+          >，請在 10 分鐘內輸入
         </p>
         <div v-else>
           <label for="verify-email" class="mb-1 block text-sm text-gray-600">註冊的電子郵件</label>
@@ -31,7 +32,11 @@
           />
         </div>
 
-        <button type="submit" class="btn-cute w-full py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="loading">
+        <button
+          type="submit"
+          class="btn-cute w-full py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+          :disabled="loading"
+        >
           <LoadingSpinner v-if="loading" size="sm" />
           <template v-else>驗證並登入</template>
         </button>
@@ -68,7 +73,7 @@ const submit = async () => {
   }
   loading.value = true
   try {
-    const res = await apiClient.post('/auth/verify-email', { email: email.value, code: code.value }) as any
+    const res = (await apiClient.post('/auth/verify-email', { email: email.value, code: code.value })) as any
     authStore.setSession(res.data.token, res.data.user)
     toast.success('信箱驗證完成，歡迎加入')
     router.replace('/')

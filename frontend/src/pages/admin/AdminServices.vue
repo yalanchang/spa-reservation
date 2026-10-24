@@ -32,8 +32,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="8" class="py-12"><LoadingSpinner /></td></tr>
-          <tr v-else-if="!filtered.length"><td colspan="8" class="py-12 text-center text-gray-400">沒有符合的療程</td></tr>
+          <tr v-if="loading">
+            <td colspan="8" class="py-12"><LoadingSpinner /></td>
+          </tr>
+          <tr v-else-if="!filtered.length">
+            <td colspan="8" class="py-12 text-center text-gray-400">沒有符合的療程</td>
+          </tr>
           <tr v-for="s in filtered" v-else :key="s.id">
             <td>
               <p class="font-medium text-gray-900">{{ s.name }}</p>
@@ -45,7 +49,10 @@
             <td class="text-right tabular-nums">{{ s.completed_count }}</td>
             <td class="text-right tabular-nums">{{ s.average_rating ?? '—' }}</td>
             <td>
-              <span class="admin-tag" :class="Number(s.is_active) ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'">
+              <span
+                class="admin-tag"
+                :class="Number(s.is_active) ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+              >
                 {{ Number(s.is_active) ? '上架中' : '已下架' }}
               </span>
             </td>
@@ -62,7 +69,12 @@
     <p class="text-xs text-gray-500">下架的療程前台不會顯示，已經預約的不受影響</p>
 
     <!-- 療程表單 -->
-    <AdminModal :open="!!serviceForm" :title="serviceForm?.id ? '編輯療程' : '新增療程'" wide @close="serviceForm = null">
+    <AdminModal
+      :open="!!serviceForm"
+      :title="serviceForm?.id ? '編輯療程' : '新增療程'"
+      wide
+      @close="serviceForm = null"
+    >
       <form v-if="serviceForm" class="grid gap-4 sm:grid-cols-2" @submit.prevent="saveService">
         <div class="sm:col-span-2">
           <label class="admin-label" for="svc-name">療程名稱</label>
@@ -123,7 +135,9 @@
             <td><input v-model.number="c.sort_order" type="number" class="admin-input" /></td>
             <td class="text-right tabular-nums text-gray-500">{{ c.id ? c.service_count : '' }}</td>
             <td class="text-right">
-              <button type="button" class="admin-link" :disabled="!c.name?.trim()" @click="saveCategory(c)">{{ c.id ? '儲存' : '新增' }}</button>
+              <button type="button" class="admin-link" :disabled="!c.name?.trim()" @click="saveCategory(c)">
+                {{ c.id ? '儲存' : '新增' }}
+              </button>
             </td>
           </tr>
         </tbody>
@@ -156,16 +170,20 @@ const activeFilter = ref('')
 const keyword = ref('')
 
 const filtered = computed(() =>
-  services.value.filter(s =>
-    (!categoryFilter.value || s.category_id === categoryFilter.value) &&
-    (!activeFilter.value || String(Number(s.is_active)) === activeFilter.value) &&
-    (!keyword.value || s.name.includes(keyword.value))
+  services.value.filter(
+    (s) =>
+      (!categoryFilter.value || s.category_id === categoryFilter.value) &&
+      (!activeFilter.value || String(Number(s.is_active)) === activeFilter.value) &&
+      (!keyword.value || s.name.includes(keyword.value))
   )
 )
 
 const load = async () => {
   try {
-    const [svc, cat] = await Promise.all([apiClient.get('/admin/services'), apiClient.get('/admin/categories')]) as any[]
+    const [svc, cat] = (await Promise.all([
+      apiClient.get('/admin/services'),
+      apiClient.get('/admin/categories')
+    ])) as any[]
     services.value = svc.data || []
     categories.value = cat.data || []
   } catch (error: any) {
@@ -183,7 +201,15 @@ const serviceForm = ref<any | null>(null)
 
 const openService = (s?: any) => {
   serviceForm.value = s
-    ? { id: s.id, name: s.name, categoryId: s.category_id, price: Number(s.price), duration: s.duration, sortOrder: s.sort_order, description: s.description || '' }
+    ? {
+        id: s.id,
+        name: s.name,
+        categoryId: s.category_id,
+        price: Number(s.price),
+        duration: s.duration,
+        sortOrder: s.sort_order,
+        description: s.description || ''
+      }
     : { name: '', categoryId: categories.value[0]?.id, price: 1000, duration: 60, sortOrder: 0, description: '' }
 }
 
@@ -207,7 +233,7 @@ const saveService = async () => {
 const toggleActive = async (s: any) => {
   togglingId.value = s.id
   try {
-    const res = await apiClient.patch(`/admin/services/${s.id}/active`, { active: !Number(s.is_active) }) as any
+    const res = (await apiClient.patch(`/admin/services/${s.id}/active`, { active: !Number(s.is_active) })) as any
     toast.success(res.message)
     await load()
     refreshStorefront()

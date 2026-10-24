@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { 
-  createAppointment, 
+import {
+  createAppointment,
   getAvailableSlots,
   getUserAppointments,
   deleteAppointment,

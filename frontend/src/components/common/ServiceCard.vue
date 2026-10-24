@@ -7,7 +7,11 @@
   >
     <div class="relative">
       <img :src="serviceImage(service)" :alt="service.name" class="aspect-[16/10] w-full object-cover" />
-      <span v-if="badge" class="absolute left-3 top-3 rounded-full bg-primary-600 px-2.5 py-0.5 text-xs font-semibold text-white">{{ badge }}</span>
+      <span
+        v-if="badge"
+        class="absolute left-3 top-3 rounded-full bg-primary-600 px-2.5 py-0.5 text-xs font-semibold text-white"
+        >{{ badge }}</span
+      >
       <button
         class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/90 shadow-sm flex items-center justify-center group/heart"
         :class="{ 'animate-pop': popping }"
@@ -15,8 +19,14 @@
         @click.stop="onToggleFavorite"
         @animationend="popping = false"
       >
-        <HeartSolid v-if="liked" class="w-[18px] h-[18px] text-primary-500 transition-colors group-hover/heart:text-primary-700" />
-        <HeartOutline v-else class="w-[18px] h-[18px] text-primary-400 transition-colors group-hover/heart:text-primary-700" />
+        <HeartSolid
+          v-if="liked"
+          class="w-[18px] h-[18px] text-primary-500 transition-colors group-hover/heart:text-primary-700"
+        />
+        <HeartOutline
+          v-else
+          class="w-[18px] h-[18px] text-primary-400 transition-colors group-hover/heart:text-primary-700"
+        />
       </button>
     </div>
 
@@ -25,11 +35,14 @@
         <span class="font-semibold text-primary-500">{{ service.category_name }}</span>
         <span v-if="service.review_count" class="flex items-center gap-0.5 text-gray-500">
           <StarIcon class="h-3.5 w-3.5 text-amber-400" />
-          <span class="font-bold text-cocoa">{{ service.average_rating }}</span>（{{ service.review_count }}）
+          <span class="font-bold text-cocoa">{{ service.average_rating }}</span
+          >（{{ service.review_count }}）
         </span>
         <span v-else class="text-gray-400">尚無評價</span>
       </div>
-      <h3 class="mt-1 text-lg font-bold text-cocoa transition-colors group-hover:text-primary-600">{{ service.name }}</h3>
+      <h3 class="mt-1 text-lg font-bold text-cocoa transition-colors group-hover:text-primary-600">
+        {{ service.name }}
+      </h3>
 
       <!-- 重點條列 -->
       <ul class="mb-4 mt-2 space-y-1">
@@ -41,8 +54,12 @@
 
       <div class="mt-auto flex items-center justify-between gap-2 border-t border-primary-50 pt-3">
         <div class="leading-tight">
-          <p class="text-xl font-extrabold text-primary-600"><span class="text-xs font-semibold">NT$</span> {{ Number(service.price).toLocaleString() }}</p>
-          <p class="flex items-center gap-1 text-xs text-gray-500"><ClockIcon class="h-3.5 w-3.5" />{{ service.duration }} 分鐘</p>
+          <p class="text-xl font-extrabold text-primary-600">
+            <span class="text-xs font-semibold">NT$</span> {{ Number(service.price).toLocaleString() }}
+          </p>
+          <p class="flex items-center gap-1 text-xs text-gray-500">
+            <ClockIcon class="h-3.5 w-3.5" />{{ service.duration }} 分鐘
+          </p>
         </div>
         <button
           type="button"
@@ -56,11 +73,7 @@
   </article>
 
   <!-- 首頁人氣療程用的樣式 -->
-  <div
-    v-else
-    class="group card-cute cursor-pointer overflow-hidden"
-    @click="goToDetail"
-  >
+  <div v-else class="group card-cute cursor-pointer overflow-hidden" @click="goToDetail">
     <div class="relative overflow-hidden">
       <img :src="serviceImage(service)" :alt="service.name" class="h-48 w-full object-cover" />
       <span class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-cocoa shadow-sm">
@@ -73,7 +86,10 @@
         @click.stop="onToggleFavorite"
         @animationend="popping = false"
       >
-        <HeartSolid v-if="liked" class="w-5 h-5 text-primary-500 transition-colors group-hover/heart:text-primary-700" />
+        <HeartSolid
+          v-if="liked"
+          class="w-5 h-5 text-primary-500 transition-colors group-hover/heart:text-primary-700"
+        />
         <HeartOutline v-else class="w-5 h-5 text-primary-400 transition-colors group-hover/heart:text-primary-700" />
       </button>
     </div>
@@ -106,21 +122,24 @@ const router = useRouter()
 const toast = useToast()
 const { isFavorite, toggleFavorite } = useFavorites()
 
-const props = withDefaults(defineProps<{
-  // detailed：服務項目頁；classic：首頁人氣療程
-  layout?: 'detailed' | 'classic'
-  service: {
-    id: number
-    name: string
-    description: string
-    price: number
-    duration: number
-    image_url?: string
-    category_name?: string
-    average_rating?: number | null
-    review_count?: number
-  }
-}>(), { layout: 'detailed' })
+const props = withDefaults(
+  defineProps<{
+    // detailed：服務項目頁；classic：首頁人氣療程
+    layout?: 'detailed' | 'classic'
+    service: {
+      id: number
+      name: string
+      description: string
+      price: number
+      duration: number
+      image_url?: string
+      category_name?: string
+      average_rating?: number | null
+      review_count?: number
+    }
+  }>(),
+  { layout: 'detailed' }
+)
 
 const liked = computed(() => isFavorite(props.service.id))
 
@@ -128,7 +147,7 @@ const liked = computed(() => isFavorite(props.service.id))
 const highlights = computed(() =>
   (props.service.description || '')
     .split(/[、，,；;]/)
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean)
     .slice(0, 3)
 )

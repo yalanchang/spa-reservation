@@ -6,7 +6,11 @@
           v-for="f in filters"
           :key="f.value"
           class="-mb-px whitespace-nowrap border-b-2 px-3 pb-2.5 pt-1"
-          :class="filter === f.value ? 'border-blue-600 font-medium text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'"
+          :class="
+            filter === f.value
+              ? 'border-blue-600 font-medium text-gray-900'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          "
           @click="filter = f.value"
         >
           {{ f.label }}
@@ -30,7 +34,8 @@
             <span class="font-medium text-gray-900">{{ review.user_name }}</span>
             <StarRating :model-value="review.rating" readonly size="sm" />
             <span class="text-gray-500">
-              {{ review.service_name }}，{{ review.staff_name }}，{{ formatDateWithWeekday(review.appointment_date) }} {{ review.start_time.slice(0, 5) }}
+              {{ review.service_name }}，{{ review.staff_name }}，{{ formatDateWithWeekday(review.appointment_date) }}
+              {{ review.start_time.slice(0, 5) }}
             </span>
             <span
               class="ml-auto rounded px-2 py-0.5 text-xs font-medium"
@@ -43,7 +48,10 @@
           <p class="mt-2 whitespace-pre-line text-gray-700">{{ review.comment }}</p>
 
           <!-- 回覆 -->
-          <div v-if="editingId !== review.id && review.staff_reply" class="mt-3 flex items-start justify-between gap-3 rounded-md bg-gray-50 px-3 py-2">
+          <div
+            v-if="editingId !== review.id && review.staff_reply"
+            class="mt-3 flex items-start justify-between gap-3 rounded-md bg-gray-50 px-3 py-2"
+          >
             <p class="text-gray-700"><span class="text-gray-500">店家回覆：</span>{{ review.staff_reply }}</p>
             <button class="shrink-0 text-blue-600 hover:underline" @click="startEdit(review)">編輯</button>
           </div>
@@ -108,9 +116,9 @@ const filters = computed(() => [
 const fetchReviews = async () => {
   loading.value = true
   try {
-    const res = await apiClient.get('/admin/reviews', {
+    const res = (await apiClient.get('/admin/reviews', {
       params: { unreplied: filter.value === 'unreplied' ? 1 : undefined }
-    }) as any
+    })) as any
     reviews.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '心得載入失敗')
@@ -140,7 +148,7 @@ const saveReply = async (review: any) => {
 
   savingId.value = review.id
   try {
-    const res = await apiClient.put(`/admin/reviews/${review.id}/reply`, { reply }) as any
+    const res = (await apiClient.put(`/admin/reviews/${review.id}/reply`, { reply })) as any
     toast.success(res.message || '已回覆')
     editingId.value = null
     await Promise.all([fetchReviews(), refreshStats()])

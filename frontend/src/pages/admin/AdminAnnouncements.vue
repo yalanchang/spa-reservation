@@ -1,9 +1,19 @@
 <template>
   <div class="space-y-4">
-    <form class="admin-panel grid gap-3 p-4 lg:grid-cols-[1fr_9.5rem_9.5rem_5rem_auto] lg:items-start" @submit.prevent="save">
+    <form
+      class="admin-panel grid gap-3 p-4 lg:grid-cols-[1fr_9.5rem_9.5rem_5rem_auto] lg:items-start"
+      @submit.prevent="save"
+    >
       <div>
         <label class="admin-label" for="ann-content">{{ form.id ? '編輯公告' : '新增公告' }}</label>
-        <input id="ann-content" v-model="form.content" required maxlength="40" class="admin-input" placeholder="例如：週年慶全館 9 折" />
+        <input
+          id="ann-content"
+          v-model="form.content"
+          required
+          maxlength="40"
+          class="admin-input"
+          placeholder="例如：週年慶全館 9 折"
+        />
         <p class="admin-hint">40 字以內，首頁跑馬燈一次顯示一則</p>
       </div>
       <div>
@@ -36,17 +46,29 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="5" class="py-12"><LoadingSpinner /></td></tr>
-          <tr v-else-if="!rows.length"><td colspan="5" class="py-12 text-center text-gray-400">還沒有公告，首頁不會顯示跑馬燈</td></tr>
+          <tr v-if="loading">
+            <td colspan="5" class="py-12"><LoadingSpinner /></td>
+          </tr>
+          <tr v-else-if="!rows.length">
+            <td colspan="5" class="py-12 text-center text-gray-400">還沒有公告，首頁不會顯示跑馬燈</td>
+          </tr>
           <tr v-for="r in rows" v-else :key="r.id">
             <td class="tabular-nums text-gray-500">{{ r.sort_order }}</td>
             <td class="text-gray-900">{{ r.content }}</td>
-            <td class="whitespace-nowrap tabular-nums text-gray-600">{{ r.start_date || r.end_date ? `${r.start_date || '即日起'} ~ ${r.end_date || '不限'}` : '不限' }}</td>
-            <td><span class="admin-tag" :class="state(r).class">{{ state(r).label }}</span></td>
+            <td class="whitespace-nowrap tabular-nums text-gray-600">
+              {{ r.start_date || r.end_date ? `${r.start_date || '即日起'} ~ ${r.end_date || '不限'}` : '不限' }}
+            </td>
+            <td>
+              <span class="admin-tag" :class="state(r).class">{{ state(r).label }}</span>
+            </td>
             <td class="whitespace-nowrap text-right">
               <button type="button" class="admin-link" @click="edit(r)">編輯</button>
-              <button type="button" class="admin-link ml-3" @click="toggle(r)">{{ Number(r.is_active) ? '隱藏' : '顯示' }}</button>
-              <button type="button" class="ml-3 text-sm text-red-600 hover:text-red-800" @click="remove(r)">刪除</button>
+              <button type="button" class="admin-link ml-3" @click="toggle(r)">
+                {{ Number(r.is_active) ? '隱藏' : '顯示' }}
+              </button>
+              <button type="button" class="ml-3 text-sm text-red-600 hover:text-red-800" @click="remove(r)">
+                刪除
+              </button>
             </td>
           </tr>
         </tbody>
@@ -81,7 +103,7 @@ const state = (r: any) => {
 
 const load = async () => {
   try {
-    const res = await apiClient.get('/admin/announcements') as any
+    const res = (await apiClient.get('/admin/announcements')) as any
     rows.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '公告載入失敗')
@@ -91,11 +113,19 @@ const load = async () => {
 }
 
 const toBody = (r: any) => ({
-  content: r.content, startDate: r.start_date || '', endDate: r.end_date || '', sortOrder: r.sort_order, isActive: !!Number(r.is_active)
+  content: r.content,
+  startDate: r.start_date || '',
+  endDate: r.end_date || '',
+  sortOrder: r.sort_order,
+  isActive: !!Number(r.is_active)
 })
 
-const reset = () => { form.value = empty() }
-const edit = (r: any) => { form.value = { id: r.id, ...toBody(r) } }
+const reset = () => {
+  form.value = empty()
+}
+const edit = (r: any) => {
+  form.value = { id: r.id, ...toBody(r) }
+}
 
 const save = async () => {
   saving.value = true

@@ -62,13 +62,18 @@ export const sendVerificationCode = async (
 
   const { subject, action } = PURPOSE_TEXT[purpose]
   // 信裡寫上寄出時間，收到多封時才分得出哪封是最新的
-  const sentAt = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Taipei' })
+  const sentAt = new Date().toLocaleTimeString('zh-TW', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Taipei'
+  })
   try {
     await sendMail({
-    to: options.to || user.email,
-    subject: `${subject}：${code}`,
-    text: `${user.name} 你好：\n\n你的驗證碼是 ${code}（${sentAt} 寄出），請在 ${EXPIRE_MINUTES} 分鐘內輸入以${action}。\n重新寄送後，舊的驗證碼就會失效，請以最新一封為準。\n\n如果不是你本人操作，請忽略這封信。`,
-    html: verificationCodeHtml({ name: user.name, title: subject, action, code, minutes: EXPIRE_MINUTES, sentAt })
+      to: options.to || user.email,
+      subject: `${subject}：${code}`,
+      text: `${user.name} 你好：\n\n你的驗證碼是 ${code}（${sentAt} 寄出），請在 ${EXPIRE_MINUTES} 分鐘內輸入以${action}。\n重新寄送後，舊的驗證碼就會失效，請以最新一封為準。\n\n如果不是你本人操作，請忽略這封信。`,
+      html: verificationCodeHtml({ name: user.name, title: subject, action, code, minutes: EXPIRE_MINUTES, sentAt })
     })
   } catch (error) {
     // 沒寄出去就刪掉這組驗證碼，使用者可以馬上再試，不用等 60 秒

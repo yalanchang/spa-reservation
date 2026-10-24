@@ -20,10 +20,10 @@
 import { ref, computed } from 'vue'
 import { StarIcon } from '@heroicons/vue/24/solid'
 
-const props = withDefaults(
-  defineProps<{ modelValue: number; readonly?: boolean; size?: 'sm' | 'md' | 'lg' }>(),
-  { readonly: false, size: 'md' }
-)
+const props = withDefaults(defineProps<{ modelValue: number; readonly?: boolean; size?: 'sm' | 'md' | 'lg' }>(), {
+  readonly: false,
+  size: 'md'
+})
 const emit = defineEmits<{ 'update:modelValue': [value: number] }>()
 
 const hover = ref(0)

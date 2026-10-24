@@ -15,7 +15,8 @@ const SILVER_SPEND = 10000
 const GOLD_SPEND = 30000
 
 const taipeiToday = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
-const toDay = (d: unknown) => (d ? new Date(d as string).toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }) : null)
+const toDay = (d: unknown) =>
+  d ? new Date(d as string).toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }) : null
 
 // 會員符合資格要用到的資料
 const loadMember = async (userId: number) => {
@@ -61,11 +62,16 @@ const shortReason = (coupon: any, member: Member | null) => {
   if (coupon.usage_limit !== null && Number(coupon.used_count) >= Number(coupon.usage_limit)) return '已領完'
   if (!member) return null
   switch (coupon.audience) {
-    case 'new': return '新會員限定'
-    case 'birthday': return member.birthMonth ? '生日當月可領' : '填寫生日'
-    case 'silver': return '升級銀卡可領'
-    case 'gold': return '升級金卡可領'
-    default: return '暫不可領'
+    case 'new':
+      return '新會員限定'
+    case 'birthday':
+      return member.birthMonth ? '生日當月可領' : '填寫生日'
+    case 'silver':
+      return '升級銀卡可領'
+    case 'gold':
+      return '升級金卡可領'
+    default:
+      return '暫不可領'
   }
 }
 
@@ -84,9 +90,10 @@ const COUPON_FIELDS = `c.*,
   (SELECT COUNT(*) FROM appointments a WHERE a.coupon_id = c.id AND a.status <> 'cancelled' AND a.user_id = ? AND a.id <> ?) AS my_used`
 
 const discountOf = (coupon: any, price: number) => {
-  const raw = coupon.discount_type === 'percent'
-    ? Math.round(price * Number(coupon.discount_value) / 100)
-    : Number(coupon.discount_value)
+  const raw =
+    coupon.discount_type === 'percent'
+      ? Math.round((price * Number(coupon.discount_value)) / 100)
+      : Number(coupon.discount_value)
   return Math.min(raw, price)
 }
 
@@ -111,10 +118,12 @@ export const applyCoupon = async (rawCode: unknown, price: number, userId: numbe
   const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase() : ''
   if (!code) return { coupon: null, discount: 0 }
 
-  const coupon = await queryOne<any>(
-    `SELECT ${COUPON_FIELDS} FROM coupons c WHERE c.code = ?`,
-    [excludeAppointmentId, userId, excludeAppointmentId, code]
-  )
+  const coupon = await queryOne<any>(`SELECT ${COUPON_FIELDS} FROM coupons c WHERE c.code = ?`, [
+    excludeAppointmentId,
+    userId,
+    excludeAppointmentId,
+    code
+  ])
   if (!coupon) throw new CouponError('查無此優惠碼')
 
   const problem = couponProblem(coupon)
@@ -147,7 +156,7 @@ export const listClaimableCoupons = async (userId: number | null) => {
     [0, userId || 0, 0, userId || 0]
   )
   const member = userId ? await loadMember(userId) : null
-  return coupons.map(c => {
+  return coupons.map((c) => {
     const problem = couponProblem(c) || (member ? audienceProblem(c.audience, member) : null)
     return {
       ...publicCoupon(c),
@@ -161,10 +170,12 @@ export const listClaimableCoupons = async (userId: number | null) => {
 }
 
 export const claimCoupon = async (userId: number, couponId: number) => {
-  const coupon = await queryOne<any>(
-    `SELECT ${COUPON_FIELDS} FROM coupons c WHERE c.id = ? AND c.is_claimable = 1`,
-    [0, userId, 0, couponId]
-  )
+  const coupon = await queryOne<any>(`SELECT ${COUPON_FIELDS} FROM coupons c WHERE c.id = ? AND c.is_claimable = 1`, [
+    0,
+    userId,
+    0,
+    couponId
+  ])
   if (!coupon) throw new CouponError('找不到這張優惠券')
   const problem = couponProblem(coupon) || audienceProblem(coupon.audience, await loadMember(userId))
   if (problem) throw new CouponError(problem)
@@ -182,7 +193,7 @@ export const listMyCoupons = async (userId: number, price?: number) => {
     [0, userId, 0, userId]
   )
   const member = await loadMember(userId)
-  return coupons.map(c => {
+  return coupons.map((c) => {
     const usedUp = Number(c.my_used) >= Number(c.per_user_limit)
     const problem = usedUp ? null : couponProblem(c) || audienceProblem(c.audience, member)
     const status = usedUp ? 'used' : problem ? 'unavailable' : 'available'
@@ -192,14 +203,15 @@ export const listMyCoupons = async (userId: number, price?: number) => {
       used_count: Number(c.my_used),
       status,
       problem,
-      discount: price !== undefined && status === 'available' && price >= Number(c.min_spend) ? discountOf(c, price) : null
+      discount:
+        price !== undefined && status === 'available' && price >= Number(c.min_spend) ? discountOf(c, price) : null
     }
   })
 }
 
 // 一鍵全領：只領符合資格、還沒領過的
 export const claimAllCoupons = async (userId: number) => {
-  const claimable = (await listClaimableCoupons(userId)).filter(c => !c.claimed && !c.problem)
+  const claimable = (await listClaimableCoupons(userId)).filter((c) => !c.claimed && !c.problem)
   for (const c of claimable) {
     await execute('INSERT IGNORE INTO user_coupons (user_id, coupon_id) VALUES (?, ?)', [userId, c.id])
   }

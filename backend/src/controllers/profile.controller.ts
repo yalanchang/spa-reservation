@@ -131,10 +131,12 @@ export const updatePreferences = async (req: Request, res: Response): Promise<vo
       if (!staff) return fail(res, 400, '找不到這位美容師')
     }
 
-    await execute(
-      'UPDATE users SET preferred_staff_id = ?, skin_type = ?, care_notes = ? WHERE id = ?',
-      [preferredStaffId || null, skinType || null, careNotes || null, req.user!.userId]
-    )
+    await execute('UPDATE users SET preferred_staff_id = ?, skin_type = ?, care_notes = ? WHERE id = ?', [
+      preferredStaffId || null,
+      skinType || null,
+      careNotes || null,
+      req.user!.userId
+    ])
 
     res.json({ success: true, message: '偏好已更新', data: await loadProfile(req.user!.userId) })
   } catch (error) {
@@ -202,7 +204,12 @@ export const confirmEmailChange = async (req: Request, res: Response): Promise<v
     await execute('UPDATE users SET email = ?, email_verified = 1 WHERE id = ?', [newEmail, req.user!.userId])
 
     const user = await loadProfile(req.user!.userId)
-    const token = signToken({ userId: user.id, email: user.email, role: user.role, ...(req.user!.mfa ? { mfa: true } : {}) })
+    const token = signToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      ...(req.user!.mfa ? { mfa: true } : {})
+    })
     res.json({ success: true, message: '信箱已更換', data: { token, user } })
   } catch (error) {
     serverError(res, 'Confirm email change error', error)

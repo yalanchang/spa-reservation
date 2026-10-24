@@ -9,9 +9,9 @@
         <option value="year">今年</option>
         <option value="custom">自訂</option>
       </select>
-      <input v-model="from" type="date" class="admin-input !w-auto" aria-label="開始日期" @change="preset = 'custom'; load()" />
+      <input v-model="from" type="date" class="admin-input !w-auto" aria-label="開始日期" @change="onCustomDate" />
       <span class="text-gray-400">~</span>
-      <input v-model="to" type="date" class="admin-input !w-auto" aria-label="結束日期" @change="preset = 'custom'; load()" />
+      <input v-model="to" type="date" class="admin-input !w-auto" aria-label="結束日期" @change="onCustomDate" />
       <button type="button" class="admin-btn-outline ml-auto" :disabled="exporting" @click="exportCsv">
         <LoadingSpinner v-if="exporting" size="sm" />
         <template v-else>匯出預約明細（CSV）</template>
@@ -40,28 +40,51 @@
             <!-- 數字可以點，跳出這段期間的預約明細 -->
             <tr class="text-base">
               <td class="text-right">
-                <button type="button" class="drill font-semibold" @click="openDetail('營收明細', { status: 'completed' })">NT$ {{ money(s.revenue) }}</button>
+                <button
+                  type="button"
+                  class="drill font-semibold"
+                  @click="openDetail('營收明細', { status: 'completed' })"
+                >
+                  NT$ {{ money(s.revenue) }}
+                </button>
               </td>
               <td class="text-right">
-                <button type="button" class="drill" @click="openDetail('預約明細', { status: 'completed' })">{{ s.completed }} 筆</button>
+                <button type="button" class="drill" @click="openDetail('預約明細', { status: 'completed' })">
+                  {{ s.completed }} 筆
+                </button>
               </td>
-              <td class="text-right tabular-nums">NT$ {{ money(Number(s.completed) ? Number(s.revenue) / Number(s.completed) : 0) }}</td>
+              <td class="text-right tabular-nums">
+                NT$ {{ money(Number(s.completed) ? Number(s.revenue) / Number(s.completed) : 0) }}
+              </td>
               <td class="text-right">
-                <button type="button" class="drill" @click="openDetail('來客明細', { status: 'completed' })">{{ s.customers }} 人</button>
+                <button type="button" class="drill" @click="openDetail('來客明細', { status: 'completed' })">
+                  {{ s.customers }} 人
+                </button>
               </td>
               <td class="text-right">
                 <button type="button" class="drill" @click="openMembers">{{ s.new_members }} 人</button>
               </td>
               <td class="text-right">
-                <button type="button" class="drill" @click="openDetail('預約明細', { status: 'cancelled' })">{{ rate(s.cancelled) }}</button>
+                <button type="button" class="drill" @click="openDetail('預約明細', { status: 'cancelled' })">
+                  {{ rate(s.cancelled) }}
+                </button>
                 <p class="text-xs text-gray-400">{{ s.cancelled }} 筆</p>
               </td>
               <td class="text-right">
-                <button type="button" class="drill" :class="{ '!text-red-600': Number(s.no_show) }" @click="openDetail('預約明細', { status: 'no_show' })">{{ rate(s.no_show) }}</button>
+                <button
+                  type="button"
+                  class="drill"
+                  :class="{ '!text-red-600': Number(s.no_show) }"
+                  @click="openDetail('預約明細', { status: 'no_show' })"
+                >
+                  {{ rate(s.no_show) }}
+                </button>
                 <p class="text-xs text-gray-400">{{ s.no_show }} 筆</p>
               </td>
               <td class="text-right">
-                <button type="button" class="drill" @click="openDetail('使用優惠券的預約', { coupon: '1' })">NT$ {{ money(s.discount) }}</button>
+                <button type="button" class="drill" @click="openDetail('使用優惠券的預約', { coupon: '1' })">
+                  NT$ {{ money(s.discount) }}
+                </button>
               </td>
             </tr>
           </tbody>
@@ -81,7 +104,12 @@
         <div v-else class="flex gap-2 pt-3">
           <!-- Y 軸刻度 -->
           <div class="relative h-48 w-12 shrink-0 text-right text-xs tabular-nums text-gray-400">
-            <span v-for="t in yTicks" :key="t" class="absolute right-0 -translate-y-1/2" :style="{ bottom: `${(t / yMax) * 100}%` }">
+            <span
+              v-for="t in yTicks"
+              :key="t"
+              class="absolute right-0 -translate-y-1/2"
+              :style="{ bottom: `${(t / yMax) * 100}%` }"
+            >
               {{ metric === 'revenue' ? shortMoney(t) : t }}
             </span>
           </div>
@@ -147,12 +175,25 @@
           <h3 class="border-b border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">療程營收排行</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>療程</th><th class="text-right">次數</th><th class="w-2/5">營收</th></tr>
+              <tr>
+                <th>療程</th>
+                <th class="text-right">次數</th>
+                <th class="w-2/5">營收</th>
+              </tr>
             </thead>
             <tbody>
-              <tr v-if="!data.byService.length"><td colspan="3" class="py-8 text-center text-gray-400">沒有完成的預約</td></tr>
-              <tr v-for="row in data.byService" :key="row.name" class="cursor-pointer" @click="openDetail(`療程：${row.name}`, { status: 'completed', serviceId: String(row.id) })">
-                <td><span class="drill">{{ row.name }}</span></td>
+              <tr v-if="!data.byService.length">
+                <td colspan="3" class="py-8 text-center text-gray-400">沒有完成的預約</td>
+              </tr>
+              <tr
+                v-for="row in data.byService"
+                :key="row.name"
+                class="cursor-pointer"
+                @click="openDetail(`療程：${row.name}`, { status: 'completed', serviceId: String(row.id) })"
+              >
+                <td>
+                  <span class="drill">{{ row.name }}</span>
+                </td>
                 <td class="text-right tabular-nums">{{ row.count }}</td>
                 <td><BarCell :value="Number(row.revenue)" :max="maxServiceRevenue" /></td>
               </tr>
@@ -165,12 +206,26 @@
           <h3 class="border-b border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">美容師業績</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>美容師</th><th class="text-right">服務</th><th class="text-right">評分</th><th class="w-2/5">營收</th></tr>
+              <tr>
+                <th>美容師</th>
+                <th class="text-right">服務</th>
+                <th class="text-right">評分</th>
+                <th class="w-2/5">營收</th>
+              </tr>
             </thead>
             <tbody>
-              <tr v-if="!data.byStaff.length"><td colspan="4" class="py-8 text-center text-gray-400">沒有完成的預約</td></tr>
-              <tr v-for="row in data.byStaff" :key="row.name" class="cursor-pointer" @click="openDetail(`美容師：${row.name}`, { status: 'completed', staffId: String(row.id) })">
-                <td><span class="drill">{{ row.name }}</span></td>
+              <tr v-if="!data.byStaff.length">
+                <td colspan="4" class="py-8 text-center text-gray-400">沒有完成的預約</td>
+              </tr>
+              <tr
+                v-for="row in data.byStaff"
+                :key="row.name"
+                class="cursor-pointer"
+                @click="openDetail(`美容師：${row.name}`, { status: 'completed', staffId: String(row.id) })"
+              >
+                <td>
+                  <span class="drill">{{ row.name }}</span>
+                </td>
                 <td class="text-right tabular-nums">{{ row.count }}</td>
                 <td class="text-right tabular-nums">{{ row.rating ?? '—' }}</td>
                 <td><BarCell :value="Number(row.revenue)" :max="maxStaffRevenue" /></td>
@@ -184,12 +239,24 @@
           <h3 class="border-b border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">熱門時段</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>開始時間</th><th class="w-3/5">預約數</th></tr>
+              <tr>
+                <th>開始時間</th>
+                <th class="w-3/5">預約數</th>
+              </tr>
             </thead>
             <tbody>
-              <tr v-if="!data.byHour.length"><td colspan="2" class="py-8 text-center text-gray-400">沒有資料</td></tr>
-              <tr v-for="row in data.byHour" :key="row.hour" class="cursor-pointer" @click="openDetail(`時段：${hourText(row.hour)}`, { status: 'not_cancelled', hour: String(row.hour) })">
-                <td><span class="drill">{{ hourText(row.hour) }}</span></td>
+              <tr v-if="!data.byHour.length">
+                <td colspan="2" class="py-8 text-center text-gray-400">沒有資料</td>
+              </tr>
+              <tr
+                v-for="row in data.byHour"
+                :key="row.hour"
+                class="cursor-pointer"
+                @click="openDetail(`時段：${hourText(row.hour)}`, { status: 'not_cancelled', hour: String(row.hour) })"
+              >
+                <td>
+                  <span class="drill">{{ hourText(row.hour) }}</span>
+                </td>
                 <td><BarCell :value="Number(row.count)" :max="maxHourCount" unit="筆" /></td>
               </tr>
             </tbody>
@@ -201,12 +268,24 @@
           <h3 class="border-b border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">預約來源</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>來源</th><th class="w-3/5">預約數</th></tr>
+              <tr>
+                <th>來源</th>
+                <th class="w-3/5">預約數</th>
+              </tr>
             </thead>
             <tbody>
-              <tr v-if="!data.bySource.length"><td colspan="2" class="py-8 text-center text-gray-400">沒有資料</td></tr>
-              <tr v-for="row in data.bySource" :key="row.source" class="cursor-pointer" @click="openDetail(`來源：${SOURCE_LABELS[row.source] || row.source}`, { source: row.source })">
-                <td><span class="drill">{{ SOURCE_LABELS[row.source] || row.source }}</span></td>
+              <tr v-if="!data.bySource.length">
+                <td colspan="2" class="py-8 text-center text-gray-400">沒有資料</td>
+              </tr>
+              <tr
+                v-for="row in data.bySource"
+                :key="row.source"
+                class="cursor-pointer"
+                @click="openDetail(`來源：${SOURCE_LABELS[row.source] || row.source}`, { source: row.source })"
+              >
+                <td>
+                  <span class="drill">{{ SOURCE_LABELS[row.source] || row.source }}</span>
+                </td>
                 <td><BarCell :value="Number(row.count)" :max="maxSourceCount" unit="筆" /></td>
               </tr>
             </tbody>
@@ -244,7 +323,9 @@
             </thead>
             <tbody>
               <tr v-for="r in detail.rows" :key="r.id">
-                <td class="whitespace-nowrap tabular-nums">{{ formatDateWithWeekday(r.appointment_date) }} {{ r.start_time.slice(0, 5) }}</td>
+                <td class="whitespace-nowrap tabular-nums">
+                  {{ formatDateWithWeekday(r.appointment_date) }} {{ r.start_time.slice(0, 5) }}
+                </td>
                 <td>
                   <p class="text-gray-900">{{ r.customer_name }}</p>
                   <p class="text-xs text-gray-500">{{ r.customer_phone }}</p>
@@ -255,7 +336,9 @@
                   {{ money(r.price) }}
                   <p v-if="Number(r.discount)" class="text-xs text-gray-400">折 {{ money(r.discount) }}</p>
                 </td>
-                <td><span class="admin-tag" :class="STATUS_CLASSES[r.status]">{{ STATUS_LABELS[r.status] }}</span></td>
+                <td>
+                  <span class="admin-tag" :class="STATUS_CLASSES[r.status]">{{ STATUS_LABELS[r.status] }}</span>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -315,10 +398,16 @@ const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 const BarCell = (props: { value: number; max: number; unit?: string }) =>
   h('div', { class: 'flex items-center gap-2' }, [
     h('div', { class: 'h-2 flex-1 rounded-sm bg-gray-100' }, [
-      h('div', { class: 'h-2 rounded-sm bg-blue-600', style: { width: `${props.max ? (props.value / props.max) * 100 : 0}%` } })
+      h('div', {
+        class: 'h-2 rounded-sm bg-blue-600',
+        style: { width: `${props.max ? (props.value / props.max) * 100 : 0}%` }
+      })
     ]),
-    h('span', { class: 'w-24 shrink-0 text-right tabular-nums text-gray-700' },
-      props.unit ? `${props.value} ${props.unit}` : `NT$ ${Math.round(props.value).toLocaleString()}`)
+    h(
+      'span',
+      { class: 'w-24 shrink-0 text-right tabular-nums text-gray-700' },
+      props.unit ? `${props.value} ${props.unit}` : `NT$ ${Math.round(props.value).toLocaleString()}`
+    )
   ])
 BarCell.props = ['value', 'max', 'unit']
 
@@ -334,7 +423,8 @@ const exporting = ref(false)
 
 const s = computed(() => data.value?.summary || {})
 const money = (v: unknown) => Math.round(Number(v) || 0).toLocaleString()
-const rate = (v: unknown) => (Number(s.value.total) ? `${((Number(v) / Number(s.value.total)) * 100).toFixed(1)}%` : '—')
+const rate = (v: unknown) =>
+  Number(s.value.total) ? `${((Number(v) / Number(s.value.total)) * 100).toFixed(1)}%` : '—'
 const weekday = (date: string) => `週${WEEKDAYS[new Date(`${date}T00:00:00`).getDay()]}`
 
 // ---- 趨勢圖
@@ -359,8 +449,24 @@ const buckets = computed(() => {
     let bucket = list[list.length - 1]
     if (!bucket || bucket.key !== key) {
       bucket = byMonth.value
-        ? { key, from: date, to: date, count: 0, revenue: 0, label: `${d.getFullYear()} 年 ${d.getMonth() + 1} 月`, tick: `${d.getMonth() + 1}月` }
-        : { key, from: date, to: date, count: 0, revenue: 0, label: `${date}（${weekday(date)}）`, tick: `${d.getMonth() + 1}/${d.getDate()}` }
+        ? {
+            key,
+            from: date,
+            to: date,
+            count: 0,
+            revenue: 0,
+            label: `${d.getFullYear()} 年 ${d.getMonth() + 1} 月`,
+            tick: `${d.getMonth() + 1}月`
+          }
+        : {
+            key,
+            from: date,
+            to: date,
+            count: 0,
+            revenue: 0,
+            label: `${date}（${weekday(date)}）`,
+            tick: `${d.getMonth() + 1}/${d.getDate()}`
+          }
       list.push(bucket)
     }
     bucket.to = date
@@ -368,7 +474,7 @@ const buckets = computed(() => {
     bucket.count += Number(row?.count || 0)
     bucket.revenue += Number(row?.revenue || 0)
   }
-  return list.some(b => b.count) ? list : []
+  return list.some((b) => b.count) ? list : []
 })
 
 const value = (bucket: any) => (metric.value === 'revenue' ? bucket.revenue : bucket.count)
@@ -378,11 +484,15 @@ const yStep = computed(() => {
   const max = Math.max(1, ...buckets.value.map(value))
   const raw = max / 4
   const pow = 10 ** Math.floor(Math.log10(raw))
-  const step = [1, 2, 5, 10].map(m => m * pow).find(m => m >= raw) || pow * 10
+  const step = [1, 2, 5, 10].map((m) => m * pow).find((m) => m >= raw) || pow * 10
   return Math.max(metric.value === 'count' ? 1 : 100, step)
 })
-const yMax = computed(() => Math.max(yStep.value, Math.ceil(Math.max(1, ...buckets.value.map(value)) / yStep.value) * yStep.value))
-const yTicks = computed(() => Array.from({ length: Math.round(yMax.value / yStep.value) + 1 }, (_, i) => i * yStep.value))
+const yMax = computed(() =>
+  Math.max(yStep.value, Math.ceil(Math.max(1, ...buckets.value.map(value)) / yStep.value) * yStep.value)
+)
+const yTicks = computed(() =>
+  Array.from({ length: Math.round(yMax.value / yStep.value) + 1 }, (_, i) => i * yStep.value)
+)
 
 // X 軸最多標 8 個日期
 const xEvery = computed(() => Math.max(1, Math.ceil(buckets.value.length / 8)))
@@ -398,7 +508,9 @@ const tooltipSide = (bucket: any) => {
 const openBucket = (bucket: any) =>
   openDetail(`${bucket.label}的預約`, { status: 'not_cancelled' }, bucket.from, bucket.to)
 
-const maxServiceRevenue = computed(() => Math.max(0, ...(data.value?.byService || []).map((r: any) => Number(r.revenue))))
+const maxServiceRevenue = computed(() =>
+  Math.max(0, ...(data.value?.byService || []).map((r: any) => Number(r.revenue)))
+)
 const maxStaffRevenue = computed(() => Math.max(0, ...(data.value?.byStaff || []).map((r: any) => Number(r.revenue))))
 const maxHourCount = computed(() => Math.max(0, ...(data.value?.byHour || []).map((r: any) => Number(r.count))))
 const maxSourceCount = computed(() => Math.max(0, ...(data.value?.bySource || []).map((r: any) => Number(r.count))))
@@ -407,13 +519,25 @@ const applyPreset = () => {
   const now = new Date()
   const y = now.getFullYear()
   const m = now.getMonth()
-  if (preset.value === 'this-month') { from.value = iso(new Date(y, m, 1)); to.value = iso(new Date(y, m + 1, 0)) }
-  else if (preset.value === 'last-month') { from.value = iso(new Date(y, m - 1, 1)); to.value = iso(new Date(y, m, 0)) }
-  else if (preset.value === 'year') { from.value = iso(new Date(y, 0, 1)); to.value = iso(new Date(y, 11, 31)) }
-  else if (preset.value === '30' || preset.value === '90') {
+  if (preset.value === 'this-month') {
+    from.value = iso(new Date(y, m, 1))
+    to.value = iso(new Date(y, m + 1, 0))
+  } else if (preset.value === 'last-month') {
+    from.value = iso(new Date(y, m - 1, 1))
+    to.value = iso(new Date(y, m, 0))
+  } else if (preset.value === 'year') {
+    from.value = iso(new Date(y, 0, 1))
+    to.value = iso(new Date(y, 11, 31))
+  } else if (preset.value === '30' || preset.value === '90') {
     from.value = iso(new Date(y, m, now.getDate() - Number(preset.value) + 1))
     to.value = iso(now)
   } else return
+  load()
+}
+
+// 手動改日期就切到「自訂」
+const onCustomDate = () => {
+  preset.value = 'custom'
   load()
 }
 
@@ -421,7 +545,7 @@ const load = async () => {
   if (!from.value || !to.value) return
   loading.value = true
   try {
-    const res = await apiClient.get('/admin/reports', { params: { from: from.value, to: to.value } }) as any
+    const res = (await apiClient.get('/admin/reports', { params: { from: from.value, to: to.value } })) as any
     data.value = res.data
   } catch (error: any) {
     toast.error(error?.message || '報表載入失敗')
@@ -437,7 +561,9 @@ const members = ref<{ rows: any[]; loading: boolean } | null>(null)
 const openMembers = async () => {
   members.value = { rows: [], loading: true }
   try {
-    const res = await apiClient.get('/admin/customers', { params: { from: from.value, to: to.value, status: 'all' } }) as any
+    const res = (await apiClient.get('/admin/customers', {
+      params: { from: from.value, to: to.value, status: 'all' }
+    })) as any
     if (members.value) members.value.rows = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '會員載入失敗')
@@ -465,7 +591,15 @@ const detail = ref<{
 // 點進來時依數字帶入預設狀態，視窗裡可以再切換
 const openDetail = (title: string, params: Record<string, string>, day?: string, dayTo?: string) => {
   const { status = '', ...rest } = params
-  detail.value = { title, from: day || from.value, to: dayTo || day || to.value, status, params: rest, rows: [], loading: true }
+  detail.value = {
+    title,
+    from: day || from.value,
+    to: dayTo || day || to.value,
+    status,
+    params: rest,
+    rows: [],
+    loading: true
+  }
   loadDetail()
 }
 
@@ -474,9 +608,9 @@ const loadDetail = async () => {
   if (!d) return
   d.loading = true
   try {
-    const res = await apiClient.get('/admin/appointments', {
+    const res = (await apiClient.get('/admin/appointments', {
       params: { from: d.from, to: d.to, ...d.params, status: d.status || undefined, range: 'all' }
-    }) as any
+    })) as any
     if (detail.value === d) d.rows = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '明細載入失敗')

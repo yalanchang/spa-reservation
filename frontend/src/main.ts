@@ -5,7 +5,7 @@ import router from './router'
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { reveal } from './directives/reveal'
-import './style.css'  
+import './style.css'
 
 const app = createApp(App)
 const pinia = createPinia()

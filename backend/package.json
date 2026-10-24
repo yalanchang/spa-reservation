@@ -13,7 +13,10 @@
     "migrate": "ts-node src/scripts/migrate.ts",
     "demo:past": "ts-node src/scripts/demoPastAppointments.ts",
     "reset-password": "ts-node src/scripts/resetPassword.ts",
-    "db:copy": "ts-node src/scripts/copyDb.ts"
+    "db:copy": "ts-node src/scripts/copyDb.ts",
+    "test": "vitest run",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -22,7 +25,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.1.0",
-    "@types/node": "^20.19.37",
+    "@types/node": "^22.20.5",
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.11.0",
@@ -39,7 +42,9 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.17"
+    "@types/nodemailer": "^6.4.17",
+    "prettier": "^3.9.10",
+    "vitest": "^5.0.5"
   },
   "overrides": {
     "qs": "6.16.0"

@@ -16,9 +16,12 @@ export const toTime = (minutes: number) =>
 
 export const addMinutes = (time: string, minutes: number) => toTime(toMinutes(time) + minutes)
 
-interface Interval { start: number; end: number }
+interface Interval {
+  start: number
+  end: number
+}
 
-const overlaps = (a: Interval, list: Interval[]) => list.some(b => a.start < b.end && a.end > b.start)
+const overlaps = (a: Interval, list: Interval[]) => list.some((b) => a.start < b.end && a.end > b.start)
 
 // 某天某位美容師的上班時間與已占用的區間；沒上班回傳 null
 const loadStaffDay = async (staffId: number, date: string, excludeAppointmentId?: number) => {
@@ -33,7 +36,7 @@ const loadStaffDay = async (staffId: number, date: string, excludeAppointmentId?
     'SELECT start_time, end_time, is_full_day FROM staff_leaves WHERE staff_id = ? AND leave_date = ?',
     [staffId, date]
   )
-  if (leaves.some(l => Number(l.is_full_day))) return null
+  if (leaves.some((l) => Number(l.is_full_day))) return null
 
   const booked = await query<any>(
     `SELECT start_time, end_time FROM appointments
@@ -44,7 +47,7 @@ const loadStaffDay = async (staffId: number, date: string, excludeAppointmentId?
   return {
     open: toMinutes(schedule.start_time),
     close: toMinutes(schedule.end_time),
-    busy: [...leaves, ...booked].map(b => ({ start: toMinutes(b.start_time), end: toMinutes(b.end_time) }))
+    busy: [...leaves, ...booked].map((b) => ({ start: toMinutes(b.start_time), end: toMinutes(b.end_time) }))
   }
 }
 
@@ -56,7 +59,7 @@ const activeStaffIds = async (staffId?: number | null) => {
     const staff = await queryOne<any>('SELECT id FROM staff WHERE id = ? AND is_active = 1', [staffId])
     return staff ? [staff.id] : []
   }
-  return (await query<any>('SELECT id FROM staff WHERE is_active = 1 ORDER BY id')).map(s => s.id)
+  return (await query<any>('SELECT id FROM staff WHERE is_active = 1 ORDER BY id')).map((s) => s.id)
 }
 
 interface Options {

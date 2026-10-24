@@ -28,9 +28,9 @@ export const getStaff = async (req: Request, res: Response): Promise<void> => {
     })
   } catch (error) {
     console.error('Get staff error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }

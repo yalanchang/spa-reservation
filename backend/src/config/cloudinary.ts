@@ -46,7 +46,10 @@ export const deleteImage = (publicId: string) => {
 // 不是 Cloudinary 的網址（例如 Google 大頭貼）就略過；刪不掉只記錄，不影響主要流程
 export const deleteImageByUrl = async (url?: string | null) => {
   if (!url?.includes('res.cloudinary.com')) return
-  const publicId = url.split('/upload/')[1]?.replace(/^v\d+\//, '').replace(/\.[^/.]+$/, '')
+  const publicId = url
+    .split('/upload/')[1]
+    ?.replace(/^v\d+\//, '')
+    .replace(/\.[^/.]+$/, '')
   if (!publicId) return
   await deleteImage(publicId).catch((err) => console.error('Delete Cloudinary image error:', err))
 }

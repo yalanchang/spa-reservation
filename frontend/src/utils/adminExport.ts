@@ -4,10 +4,10 @@ import apiClient from '@/api/client'
 export const downloadAppointmentsCsv = async (from: string, to: string) => {
   let blob: Blob
   try {
-    blob = await apiClient.get('/admin/appointments/export', {
+    blob = (await apiClient.get('/admin/appointments/export', {
       params: { from, to },
       responseType: 'blob'
-    }) as unknown as Blob
+    })) as unknown as Blob
   } catch (error: any) {
     // 錯誤訊息也會是 Blob，轉回 JSON 才看得到原因
     if (error instanceof Blob) throw JSON.parse(await error.text())

@@ -10,7 +10,10 @@
       </div>
       <template v-if="summary.nextTier">
         <div class="mt-3 h-2 overflow-hidden rounded-full bg-white">
-          <div class="h-full rounded-full bg-primary-500 transition-all duration-700" :style="{ width: `${progress}%` }"></div>
+          <div
+            class="h-full rounded-full bg-primary-500 transition-all duration-700"
+            :style="{ width: `${progress}%` }"
+          ></div>
         </div>
         <p class="mt-2 text-sm text-gray-500">
           再消費 NT$ {{ summary.nextTier.remaining.toLocaleString() }} 即可升級為{{ summary.nextTier.name }}
@@ -36,7 +39,8 @@
         <div>
           <p class="font-semibold text-cocoa">{{ summary.nextAppointment.service_name }}</p>
           <p class="text-sm text-gray-500">
-            {{ summary.nextAppointment.appointment_date.replace(/-/g, '/') }} {{ summary.nextAppointment.start_time }}，美容師 {{ summary.nextAppointment.staff_name }}
+            {{ summary.nextAppointment.appointment_date.replace(/-/g, '/') }}
+            {{ summary.nextAppointment.start_time }}，美容師 {{ summary.nextAppointment.staff_name }}
           </p>
         </div>
         <span class="text-sm text-primary-600">查看</span>
@@ -73,7 +77,7 @@ const progress = computed(() => {
 
 onMounted(async () => {
   try {
-    const res = await apiClient.get('/auth/profile/summary') as any
+    const res = (await apiClient.get('/auth/profile/summary')) as any
     summary.value = res.data
   } finally {
     loading.value = false

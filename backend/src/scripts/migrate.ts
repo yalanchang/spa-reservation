@@ -26,9 +26,7 @@ const connectOrCreate = async (database: string) => {
   } catch (error: any) {
     if (error.code !== 'ER_BAD_DB_ERROR') throw error
     const server = await connect()
-    await server.query(
-      `CREATE DATABASE \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    )
+    await server.query(`CREATE DATABASE \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`)
     await server.end()
     console.log(`已建立資料庫 ${database}`)
     return connect(database)
@@ -37,7 +35,10 @@ const connectOrCreate = async (database: string) => {
 
 const main = async () => {
   const dir = path.join(__dirname, '../../migrations')
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.sql'))
+    .sort()
   const database = process.env.DB_NAME || 'beauty_spa'
   const connection = await connectOrCreate(database)
 
@@ -52,7 +53,7 @@ const main = async () => {
     const [appliedRows] = await connection.query('SELECT filename FROM schema_migrations')
     const applied = new Set((appliedRows as any[]).map((row) => row.filename))
 
-    // 
+    //
     const [userTables] = await connection.query("SHOW TABLES LIKE 'users'")
     if (applied.size === 0 && (userTables as any[]).length > 0) {
       await connection.query('INSERT INTO schema_migrations (filename) VALUES (?)', [files[0]])

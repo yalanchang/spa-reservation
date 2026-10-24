@@ -16,12 +16,16 @@
             <p class="text-sm text-gray-500">密碼</p>
             <p class="font-medium text-cocoa">{{ user?.has_password ? '••••••••' : '尚未設定' }}</p>
           </div>
-          <button type="button" class="security-action" @click="openPassword">{{ user?.has_password ? '變更' : '設定' }}</button>
+          <button type="button" class="security-action" @click="openPassword">
+            {{ user?.has_password ? '變更' : '設定' }}
+          </button>
         </li>
         <li v-for="m in socialLogins" :key="m.label" class="flex items-center gap-4 px-4 py-4">
           <div class="min-w-0 flex-1">
             <p class="text-sm text-gray-500">{{ m.label }} 登入</p>
-            <p class="font-medium" :class="m.linked ? 'text-emerald-600' : 'text-gray-400'">{{ m.linked ? '已連結' : '未連結' }}</p>
+            <p class="font-medium" :class="m.linked ? 'text-emerald-600' : 'text-gray-400'">
+              {{ m.linked ? '已連結' : '未連結' }}
+            </p>
           </div>
         </li>
       </ul>
@@ -32,7 +36,9 @@
       <h3 class="profile-section-title">刪除帳號</h3>
       <div class="flex items-center gap-4 rounded-2xl border border-red-100 px-4 py-4">
         <p class="flex-1 text-sm text-gray-500">刪除後會員資料、收藏與心得都會清除，無法復原</p>
-        <button type="button" class="security-action !border-red-200 !text-red-600" @click="openDelete">刪除帳號</button>
+        <button type="button" class="security-action !border-red-200 !text-red-600" @click="openDelete">
+          刪除帳號
+        </button>
       </div>
     </section>
 
@@ -64,7 +70,11 @@
         </div>
         <div class="flex gap-3 pt-2">
           <button type="button" class="btn-cute-outline flex-1 py-2.5" @click="emailOpen = false">取消</button>
-          <button type="submit" class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="savingEmail">
+          <button
+            type="submit"
+            class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+            :disabled="savingEmail"
+          >
             <LoadingSpinner v-if="savingEmail" size="sm" />
             <template v-else>寄送驗證碼</template>
           </button>
@@ -73,7 +83,8 @@
 
       <form v-else class="space-y-4" @submit.prevent="confirmEmail">
         <p class="text-sm text-gray-500">
-          驗證碼已寄到 <span class="font-medium text-cocoa">{{ emailForm.newEmail }}</span>，10 分鐘內有效
+          驗證碼已寄到 <span class="font-medium text-cocoa">{{ emailForm.newEmail }}</span
+          >，10 分鐘內有效
         </p>
         <VerificationCode
           id="email-code"
@@ -85,7 +96,11 @@
         />
         <div class="flex gap-3 pt-2">
           <button type="button" class="btn-cute-outline flex-1 py-2.5" @click="emailStep = 'request'">上一步</button>
-          <button type="submit" class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="savingEmail">
+          <button
+            type="submit"
+            class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+            :disabled="savingEmail"
+          >
             <LoadingSpinner v-if="savingEmail" size="sm" />
             <template v-else>確認更換</template>
           </button>
@@ -96,7 +111,9 @@
     <!-- 密碼 -->
     <BaseModal :open="passwordOpen" :title="user?.has_password ? '變更密碼' : '設定密碼'" @close="passwordOpen = false">
       <form class="space-y-4" @submit.prevent="changePassword">
-        <p v-if="!user?.has_password" class="text-sm text-gray-500">你目前是用 Google 或 LINE 登入，設定密碼後也可以用信箱和密碼登入</p>
+        <p v-if="!user?.has_password" class="text-sm text-gray-500">
+          你目前是用 Google 或 LINE 登入，設定密碼後也可以用信箱和密碼登入
+        </p>
         <div v-if="user?.has_password">
           <label for="current-password" class="profile-label">目前的密碼</label>
           <PasswordInput id="current-password" v-model="passwordForm.current" autocomplete="current-password" />
@@ -108,11 +125,20 @@
         <div>
           <label for="confirm-password" class="profile-label">再輸入一次新密碼</label>
           <PasswordInput id="confirm-password" v-model="passwordForm.confirm" autocomplete="new-password" />
-          <p v-if="passwordForm.confirm && passwordForm.confirm !== passwordForm.next" class="mt-1 text-xs text-red-500">兩次輸入的密碼不一樣</p>
+          <p
+            v-if="passwordForm.confirm && passwordForm.confirm !== passwordForm.next"
+            class="mt-1 text-xs text-red-500"
+          >
+            兩次輸入的密碼不一樣
+          </p>
         </div>
         <div class="flex gap-3 pt-2">
           <button type="button" class="btn-cute-outline flex-1 py-2.5" @click="passwordOpen = false">取消</button>
-          <button type="submit" class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="savingPassword">
+          <button
+            type="submit"
+            class="btn-cute flex-1 py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+            :disabled="savingPassword"
+          >
             <LoadingSpinner v-if="savingPassword" size="sm" />
             <template v-else>儲存</template>
           </button>
@@ -190,10 +216,10 @@ const openEmail = () => {
 }
 
 const sendEmailCode = async () => {
-  const res = await apiClient.post('/auth/email/request', {
+  const res = (await apiClient.post('/auth/email/request', {
     newEmail: emailForm.value.newEmail,
     password: emailForm.value.password
-  }) as any
+  })) as any
   return res.data?.waitSeconds ?? 60
 }
 
@@ -214,7 +240,7 @@ const confirmEmail = async () => {
   if (emailForm.value.code.length !== 6) return toast.warning('請輸入 6 位數驗證碼')
   savingEmail.value = true
   try {
-    const res = await apiClient.post('/auth/email/confirm', { code: emailForm.value.code }) as any
+    const res = (await apiClient.post('/auth/email/confirm', { code: emailForm.value.code })) as any
     authStore.setSession(res.data.token, res.data.user)
     toast.success('信箱已更換')
     emailOpen.value = false
@@ -241,10 +267,10 @@ const changePassword = async () => {
 
   savingPassword.value = true
   try {
-    const res = await apiClient.put('/auth/password', {
+    const res = (await apiClient.put('/auth/password', {
       currentPassword: passwordForm.value.current,
       newPassword: passwordForm.value.next
-    }) as any
+    })) as any
     toast.success(res.message)
     passwordOpen.value = false
     await authStore.fetchProfile()

@@ -10,7 +10,14 @@
         </div>
         <div>
           <label for="profile-birthday" class="profile-label">生日</label>
-          <input id="profile-birthday" v-model="form.birthday" type="date" :max="today" min="1900-01-01" class="profile-input" />
+          <input
+            id="profile-birthday"
+            v-model="form.birthday"
+            type="date"
+            :max="today"
+            min="1900-01-01"
+            class="profile-input"
+          />
         </div>
         <div>
           <label for="profile-gender" class="profile-label">性別</label>
@@ -29,7 +36,12 @@
         <div>
           <label for="profile-email" class="profile-label">電子郵件</label>
           <div class="flex gap-2">
-            <input id="profile-email" :value="user?.email" readonly class="profile-input flex-1 cursor-default bg-gray-50 text-gray-500" />
+            <input
+              id="profile-email"
+              :value="user?.email"
+              readonly
+              class="profile-input flex-1 cursor-default bg-gray-50 text-gray-500"
+            />
             <router-link
               :to="{ path: '/profile', query: { tab: 'security' } }"
               class="flex shrink-0 items-center rounded-xl border border-primary-200 px-4 text-sm font-medium text-primary-600 transition hover:text-primary-700"
@@ -41,7 +53,9 @@
         <div>
           <label for="profile-phone" class="profile-label">聯絡電話</label>
           <input id="profile-phone" v-model="form.phone" type="tel" placeholder="您的聯絡電話" class="profile-input" />
-          <p v-if="form.phone && !isValidTaiwanPhone(form.phone)" class="mt-1 text-xs text-red-500">手機為 09 開頭共 10 碼，市話請加區碼</p>
+          <p v-if="form.phone && !isValidTaiwanPhone(form.phone)" class="mt-1 text-xs text-red-500">
+            手機為 09 開頭共 10 碼，市話請加區碼
+          </p>
         </div>
         <div>
           <label for="profile-city" class="profile-label">縣市</label>
@@ -52,7 +66,13 @@
         </div>
         <div>
           <label for="profile-address" class="profile-label">地址</label>
-          <input id="profile-address" v-model="form.address" maxlength="200" placeholder="區、路、號" class="profile-input" />
+          <input
+            id="profile-address"
+            v-model="form.address"
+            maxlength="200"
+            placeholder="區、路、號"
+            class="profile-input"
+          />
         </div>
       </div>
     </section>
@@ -69,7 +89,9 @@
         <div>
           <label for="profile-emergency-phone" class="profile-label">電話</label>
           <input id="profile-emergency-phone" v-model="form.emergencyPhone" type="tel" class="profile-input" />
-          <p v-if="form.emergencyPhone && !isValidTaiwanPhone(form.emergencyPhone)" class="mt-1 text-xs text-red-500">電話格式不正確</p>
+          <p v-if="form.emergencyPhone && !isValidTaiwanPhone(form.emergencyPhone)" class="mt-1 text-xs text-red-500">
+            電話格式不正確
+          </p>
         </div>
       </div>
     </section>
@@ -88,12 +110,23 @@
             class="profile-input uppercase"
             @input="form.invoiceCarrier = form.invoiceCarrier.toUpperCase()"
           />
-          <p v-if="form.invoiceCarrier && !isValidCarrier(form.invoiceCarrier)" class="mt-1 text-xs text-red-500">「/」開頭加 7 碼英數字</p>
+          <p v-if="form.invoiceCarrier && !isValidCarrier(form.invoiceCarrier)" class="mt-1 text-xs text-red-500">
+            「/」開頭加 7 碼英數字
+          </p>
         </div>
         <div>
           <label for="profile-tax-id" class="profile-label">公司統一編號</label>
-          <input id="profile-tax-id" v-model="form.taxId" inputmode="numeric" maxlength="8" placeholder="需要打統編時填寫" class="profile-input" />
-          <p v-if="form.taxId && !isValidTaxId(form.taxId)" class="mt-1 text-xs text-red-500">統一編號不正確，請再確認一次</p>
+          <input
+            id="profile-tax-id"
+            v-model="form.taxId"
+            inputmode="numeric"
+            maxlength="8"
+            placeholder="需要打統編時填寫"
+            class="profile-input"
+          />
+          <p v-if="form.taxId && !isValidTaxId(form.taxId)" class="mt-1 text-xs text-red-500">
+            統一編號不正確，請再確認一次
+          </p>
         </div>
       </div>
     </section>
@@ -111,7 +144,11 @@
     </section>
 
     <div class="flex justify-end">
-      <button type="submit" class="btn-cute px-8 py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="saving">
+      <button
+        type="submit"
+        class="btn-cute px-8 py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+        :disabled="saving"
+      >
         <LoadingSpinner v-if="saving" size="sm" />
         <template v-else>儲存變更</template>
       </button>
@@ -172,7 +209,7 @@ const save = async () => {
   }
   saving.value = true
   try {
-    const res = await apiClient.put('/auth/profile', form.value) as any
+    const res = (await apiClient.put('/auth/profile', form.value)) as any
     authStore.setSession(authStore.token!, res.data)
     toast.success('資料已更新')
   } catch (error: any) {

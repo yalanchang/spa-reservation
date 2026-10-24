@@ -5,7 +5,11 @@ import { logAction } from '../utils/adminLog'
 
 const STATUSES = ['pending', 'confirmed', 'completed', 'cancelled', 'no_show']
 const STATUS_TEXT: Record<string, string> = {
-  pending: '待確認', confirmed: '已確認', completed: '已完成', cancelled: '已取消', no_show: '未到店'
+  pending: '待確認',
+  confirmed: '已確認',
+  completed: '已完成',
+  cancelled: '已取消',
+  no_show: '未到店'
 }
 
 // 依目前狀態與是否已過預約時間，決定可以改成哪些狀態
@@ -56,16 +60,19 @@ export const getStats = async (req: Request, res: Response): Promise<void> => {
     })
   } catch (error) {
     console.error('Get admin stats error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
 
 export const listAppointments = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { date, status, q, range, from, to, coupon, serviceId, staffId, hour, source } = req.query as Record<string, string | undefined>
+    const { date, status, q, range, from, to, coupon, serviceId, staffId, hour, source } = req.query as Record<
+      string,
+      string | undefined
+    >
     const where: string[] = []
     const params: any[] = []
 
@@ -93,10 +100,22 @@ export const listAppointments = async (req: Request, res: Response): Promise<voi
 
     if (coupon === '1') where.push('a.discount > 0')
     // 報表各排行點進來的條件
-    if (serviceId) { where.push('a.service_id = ?'); params.push(Number(serviceId)) }
-    if (staffId) { where.push('a.staff_id = ?'); params.push(Number(staffId)) }
-    if (hour !== undefined && /^\d{1,2}$/.test(hour)) { where.push('HOUR(a.start_time) = ?'); params.push(Number(hour)) }
-    if (source) { where.push('a.source = ?'); params.push(source) }
+    if (serviceId) {
+      where.push('a.service_id = ?')
+      params.push(Number(serviceId))
+    }
+    if (staffId) {
+      where.push('a.staff_id = ?')
+      params.push(Number(staffId))
+    }
+    if (hour !== undefined && /^\d{1,2}$/.test(hour)) {
+      where.push('HOUR(a.start_time) = ?')
+      params.push(Number(hour))
+    }
+    if (source) {
+      where.push('a.source = ?')
+      params.push(source)
+    }
     // 報表的每日長條：不含取消
     if (status === 'not_cancelled') where.push("a.status <> 'cancelled'")
 
@@ -135,9 +154,9 @@ export const listAppointments = async (req: Request, res: Response): Promise<voi
     })
   } catch (error) {
     console.error('List admin appointments error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -154,28 +173,34 @@ export const updateAppointmentStatus = async (req: Request, res: Response): Prom
     )
 
     if (!appointment) {
-      res.status(404).json({ 
-        success: false, 
-        message: '預約不存在' 
+      res.status(404).json({
+        success: false,
+        message: '預約不存在'
       })
       return
     }
 
     if (!allowedNextStatuses(appointment.status, !!Number(appointment.is_past)).includes(status)) {
-      res.status(400).json({ 
-        success: false, 
-        message: '目前的預約狀態無法這樣變更' 
+      res.status(400).json({
+        success: false,
+        message: '目前的預約狀態無法這樣變更'
       })
       return
     }
 
     // 確認或取消時通知顧客（顧客的鈴鐺會顯示），其他狀態不通知
     const notice = ['confirmed', 'cancelled'].includes(status) ? status : null
-    await execute(
-      'UPDATE appointments SET status = ?, status_notice = ? WHERE id = ?',
-      [status, notice, appointment.id]
+    await execute('UPDATE appointments SET status = ?, status_notice = ? WHERE id = ?', [
+      status,
+      notice,
+      appointment.id
+    ])
+    await logAction(
+      req,
+      '變更預約狀態',
+      appointment.customer_name,
+      `${STATUS_TEXT[appointment.status]} → ${STATUS_TEXT[status]}`
     )
-    await logAction(req, '變更預約狀態', appointment.customer_name, `${STATUS_TEXT[appointment.status]} → ${STATUS_TEXT[status]}`)
 
     res.json({
       success: true,
@@ -183,9 +208,9 @@ export const updateAppointmentStatus = async (req: Request, res: Response): Prom
     })
   } catch (error) {
     console.error('Update appointment status error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -214,9 +239,9 @@ export const listReviews = async (req: Request, res: Response): Promise<void> =>
     })
   } catch (error) {
     console.error('List admin reviews error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -226,9 +251,9 @@ export const replyReview = async (req: Request, res: Response): Promise<void> =>
     const reply = typeof req.body.reply === 'string' ? req.body.reply.trim() : ''
 
     if (reply.length > 500) {
-      res.status(400).json({ 
-        success: false, 
-        message: '回覆請在 500 字以內' 
+      res.status(400).json({
+        success: false,
+        message: '回覆請在 500 字以內'
       })
       return
     }
@@ -236,9 +261,9 @@ export const replyReview = async (req: Request, res: Response): Promise<void> =>
     const review = await queryOne('SELECT id FROM reviews WHERE id = ?', [req.params.id])
 
     if (!review) {
-      res.status(404).json({ 
-        success: false, 
-        message: '心得不存在' 
+      res.status(404).json({
+        success: false,
+        message: '心得不存在'
       })
       return
     }
@@ -253,9 +278,9 @@ export const replyReview = async (req: Request, res: Response): Promise<void> =>
     })
   } catch (error) {
     console.error('Reply review error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -277,9 +302,9 @@ export const listStaffUsers = async (req: Request, res: Response): Promise<void>
     })
   } catch (error) {
     console.error('List staff users error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -315,10 +340,7 @@ export const createStaffUser = async (req: Request, res: Response): Promise<void
     }
 
     const hashed = await bcrypt.hash(password, 12)
-    await execute(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashed, role]
-    )
+    await execute('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [name, email, hashed, role])
     await logAction(req, '新增後台帳號', name, email)
 
     res.json({
@@ -327,9 +349,9 @@ export const createStaffUser = async (req: Request, res: Response): Promise<void
     })
   } catch (error) {
     console.error('Create staff user error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -377,9 +399,9 @@ export const deactivateStaffUser = async (req: Request, res: Response): Promise<
     })
   } catch (error) {
     console.error('Deactivate staff user error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -389,9 +411,9 @@ export const updateUserRole = async (req: Request, res: Response): Promise<void>
     const { role } = req.body
 
     if (!STAFF_ROLES.includes(role)) {
-      res.status(400).json({ 
-        success: false, 
-        message: '角色不正確' 
+      res.status(400).json({
+        success: false,
+        message: '角色不正確'
       })
       return
     }
@@ -408,9 +430,9 @@ export const updateUserRole = async (req: Request, res: Response): Promise<void>
     })
   } catch (error) {
     console.error('Update user role error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }

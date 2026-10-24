@@ -11,18 +11,18 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
     const { appointmentId, rating, comment } = req.body
 
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      res.status(400).json({ 
-        success: false, 
-        message: '請選擇 1 到 5 顆星' 
+      res.status(400).json({
+        success: false,
+        message: '請選擇 1 到 5 顆星'
       })
       return
     }
 
     const text = typeof comment === 'string' ? comment.trim() : ''
     if (text.length < 5 || text.length > 500) {
-      res.status(400).json({ 
-        success: false, 
-        message: '心得請寫 5 到 500 個字' 
+      res.status(400).json({
+        success: false,
+        message: '心得請寫 5 到 500 個字'
       })
       return
     }
@@ -35,31 +35,28 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
     )
 
     if (!appointment) {
-      res.status(404).json({ 
-        success: false, 
-        message: '預約不存在' 
+      res.status(404).json({
+        success: false,
+        message: '預約不存在'
       })
       return
     }
 
     // 店家標記「已完成」才算真的體驗過，避免沒到店的人留評價
     if (appointment.status !== 'completed') {
-      res.status(400).json({ 
-        success: false, 
-        message: '療程完成後才能撰寫心得' 
+      res.status(400).json({
+        success: false,
+        message: '療程完成後才能撰寫心得'
       })
       return
     }
 
-    const existing = await queryOne(
-      'SELECT id FROM reviews WHERE appointment_id = ?',
-      [appointment.id]
-    )
+    const existing = await queryOne('SELECT id FROM reviews WHERE appointment_id = ?', [appointment.id])
 
     if (existing) {
-      res.status(400).json({ 
-        success: false, 
-        message: '這筆預約已經寫過心得了' 
+      res.status(400).json({
+        success: false,
+        message: '這筆預約已經寫過心得了'
       })
       return
     }
@@ -76,9 +73,9 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
     })
   } catch (error) {
     console.error('Create review error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -114,9 +111,9 @@ export const getServiceReviews = async (req: Request, res: Response): Promise<vo
     })
   } catch (error) {
     console.error('Get service reviews error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }

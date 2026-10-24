@@ -19,7 +19,7 @@ export const useServicesStore = defineStore('services', {
     async fetchServices() {
       this.loading = true
       try {
-        const response = await apiClient.get<Service[]>('/services')as any
+        const response = (await apiClient.get<Service[]>('/services')) as any
         if (response.success && response.data) {
           this.services = response.data
         }
@@ -32,7 +32,7 @@ export const useServicesStore = defineStore('services', {
 
     async fetchCategories() {
       try {
-        const response = await apiClient.get('/services/categories')as any
+        const response = (await apiClient.get('/services/categories')) as any
         if (response.success && response.data) {
           this.categories = response.data
         }

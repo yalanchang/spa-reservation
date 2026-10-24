@@ -19,15 +19,16 @@ const main = async () => {
   }
 
   if (flag === '--clear') {
-    const [result] = await execute(
-      "DELETE FROM appointments WHERE user_id = ? AND appointment_no LIKE 'DEMO-%'",
-      [user.id]
-    )
+    const [result] = await execute("DELETE FROM appointments WHERE user_id = ? AND appointment_no LIKE 'DEMO-%'", [
+      user.id
+    ])
     console.log(`已刪除 ${(result as any).affectedRows} 筆模擬預約`)
     return
   }
 
-  const services = await query<any>('SELECT id, name, duration, price FROM services WHERE is_active = 1 ORDER BY id LIMIT 3')
+  const services = await query<any>(
+    'SELECT id, name, duration, price FROM services WHERE is_active = 1 ORDER BY id LIMIT 3'
+  )
   const staff = await query<any>('SELECT id, name FROM staff WHERE is_active = 1 ORDER BY id')
 
   for (const [i, service] of services.entries()) {
@@ -43,9 +44,17 @@ const main = async () => {
           appointment_date, start_time, end_time, duration, price, status)
        VALUES (?, ?, ?, ?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), ?, ?, ?, ?, 'completed')`,
       [
-        `DEMO-${Date.now()}-${i}`, user.id, stylist.id, service.id,
-        user.name, user.phone || '0912345678',
-        daysAgo, start, end, service.duration, service.price
+        `DEMO-${Date.now()}-${i}`,
+        user.id,
+        stylist.id,
+        service.id,
+        user.name,
+        user.phone || '0912345678',
+        daysAgo,
+        start,
+        end,
+        service.duration,
+        service.price
       ]
     )
     console.log(`✔ ${daysAgo} 天前 ${start}「${service.name}」美容師 ${stylist.name}`)

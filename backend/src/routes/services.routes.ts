@@ -1,9 +1,5 @@
 import { Router } from 'express'
-import { 
-  getServices, 
-  getServiceById, 
-  getCategories 
-} from '../controllers/services.controller'
+import { getServices, getServiceById, getCategories } from '../controllers/services.controller'
 
 const router = Router()
 

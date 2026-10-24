@@ -46,13 +46,25 @@
         </template>
         <template v-else>
           <p class="text-sm text-gray-500">共 {{ visibleServices.length }} 項</p>
-          <button type="button" class="text-sm font-medium text-primary-600 hover:underline" @click="managing = true">管理</button>
+          <button type="button" class="text-sm font-medium text-primary-600 hover:underline" @click="managing = true">
+            管理
+          </button>
         </template>
 
-        <select v-model="activeCategory" class="ml-auto rounded-full border border-primary-100 bg-white px-4 py-2 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-primary-100" aria-label="分類">
-          <option v-for="tab in categoryTabs" :key="tab.id ?? 'all'" :value="tab.id">{{ tab.name }}（{{ tab.count }}）</option>
+        <select
+          v-model="activeCategory"
+          class="ml-auto rounded-full border border-primary-100 bg-white px-4 py-2 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-primary-100"
+          aria-label="分類"
+        >
+          <option v-for="tab in categoryTabs" :key="tab.id ?? 'all'" :value="tab.id">
+            {{ tab.name }}（{{ tab.count }}）
+          </option>
         </select>
-        <select v-model="sort" class=" rounded-full border border-primary-100 bg-white px-4 py-2 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-primary-100" aria-label="排序">
+        <select
+          v-model="sort"
+          class="rounded-full border border-primary-100 bg-white px-4 py-2 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-primary-100"
+          aria-label="排序"
+        >
           <option value="recent">最近收藏</option>
           <option value="price-asc">價格 低→高</option>
           <option value="price-desc">價格 高→低</option>
@@ -78,22 +90,32 @@
           />
 
           <router-link :to="`/services/${service.id}`" class="shrink-0">
-            <img :src="serviceImage(service)" :alt="service.name" class="h-24 w-24 rounded-2xl object-cover sm:h-28 sm:w-36" />
+            <img
+              :src="serviceImage(service)"
+              :alt="service.name"
+              class="h-24 w-24 rounded-2xl object-cover sm:h-28 sm:w-36"
+            />
           </router-link>
 
           <div class="min-w-0 flex-1">
             <p class="text-xs font-semibold text-primary-500">{{ service.category_name }}</p>
-            <router-link :to="`/services/${service.id}`" class="mt-0.5 block truncate font-bold text-cocoa hover:text-primary-600">
+            <router-link
+              :to="`/services/${service.id}`"
+              class="mt-0.5 block truncate font-bold text-cocoa hover:text-primary-600"
+            >
               {{ service.name }}
             </router-link>
             <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
               <span class="flex items-center gap-1"><ClockIcon class="h-4 w-4" />{{ service.duration }} 分鐘</span>
               <span v-if="service.review_count" class="flex items-center gap-1">
                 <StarIcon class="h-4 w-4 text-amber-400" />
-                <span class="font-semibold text-cocoa">{{ service.average_rating }}</span>（{{ service.review_count }}）
+                <span class="font-semibold text-cocoa">{{ service.average_rating }}</span
+                >（{{ service.review_count }}）
               </span>
             </div>
-            <p class="mt-2 text-lg font-bold text-primary-600 sm:hidden">NT$ {{ Number(service.price).toLocaleString() }}</p>
+            <p class="mt-2 text-lg font-bold text-primary-600 sm:hidden">
+              NT$ {{ Number(service.price).toLocaleString() }}
+            </p>
           </div>
 
           <div class="hidden shrink-0 flex-col items-end gap-2 sm:flex">
@@ -101,8 +123,13 @@
               <span class="text-sm font-medium">NT$</span> {{ Number(service.price).toLocaleString() }}
             </p>
             <div v-if="!managing" class="flex items-center gap-3">
-              <button type="button" class="text-sm text-gray-400 hover:text-cocoa" @click="removeOne(service)">移除</button>
-              <router-link :to="`/booking?serviceId=${service.id}`" class="rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white transition active:scale-95">
+              <button type="button" class="text-sm text-gray-400 hover:text-cocoa" @click="removeOne(service)">
+                移除
+              </button>
+              <router-link
+                :to="`/booking?serviceId=${service.id}`"
+                class="rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white transition active:scale-95"
+              >
                 預約
               </router-link>
             </div>
@@ -110,7 +137,11 @@
 
           <!-- 手機版操作 -->
           <div v-if="!managing" class="flex shrink-0 flex-col items-end gap-2 sm:hidden">
-            <router-link :to="`/booking?serviceId=${service.id}`" class="rounded-full bg-primary-600 px-4 py-1.5 text-sm font-semibold text-white">預約</router-link>
+            <router-link
+              :to="`/booking?serviceId=${service.id}`"
+              class="rounded-full bg-primary-600 px-4 py-1.5 text-sm font-semibold text-white"
+              >預約</router-link
+            >
             <button type="button" class="text-xs text-gray-400" @click="removeOne(service)">移除</button>
           </div>
         </li>
@@ -144,7 +175,7 @@ const selected = ref<number[]>([])
 // 依收藏的先後；已下架的服務不顯示
 const favoriteServices = computed(() =>
   favorites.value
-    .map(id => servicesStore.services.find(s => s.id === id))
+    .map((id) => servicesStore.services.find((s) => s.id === id))
     .filter((s): s is NonNullable<typeof s> => !!s)
 )
 
@@ -153,7 +184,7 @@ const categoryTabs = computed(() => {
     { id: undefined, name: '全部', count: favoriteServices.value.length }
   ]
   for (const s of favoriteServices.value) {
-    const tab = tabs.find(t => t.id === s.category_id)
+    const tab = tabs.find((t) => t.id === s.category_id)
     if (tab) tab.count++
     else tabs.push({ id: s.category_id, name: s.category_name || '其他', count: 1 })
   }
@@ -161,7 +192,7 @@ const categoryTabs = computed(() => {
 })
 
 const visibleServices = computed(() => {
-  const list = favoriteServices.value.filter(s => !activeCategory.value || s.category_id === activeCategory.value)
+  const list = favoriteServices.value.filter((s) => !activeCategory.value || s.category_id === activeCategory.value)
   if (sort.value === 'recent') return [...list].reverse()
   if (sort.value === 'price-asc') return [...list].sort((a, b) => Number(a.price) - Number(b.price))
   if (sort.value === 'price-desc') return [...list].sort((a, b) => Number(b.price) - Number(a.price))
@@ -208,20 +239,22 @@ const removeSelected = () => {
 
 // 目前分類被移光了就回到「全部」
 const fixCategory = () => {
-  if (activeCategory.value && !favoriteServices.value.some(s => s.category_id === activeCategory.value)) {
+  if (activeCategory.value && !favoriteServices.value.some((s) => s.category_id === activeCategory.value)) {
     activeCategory.value = undefined
   }
 }
 
 // ---- 管理模式
-const allSelected = computed(() => visibleServices.value.length > 0 && visibleServices.value.every(s => selected.value.includes(s.id)))
+const allSelected = computed(
+  () => visibleServices.value.length > 0 && visibleServices.value.every((s) => selected.value.includes(s.id))
+)
 
 const toggleSelect = (id: number) => {
-  selected.value = selected.value.includes(id) ? selected.value.filter(s => s !== id) : [...selected.value, id]
+  selected.value = selected.value.includes(id) ? selected.value.filter((s) => s !== id) : [...selected.value, id]
 }
 
 const toggleAll = () => {
-  selected.value = allSelected.value ? [] : visibleServices.value.map(s => s.id)
+  selected.value = allSelected.value ? [] : visibleServices.value.map((s) => s.id)
 }
 
 const stopManaging = () => {
@@ -243,7 +276,9 @@ onMounted(async () => {
 <style scoped>
 .fav-enter-active,
 .fav-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 .fav-enter-from,
 .fav-leave-to {

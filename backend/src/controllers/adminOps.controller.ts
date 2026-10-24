@@ -85,7 +85,7 @@ export const getCustomer = async (req: Request, res: Response): Promise<void> =>
       data: {
         ...customer,
         birthday: formatDate(customer.birthday),
-        appointments: appointments.map(a => ({ ...a, appointment_date: formatDate(a.appointment_date) }))
+        appointments: appointments.map((a) => ({ ...a, appointment_date: formatDate(a.appointment_date) }))
       }
     })
   } catch (error) {
@@ -149,12 +149,16 @@ export const createAdminAppointment = async (req: Request, res: Response): Promi
     if (!isDate(date) || !isTime(time)) return fail(res, 400, '請選擇日期與時段')
     if (!SOURCES.includes(source)) return fail(res, 400, '請選擇預約來源')
 
-    const service = await queryOne<any>('SELECT name, duration, price FROM services WHERE id = ? AND is_active = 1', [serviceId])
+    const service = await queryOne<any>('SELECT name, duration, price FROM services WHERE id = ? AND is_active = 1', [
+      serviceId
+    ])
     if (!service) return fail(res, 400, '請選擇療程')
 
     // 電話對得到會員就自動連結，顧客登入後也看得到這筆預約
     const phone = normalizeTaiwanPhone(customerPhone)
-    const member = await queryOne<any>("SELECT id FROM users WHERE phone = ? AND role = 'customer' AND is_active = 1", [phone])
+    const member = await queryOne<any>("SELECT id FROM users WHERE phone = ? AND role = 'customer' AND is_active = 1", [
+      phone
+    ])
 
     // 檢查空檔到寫入要排隊，避免跟前台同時搶到同一個時段
     const assigned = await withBookingLock(async () => {
@@ -166,8 +170,19 @@ export const createAdminAppointment = async (req: Request, res: Response): Promi
           start_time, end_time, duration, price, status, source, notes)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?)`,
         [
-          'APT' + Date.now(), member?.id || null, staff, serviceId, customerName, phone, date,
-          time, addMinutes(time, service.duration), service.duration, service.price, source, notes || null
+          'APT' + Date.now(),
+          member?.id || null,
+          staff,
+          serviceId,
+          customerName,
+          phone,
+          date,
+          time,
+          addMinutes(time, service.duration),
+          service.duration,
+          service.price,
+          source,
+          notes || null
         ]
       )
       return staff
@@ -184,7 +199,11 @@ export const createAdminAppointment = async (req: Request, res: Response): Promi
 // ---------- 匯出 ----------
 
 const STATUS_TEXT: Record<string, string> = {
-  pending: '待確認', confirmed: '已確認', completed: '已完成', cancelled: '已取消', no_show: '未到店'
+  pending: '待確認',
+  confirmed: '已確認',
+  completed: '已完成',
+  cancelled: '已取消',
+  no_show: '未到店'
 }
 const SOURCE_TEXT: Record<string, string> = { online: '線上', phone: '電話', walk_in: '現場', line: 'LINE' }
 
@@ -210,13 +229,42 @@ export const exportAppointments = async (req: Request, res: Response): Promise<v
        ORDER BY a.appointment_date, a.start_time`,
       [from, to]
     )
-    const header = ['預約編號', '日期', '開始', '結束', '顧客', '電話', '療程', '美容師', '金額', '折扣', '狀態', '來源', '備註', '建立時間']
-    const lines = rows.map(r => [
-      r.appointment_no, formatDate(r.appointment_date), String(r.start_time).slice(0, 5), String(r.end_time).slice(0, 5),
-      r.customer_name, r.customer_phone, r.service_name, r.staff_name, Number(r.price), Number(r.discount),
-      STATUS_TEXT[r.status] || r.status, SOURCE_TEXT[r.source] || r.source, r.notes,
-      new Date(r.created_at).toLocaleString('zh-TW', { hour12: false, timeZone: 'Asia/Taipei' })
-    ].map(csvCell).join(','))
+    const header = [
+      '預約編號',
+      '日期',
+      '開始',
+      '結束',
+      '顧客',
+      '電話',
+      '療程',
+      '美容師',
+      '金額',
+      '折扣',
+      '狀態',
+      '來源',
+      '備註',
+      '建立時間'
+    ]
+    const lines = rows.map((r) =>
+      [
+        r.appointment_no,
+        formatDate(r.appointment_date),
+        String(r.start_time).slice(0, 5),
+        String(r.end_time).slice(0, 5),
+        r.customer_name,
+        r.customer_phone,
+        r.service_name,
+        r.staff_name,
+        Number(r.price),
+        Number(r.discount),
+        STATUS_TEXT[r.status] || r.status,
+        SOURCE_TEXT[r.source] || r.source,
+        r.notes,
+        new Date(r.created_at).toLocaleString('zh-TW', { hour12: false, timeZone: 'Asia/Taipei' })
+      ]
+        .map(csvCell)
+        .join(',')
+    )
 
     await logAction(req, '匯出預約', `${from} ~ ${to}`, `${rows.length} 筆`)
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
@@ -241,7 +289,7 @@ export const listCoupons = async (req: Request, res: Response): Promise<void> =>
     )
     res.json({
       success: true,
-      data: coupons.map(c => ({ ...c, start_date: formatDate(c.start_date), end_date: formatDate(c.end_date) }))
+      data: coupons.map((c) => ({ ...c, start_date: formatDate(c.start_date), end_date: formatDate(c.end_date) }))
     })
   } catch (error) {
     serverError(res, 'List coupons error', error)
@@ -261,8 +309,10 @@ export const saveCoupon = async (req: Request, res: Response): Promise<void> => 
     const minSpend = Number(req.body.minSpend) || 0
     const startDate = req.body.startDate || null
     const endDate = req.body.endDate || null
-    const usageLimit = req.body.usageLimit === '' || req.body.usageLimit === null || req.body.usageLimit === undefined
-      ? null : Number(req.body.usageLimit)
+    const usageLimit =
+      req.body.usageLimit === '' || req.body.usageLimit === null || req.body.usageLimit === undefined
+        ? null
+        : Number(req.body.usageLimit)
 
     if (!/^[A-Z0-9_-]{3,30}$/.test(code)) return fail(res, 400, '優惠碼請用 3–30 個英數字')
     if (!name || name.length > 100) return fail(res, 400, '請填寫活動名稱')
@@ -270,17 +320,39 @@ export const saveCoupon = async (req: Request, res: Response): Promise<void> => 
       return fail(res, 400, type === 'percent' ? '折扣百分比請填 1–99' : '折抵金額請填正整數')
     }
     if (!Number.isInteger(minSpend) || minSpend < 0) return fail(res, 400, '最低消費請填 0 以上的整數')
-    if ((startDate && !isDate(startDate)) || (endDate && !isDate(endDate)) || (startDate && endDate && startDate > endDate)) {
+    if (
+      (startDate && !isDate(startDate)) ||
+      (endDate && !isDate(endDate)) ||
+      (startDate && endDate && startDate > endDate)
+    ) {
       return fail(res, 400, '活動期間不正確')
     }
-    if (usageLimit !== null && (!Number.isInteger(usageLimit) || usageLimit < 1)) return fail(res, 400, '總使用次數上限請填正整數，或留空代表不限')
-    if (!Number.isInteger(perUserLimit) || perUserLimit < 1 || perUserLimit > 99) return fail(res, 400, '每人限用次數請填 1–99')
+    if (usageLimit !== null && (!Number.isInteger(usageLimit) || usageLimit < 1))
+      return fail(res, 400, '總使用次數上限請填正整數，或留空代表不限')
+    if (!Number.isInteger(perUserLimit) || perUserLimit < 1 || perUserLimit > 99)
+      return fail(res, 400, '每人限用次數請填 1–99')
     if (description.length > 200) return fail(res, 400, '說明請在 200 字以內')
 
-    const duplicate = await queryOne<any>('SELECT id FROM coupons WHERE code = ? AND id <> ?', [code, req.params.id || 0])
+    const duplicate = await queryOne<any>('SELECT id FROM coupons WHERE code = ? AND id <> ?', [
+      code,
+      req.params.id || 0
+    ])
     if (duplicate) return fail(res, 400, '這個優惠碼已經存在')
 
-    const values = [code, name, description || null, type, value, minSpend, startDate, endDate, usageLimit, audience, isClaimable, perUserLimit]
+    const values = [
+      code,
+      name,
+      description || null,
+      type,
+      value,
+      minSpend,
+      startDate,
+      endDate,
+      usageLimit,
+      audience,
+      isClaimable,
+      perUserLimit
+    ]
     if (req.params.id) {
       const [result] = await execute(
         `UPDATE coupons SET code = ?, name = ?, description = ?, discount_type = ?, discount_value = ?, min_spend = ?,
@@ -312,7 +384,7 @@ export const listAnnouncements = async (req: Request, res: Response): Promise<vo
     const rows = await query<any>('SELECT * FROM announcements ORDER BY sort_order, id')
     res.json({
       success: true,
-      data: rows.map(r => ({ ...r, start_date: formatDate(r.start_date), end_date: formatDate(r.end_date) }))
+      data: rows.map((r) => ({ ...r, start_date: formatDate(r.start_date), end_date: formatDate(r.end_date) }))
     })
   } catch (error) {
     serverError(res, 'List announcements error', error)
@@ -326,7 +398,11 @@ export const saveAnnouncement = async (req: Request, res: Response): Promise<voi
     const endDate = req.body.endDate || null
     const sortOrder = Number(req.body.sortOrder) || 0
     if (!content || content.length > 40) return fail(res, 400, '公告內容請在 40 字以內，跑馬燈才放得下')
-    if ((startDate && !isDate(startDate)) || (endDate && !isDate(endDate)) || (startDate && endDate && startDate > endDate)) {
+    if (
+      (startDate && !isDate(startDate)) ||
+      (endDate && !isDate(endDate)) ||
+      (startDate && endDate && startDate > endDate)
+    ) {
       return fail(res, 400, '顯示期間不正確')
     }
     const values = [content, startDate, endDate, sortOrder, req.body.isActive === false ? 0 : 1]
@@ -372,7 +448,7 @@ export const listClosures = async (req: Request, res: Response): Promise<void> =
                AND a.status IN ('pending', 'confirmed')) AS appointment_count
        FROM store_closures c WHERE c.closure_date >= CURDATE() ORDER BY c.closure_date`
     )
-    res.json({ success: true, data: rows.map(r => ({ ...r, closure_date: formatDate(r.closure_date) })) })
+    res.json({ success: true, data: rows.map((r) => ({ ...r, closure_date: formatDate(r.closure_date) })) })
   } catch (error) {
     serverError(res, 'List closures error', error)
   }
@@ -479,7 +555,7 @@ export const getReports = async (req: Request, res: Response): Promise<void> => 
         byService,
         byStaff,
         bySource,
-        byDay: byDay.map(d => ({ ...d, date: formatDate(d.date) })),
+        byDay: byDay.map((d) => ({ ...d, date: formatDate(d.date) })),
         byHour
       }
     })

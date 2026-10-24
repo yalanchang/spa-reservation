@@ -4,9 +4,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <h3 class="text-lg font-bold mb-4 text-primary-600">關於我們</h3>
-          <p class="text-cocoa/70 text-sm">
-            提供專業美容服務，讓您享受最舒適的美容體驗。
-          </p>
+          <p class="text-cocoa/70 text-sm">提供專業美容服務，讓您享受最舒適的美容體驗。</p>
         </div>
         <div>
           <h3 class="text-lg font-bold mb-4 text-primary-600">營業時間</h3>

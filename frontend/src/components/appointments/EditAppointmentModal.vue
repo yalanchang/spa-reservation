@@ -11,9 +11,7 @@
         <div class="flex items-start justify-between p-5 border-b">
           <div>
             <h3 class="text-lg font-semibold text-gray-900">修改預約</h3>
-            <p class="text-sm text-gray-500 mt-1">
-              {{ appointment.service_name }}，{{ appointment.duration }} 分鐘
-            </p>
+            <p class="text-sm text-gray-500 mt-1">{{ appointment.service_name }}，{{ appointment.duration }} 分鐘</p>
           </div>
           <button class="text-gray-400 hover:text-gray-600" aria-label="關閉" @click="emit('close')">
             <XMarkIcon class="w-6 h-6" />
@@ -21,10 +19,7 @@
         </div>
 
         <div class="p-5 space-y-4">
-          <p
-            v-if="appointment.status === 'confirmed'"
-            class="text-sm bg-amber-50 text-amber-800 rounded-lg px-3 py-2"
-          >
+          <p v-if="appointment.status === 'confirmed'" class="text-sm bg-amber-50 text-amber-800 rounded-lg px-3 py-2">
             修改日期、時段或美容師後，預約會改回「待確認」
           </p>
 
@@ -61,7 +56,9 @@
               :disabled="slotsLoading || !availableSlots.length"
               class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="" disabled>{{ slotsLoading ? '載入中…' : availableSlots.length ? '請選擇時段' : '這天沒有空檔，請換一天' }}</option>
+              <option value="" disabled>
+                {{ slotsLoading ? '載入中…' : availableSlots.length ? '請選擇時段' : '這天沒有空檔，請換一天' }}
+              </option>
               <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
             </select>
           </div>
@@ -179,7 +176,7 @@ const loadSlots = async () => {
   if (!form.value.date) return
   slotsLoading.value = true
   try {
-    const response = await apiClient.get('/appointments/available', {
+    const response = (await apiClient.get('/appointments/available', {
       params: {
         date: form.value.date,
         serviceId: props.appointment.service_id,
@@ -187,7 +184,7 @@ const loadSlots = async () => {
         // 自己這筆不算占用，原本的時段也能選
         excludeId: props.appointment.id
       }
-    }) as any
+    })) as any
     if (response.success) {
       availableSlots.value = response.data || []
       // 換了日期或美容師後原本的時段可能沒空了
@@ -205,7 +202,7 @@ watch(() => [form.value.date, form.value.staffId], loadSlots)
 onMounted(async () => {
   loadSlots()
   try {
-    const response = await apiClient.get('/staff') as any
+    const response = (await apiClient.get('/staff')) as any
     if (response.success) {
       staffList.value = response.data || []
     }

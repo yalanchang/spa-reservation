@@ -6,16 +6,7 @@ import { applyCoupon, CouponError } from '../utils/coupon'
 
 export const createAppointment = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {
-      serviceId,
-      staffId,
-      date,
-      time,
-      customerName,
-      customerPhone,
-      notes,
-      couponCode
-    } = req.body
+    const { serviceId, staffId, date, time, customerName, customerPhone, notes, couponCode } = req.body
 
     if (!customerName?.trim()) {
       res.status(400).json({ success: false, message: '請填寫姓名' })
@@ -23,30 +14,27 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
     }
 
     if (!customerPhone || !isValidTaiwanPhone(customerPhone)) {
-      res.status(400).json({ 
-        success: false, 
-        message: '電話格式不正確：手機為 09 開頭共 10 碼，市話請加區碼' 
+      res.status(400).json({
+        success: false,
+        message: '電話格式不正確：手機為 09 開頭共 10 碼，市話請加區碼'
       })
       return
     }
 
     if (!date || !time || taipeiTime(date, time) <= new Date()) {
-      res.status(400).json({ 
-        success: false, 
-        message: '這個時段已經過了，請選擇其他時段' 
+      res.status(400).json({
+        success: false,
+        message: '這個時段已經過了，請選擇其他時段'
       })
       return
     }
 
-    const service = await queryOne(
-      'SELECT duration, price FROM services WHERE id = ? AND is_active = 1',
-      [serviceId]
-    )
+    const service = await queryOne('SELECT duration, price FROM services WHERE id = ? AND is_active = 1', [serviceId])
 
     if (!service) {
-      res.status(404).json({ 
-        success: false, 
-        message: '服務不存在' 
+      res.status(404).json({
+        success: false,
+        message: '服務不存在'
       })
       return
     }
@@ -88,9 +76,9 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
     })
 
     if (!appointmentNo) {
-      res.status(400).json({ 
-        success: false, 
-        message: '此時段已被預約，請選擇其他時段' 
+      res.status(400).json({
+        success: false,
+        message: '此時段已被預約，請選擇其他時段'
       })
       return
     }
@@ -106,9 +94,9 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
       return
     }
     console.error('Create appointment error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -132,11 +120,22 @@ export const getAvailableSlots = async (req: Request, res: Response): Promise<vo
     // 修改預約時：時長沿用原本的預約，並且不把自己算成占用
     let exclude: number | undefined
     if (excludeId && (req as any).user) {
-      const own = await queryOne<any>('SELECT id, duration FROM appointments WHERE id = ? AND user_id = ?', [excludeId, (req as any).user.userId])
-      if (own) { exclude = own.id; duration = own.duration }
+      const own = await queryOne<any>('SELECT id, duration FROM appointments WHERE id = ? AND user_id = ?', [
+        excludeId,
+        (req as any).user.userId
+      ])
+      if (own) {
+        exclude = own.id
+        duration = own.duration
+      }
     }
 
-    const slots = await getSlotStaff({ date, duration, staffId: staffId ? Number(staffId) : null, excludeAppointmentId: exclude })
+    const slots = await getSlotStaff({
+      date,
+      duration,
+      staffId: staffId ? Number(staffId) : null,
+      excludeAppointmentId: exclude
+    })
     res.json({
       success: true,
       data: [...slots.keys()],
@@ -144,9 +143,9 @@ export const getAvailableSlots = async (req: Request, res: Response): Promise<vo
     })
   } catch (error) {
     console.error('Get available slots error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -177,9 +176,9 @@ export const getUserAppointments = async (req: Request, res: Response): Promise<
     })
   } catch (error) {
     console.error('Get user appointments error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -198,26 +197,23 @@ export const deleteAppointment = async (req: Request, res: Response): Promise<vo
     )
 
     if (!appointment) {
-      res.status(404).json({ 
-        success: false, 
-        message: '預約不存在' 
+      res.status(404).json({
+        success: false,
+        message: '預約不存在'
       })
       return
     }
 
     if (!['pending', 'confirmed'].includes(appointment.status) || appointment.is_past) {
-      res.status(400).json({ 
-        success: false, 
-        message: '此預約無法取消' 
+      res.status(400).json({
+        success: false,
+        message: '此預約無法取消'
       })
       return
     }
 
     // 不直接刪除，改成「已取消」：店家看得到取消紀錄，報表與優惠券使用次數也正確
-    await execute(
-      "UPDATE appointments SET status = 'cancelled', status_notice = NULL WHERE id = ?",
-      [appointment.id]
-    )
+    await execute("UPDATE appointments SET status = 'cancelled', status_notice = NULL WHERE id = ?", [appointment.id])
 
     res.json({
       success: true,
@@ -225,9 +221,9 @@ export const deleteAppointment = async (req: Request, res: Response): Promise<vo
     })
   } catch (error) {
     console.error('Delete appointment error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -248,49 +244,49 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
     )
 
     if (!appointment) {
-      res.status(404).json({ 
-        success: false, 
-        message: '預約不存在' 
+      res.status(404).json({
+        success: false,
+        message: '預約不存在'
       })
       return
     }
 
     if (!['pending', 'confirmed'].includes(appointment.status) || appointment.is_past) {
-      res.status(400).json({ 
-        success: false, 
-        message: '此預約無法修改' 
+      res.status(400).json({
+        success: false,
+        message: '此預約無法修改'
       })
       return
     }
 
     if (!staffId || !date || !time) {
-      res.status(400).json({ 
-        success: false, 
-        message: '請選擇美容師、日期和時段' 
+      res.status(400).json({
+        success: false,
+        message: '請選擇美容師、日期和時段'
       })
       return
     }
 
     if (!customerName?.trim()) {
-      res.status(400).json({ 
-        success: false, 
-        message: '請填寫姓名' 
+      res.status(400).json({
+        success: false,
+        message: '請填寫姓名'
       })
       return
     }
 
     if (!customerPhone || !isValidTaiwanPhone(customerPhone)) {
-      res.status(400).json({ 
-        success: false, 
-        message: '電話格式不正確：手機為 09 開頭共 10 碼，市話請加區碼' 
+      res.status(400).json({
+        success: false,
+        message: '電話格式不正確：手機為 09 開頭共 10 碼，市話請加區碼'
       })
       return
     }
 
     if (taipeiTime(date, time) <= new Date()) {
-      res.status(400).json({ 
-        success: false, 
-        message: '這個時段已經過了，請選擇其他時段' 
+      res.status(400).json({
+        success: false,
+        message: '這個時段已經過了，請選擇其他時段'
       })
       return
     }
@@ -300,7 +296,11 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
     // 檢查空檔到更新要排隊進行，避免跟別人同時搶到同一個時段
     const updated = await withBookingLock(async () => {
       const free = await findFreeStaff({
-        date, time, duration: appointment.duration, staffId: Number(staffId), excludeAppointmentId: appointment.id
+        date,
+        time,
+        duration: appointment.duration,
+        staffId: Number(staffId),
+        excludeAppointmentId: appointment.id
       })
       if (!free) return false
 
@@ -313,8 +313,13 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
            customer_name = ?, customer_phone = ?, notes = ?, status_notice = NULL
          WHERE id = ?`,
         [
-          date, time, staffId,
-          staffId, date, time, endTime,
+          date,
+          time,
+          staffId,
+          staffId,
+          date,
+          time,
+          endTime,
           customerName.trim(),
           normalizeTaiwanPhone(customerPhone),
           notes || null,
@@ -325,9 +330,9 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
     })
 
     if (!updated) {
-      res.status(400).json({ 
-        success: false, 
-        message: '此時段已被預約，請選擇其他時段' 
+      res.status(400).json({
+        success: false,
+        message: '此時段已被預約，請選擇其他時段'
       })
       return
     }
@@ -338,9 +343,9 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
     })
   } catch (error) {
     console.error('Update appointment error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -352,10 +357,9 @@ export const markNoticesRead = async (req: Request, res: Response): Promise<void
       return
     }
 
-    await execute(
-      'UPDATE appointments SET status_notice = NULL WHERE user_id = ? AND status_notice IS NOT NULL',
-      [(req as any).user.userId]
-    )
+    await execute('UPDATE appointments SET status_notice = NULL WHERE user_id = ? AND status_notice IS NOT NULL', [
+      (req as any).user.userId
+    ])
 
     res.json({
       success: true,
@@ -363,9 +367,9 @@ export const markNoticesRead = async (req: Request, res: Response): Promise<void
     })
   } catch (error) {
     console.error('Mark notices read error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: '伺服器錯誤' 
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤'
     })
   }
 }
@@ -373,7 +377,9 @@ export const markNoticesRead = async (req: Request, res: Response): Promise<void
 // 預約前先試算優惠碼
 export const checkCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
-    const service = await queryOne<any>('SELECT price FROM services WHERE id = ? AND is_active = 1', [req.body.serviceId])
+    const service = await queryOne<any>('SELECT price FROM services WHERE id = ? AND is_active = 1', [
+      req.body.serviceId
+    ])
     if (!service) {
       res.status(404).json({ success: false, message: '服務不存在' })
       return

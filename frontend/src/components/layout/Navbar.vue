@@ -2,16 +2,16 @@
   <nav class="sticky top-0 z-50 bg-white border-b border-primary-100">
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
-        <router-link to="/" class="text-xl font-extrabold text-primary-600 flex-shrink-0">
-          美容預約系統
-        </router-link>
+        <router-link to="/" class="text-xl font-extrabold text-primary-600 flex-shrink-0"> 美容預約系統 </router-link>
 
         <div class="hidden sm:flex items-center gap-1">
           <router-link to="/services" class="nav-pill hover-bold" data-text="服務項目">服務項目</router-link>
           <router-link to="/favorites" class="nav-pill hover-bold" data-text="我的收藏">我的收藏</router-link>
           <router-link to="/coupons" class="nav-pill hover-bold" data-text="領券中心">領券中心</router-link>
           <router-link to="/booking" class="nav-pill hover-bold" data-text="立即預約">立即預約</router-link>
-          <router-link v-if="authStore.isLoggedIn" to="/appointments" class="nav-pill hover-bold" data-text="我的預約">我的預約</router-link>
+          <router-link v-if="authStore.isLoggedIn" to="/appointments" class="nav-pill hover-bold" data-text="我的預約"
+            >我的預約</router-link
+          >
 
           <template v-if="authStore.isLoggedIn">
             <NotificationBell />
@@ -26,7 +26,12 @@
                 :aria-expanded="accountOpen"
                 @click="accountOpen = !accountOpen"
               >
-                <img v-if="authStore.user?.avatar" :src="authStore.user.avatar" alt="" class="h-full w-full object-cover" />
+                <img
+                  v-if="authStore.user?.avatar"
+                  :src="authStore.user.avatar"
+                  alt=""
+                  class="h-full w-full object-cover"
+                />
                 <span v-else class="text-sm text-primary-600">{{ authStore.user?.name?.charAt(0) }}</span>
               </button>
               <div
@@ -49,7 +54,12 @@
                   {{ item.label }}
                 </router-link>
                 <div class="mt-1 border-t border-primary-50 pt-1">
-                  <button type="button" class="block w-full px-4 py-2.5 text-left text-sm text-gray-500 hover:text-cocoa" role="menuitem" @click="handleLogout">
+                  <button
+                    type="button"
+                    class="block w-full px-4 py-2.5 text-left text-sm text-gray-500 hover:text-cocoa"
+                    role="menuitem"
+                    @click="handleLogout"
+                  >
                     登出
                   </button>
                 </div>
@@ -57,13 +67,7 @@
             </div>
           </template>
 
-          <router-link
-            v-else
-            to="/login"
-            class="btn-cute ml-2 px-5 py-2"
-          >
-            登入
-          </router-link>
+          <router-link v-else to="/login" class="btn-cute ml-2 px-5 py-2"> 登入 </router-link>
         </div>
 
         <div class="sm:hidden flex items-center gap-2">
@@ -89,11 +93,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div
-        v-if="menuOpen"
-        class="fixed inset-0 bg-black bg-opacity-40 z-40 sm:hidden"
-        @click="menuOpen = false"
-      />
+      <div v-if="menuOpen" class="fixed inset-0 bg-black bg-opacity-40 z-40 sm:hidden" @click="menuOpen = false" />
     </transition>
 
     <transition
@@ -104,10 +104,7 @@
       leave-from-class="translate-x-0"
       leave-to-class="translate-x-full"
     >
-      <div
-        v-if="menuOpen"
-        class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 flex flex-col sm:hidden"
-      >
+      <div v-if="menuOpen" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 flex flex-col sm:hidden">
         <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 flex-shrink-0">
           <span class="text-lg font-extrabold text-primary-600">美容預約系統</span>
           <button
@@ -122,7 +119,9 @@
         </div>
 
         <div v-if="authStore.isLoggedIn" class="flex items-center space-x-3 px-5 py-5 border-b border-gray-100">
-          <div class="w-12 h-12 bg-primary-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
+          <div
+            class="w-12 h-12 bg-primary-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
+          >
             <img v-if="authStore.user?.avatar" :src="authStore.user.avatar" alt="" class="w-full h-full object-cover" />
             <span v-else class="text-primary-600 text-lg font-semibold">
               {{ authStore.user?.name?.charAt(0) }}
@@ -142,11 +141,14 @@
             @click="menuOpen = false"
           >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
             </svg>
             <span class="font-medium">服務項目</span>
           </router-link>
-
 
           <router-link
             to="/booking"
@@ -154,11 +156,14 @@
             @click="menuOpen = false"
           >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
             <span class="font-medium">立即預約</span>
           </router-link>
-
 
           <router-link
             to="/coupons"
@@ -166,7 +171,11 @@
             @click="menuOpen = false"
           >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"
+              />
             </svg>
             <span class="font-medium">領券中心</span>
           </router-link>
@@ -177,7 +186,11 @@
             @click="menuOpen = false"
           >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+              />
             </svg>
             <span class="font-medium">我的收藏</span>
           </router-link>
@@ -188,8 +201,18 @@
               class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 transition hover:font-bold"
               @click="menuOpen = false"
             >
-              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               <span class="font-medium">我的預約</span>
             </router-link>
@@ -198,8 +221,18 @@
               class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 transition hover:font-bold"
               @click="menuOpen = false"
             >
-              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
               <span class="font-medium">個人資料</span>
             </router-link>
@@ -212,18 +245,11 @@
               class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl border border-gray-300 text-gray-700 transition hover:font-bold"
               @click="handleLogout"
             >
-             
               <span class="font-medium">登出</span>
             </button>
           </template>
           <template v-else>
-            <router-link
-              to="/login"
-              class="btn-cute w-full py-2.5"
-              @click="menuOpen = false"
-            >
-              登入
-            </router-link>
+            <router-link to="/login" class="btn-cute w-full py-2.5" @click="menuOpen = false"> 登入 </router-link>
           </template>
         </div>
       </div>
@@ -258,7 +284,12 @@ const onDocumentClick = (e: MouseEvent) => {
 const onKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') accountOpen.value = false
 }
-watch(() => route.fullPath, () => { accountOpen.value = false })
+watch(
+  () => route.fullPath,
+  () => {
+    accountOpen.value = false
+  }
+)
 onMounted(() => {
   document.addEventListener('click', onDocumentClick)
   document.addEventListener('keydown', onKeydown)

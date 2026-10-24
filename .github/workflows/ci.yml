@@ -1,0 +1,47 @@
+# push 或 PR 時自動檢查：格式、型別、編譯、測試
+# Render 設成「CI 通過才部署」時，這裡失敗就不會上線
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: 格式檢查
+        run: npm run format:check
+      - name: 型別檢查與編譯
+        run: npm run build
+      - name: 測試
+        run: npm test
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: 格式檢查
+        run: npm run format:check
+      - name: 型別檢查與編譯
+        run: npm run build

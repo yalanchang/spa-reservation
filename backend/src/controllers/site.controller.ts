@@ -23,7 +23,7 @@ export const getClosures = async (req: Request, res: Response): Promise<void> =>
     const rows = await query<any>(
       'SELECT closure_date, reason FROM store_closures WHERE closure_date >= CURDATE() ORDER BY closure_date LIMIT 60'
     )
-    res.json({ success: true, data: rows.map(r => ({ date: formatDate(r.closure_date), reason: r.reason })) })
+    res.json({ success: true, data: rows.map((r) => ({ date: formatDate(r.closure_date), reason: r.reason })) })
   } catch (error) {
     serverError(res, 'Get closures error', error)
   }

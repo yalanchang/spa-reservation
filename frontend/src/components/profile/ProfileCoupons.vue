@@ -6,7 +6,9 @@
         <option value="used">已使用（{{ count('used') }}）</option>
         <option value="unavailable">無法使用（{{ count('unavailable') }}）</option>
       </select>
-      <router-link to="/coupons" class="ml-auto text-sm font-medium text-primary-600 hover:text-primary-700">去領券中心</router-link>
+      <router-link to="/coupons" class="ml-auto text-sm font-medium text-primary-600 hover:text-primary-700"
+        >去領券中心</router-link
+      >
     </div>
 
     <div v-if="loading" class="py-10"><LoadingSpinner /></div>
@@ -41,8 +43,8 @@ const coupons = ref<any[]>([])
 const loading = ref(true)
 const status = ref('available')
 
-const count = (s: string) => coupons.value.filter(c => c.status === s).length
-const visible = computed(() => coupons.value.filter(c => c.status === status.value))
+const count = (s: string) => coupons.value.filter((c) => c.status === s).length
+const visible = computed(() => coupons.value.filter((c) => c.status === status.value))
 
 const noteOf = (c: any) => {
   if (c.status === 'used') return `已使用 ${c.used_count} 次`
@@ -52,7 +54,7 @@ const noteOf = (c: any) => {
 
 onMounted(async () => {
   try {
-    const res = await apiClient.get('/coupons/mine') as any
+    const res = (await apiClient.get('/coupons/mine')) as any
     coupons.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '優惠券載入失敗')

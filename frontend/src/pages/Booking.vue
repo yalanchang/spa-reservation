@@ -11,14 +11,22 @@
         <li class="flex w-20 flex-col items-center gap-1.5 text-center sm:w-24">
           <span
             class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition"
-            :class="currentStep >= index ? 'bg-primary-600 text-white' : 'border-2 border-gray-200 bg-white text-gray-400'"
+            :class="
+              currentStep >= index ? 'bg-primary-600 text-white' : 'border-2 border-gray-200 bg-white text-gray-400'
+            "
           >
             <CheckIcon v-if="currentStep > index" class="h-4 w-4" />
             <template v-else>{{ index + 1 }}</template>
           </span>
           <span
             class="whitespace-nowrap text-sm"
-            :class="currentStep === index ? 'font-bold text-primary-600' : currentStep > index ? 'text-primary-600' : 'text-gray-400'"
+            :class="
+              currentStep === index
+                ? 'font-bold text-primary-600'
+                : currentStep > index
+                  ? 'text-primary-600'
+                  : 'text-gray-400'
+            "
           >
             {{ step }}
           </span>
@@ -41,7 +49,9 @@
           v-model="activeGroupId"
           class="w-48 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-cocoa focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
-          <option v-for="group in serviceGroups" :key="group.id" :value="group.id">{{ group.name }}（{{ group.services.length }}）</option>
+          <option v-for="group in serviceGroups" :key="group.id" :value="group.id">
+            {{ group.name }}（{{ group.services.length }}）
+          </option>
         </select>
       </div>
 
@@ -50,11 +60,15 @@
           <button
             type="button"
             class="group flex w-full items-center gap-6 rounded-2xl border bg-white px-5 py-5 text-left transition-colors sm:px-7 sm:py-6"
-            :class="selectedService?.id === service.id ? 'border-primary-400' : 'border-transparent hover:border-primary-200'"
+            :class="
+              selectedService?.id === service.id ? 'border-primary-400' : 'border-transparent hover:border-primary-200'
+            "
             @click="chooseService(service)"
           >
             <div class="min-w-0 flex-1">
-              <p class="text-base font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">{{ service.name }}</p>
+              <p class="text-base font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">
+                {{ service.name }}
+              </p>
               <p class="mt-1.5 text-sm text-gray-500">{{ service.duration }} 分鐘</p>
             </div>
             <p class="shrink-0 text-lg font-bold text-primary-600">
@@ -73,15 +87,24 @@
       <div class="flex items-center justify-between gap-4 rounded-2xl bg-primary-50/60 px-5 py-4">
         <div class="min-w-0">
           <p class="truncate font-bold text-cocoa">{{ selectedService?.name }}</p>
-          <p class="mt-0.5 flex gap-3 text-sm text-gray-500"><span>{{ selectedService?.duration }} 分鐘</span><span>NT$ {{ Number(selectedService?.price).toLocaleString() }}</span></p>
+          <p class="mt-0.5 flex gap-3 text-sm text-gray-500">
+            <span>{{ selectedService?.duration }} 分鐘</span
+            ><span>NT$ {{ Number(selectedService?.price).toLocaleString() }}</span>
+          </p>
         </div>
-        <button type="button" class="shrink-0 text-sm font-medium text-primary-600 hover:text-primary-700" @click="currentStep = 0">更換</button>
+        <button
+          type="button"
+          class="shrink-0 text-sm font-medium text-primary-600 hover:text-primary-700"
+          @click="currentStep = 0"
+        >
+          更換
+        </button>
       </div>
-      
+
       <!-- 美容師選擇 -->
       <div>
         <label class="block text-sm font-medium mb-2">選擇美容師</label>
-        <select 
+        <select
           v-model="selectedStaff"
           class="w-full rounded-xl border border-gray-200 px-3 py-2.5 focus:ring-2 focus:ring-primary-200 focus:border-primary-300 focus:outline-none"
         >
@@ -104,7 +127,10 @@
       </div>
 
       <!-- 可預約時段 -->
-      <p v-if="selectedDate && slotsLoaded && !availableSlots.length" class="rounded-2xl bg-primary-50/60 px-5 py-4 text-sm text-cocoa">
+      <p
+        v-if="selectedDate && slotsLoaded && !availableSlots.length"
+        class="rounded-2xl bg-primary-50/60 px-5 py-4 text-sm text-cocoa"
+      >
         {{ slotMessage || '這天已經約滿，請換一天' }}
       </p>
       <div v-if="availableSlots.length">
@@ -120,12 +146,7 @@
       </div>
 
       <div class="flex gap-4 pt-2">
-        <button
-          @click="currentStep = 0"
-          class="btn-cute-outline flex-1"
-        >
-          上一步
-        </button>
+        <button @click="currentStep = 0" class="btn-cute-outline flex-1">上一步</button>
         <button
           @click="currentStep = 2"
           :disabled="!selectedTime"
@@ -160,7 +181,7 @@
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">美容師</span>
-          <span class="font-medium">{{ staffList.find(s => s.id === selectedStaff)?.name || '由店家安排' }}</span>
+          <span class="font-medium">{{ staffList.find((s) => s.id === selectedStaff)?.name || '由店家安排' }}</span>
         </div>
         <div class="space-y-2 border-t border-dashed border-primary-200 pt-3">
           <div class="flex justify-between">
@@ -173,7 +194,9 @@
           </div>
           <div class="flex items-baseline justify-between">
             <span class="font-bold text-cocoa">應付金額</span>
-            <span class="text-2xl font-bold text-primary-600">NT$ {{ (Number(selectedService?.price) - (coupon?.discount || 0)).toLocaleString() }}</span>
+            <span class="text-2xl font-bold text-primary-600"
+              >NT$ {{ (Number(selectedService?.price) - (coupon?.discount || 0)).toLocaleString() }}</span
+            >
           </div>
         </div>
       </div>
@@ -181,8 +204,12 @@
       <!-- 優惠券：從券夾選，或輸入優惠碼 -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <label for="coupon-select" class="block text-sm font-medium">優惠券 <span class="ml-1 text-xs text-gray-400">選填</span></label>
-          <router-link to="/coupons" class="text-xs font-medium text-primary-600 hover:text-primary-700">去領券中心</router-link>
+          <label for="coupon-select" class="block text-sm font-medium"
+            >優惠券 <span class="ml-1 text-xs text-gray-400">選填</span></label
+          >
+          <router-link to="/coupons" class="text-xs font-medium text-primary-600 hover:text-primary-700"
+            >去領券中心</router-link
+          >
         </div>
         <select
           id="coupon-select"
@@ -190,11 +217,13 @@
           class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
           @change="selectCoupon(($event.target as HTMLSelectElement).value)"
         >
-          <option value="">{{ usableCoupons.length ? `不使用優惠券（有 ${usableCoupons.length} 張可用）` : '沒有可用的優惠券' }}</option>
+          <option value="">
+            {{ usableCoupons.length ? `不使用優惠券（有 ${usableCoupons.length} 張可用）` : '沒有可用的優惠券' }}
+          </option>
           <option v-for="c in usableCoupons" :key="c.code" :value="c.code">
             {{ c.name }}（折 NT$ {{ c.discount.toLocaleString() }}）
           </option>
-          <option v-if="coupon && !usableCoupons.some(c => c.code === coupon!.code)" :value="coupon.code">
+          <option v-if="coupon && !usableCoupons.some((c) => c.code === coupon!.code)" :value="coupon.code">
             {{ coupon.name }}（折 NT$ {{ coupon.discount.toLocaleString() }}）
           </option>
         </select>
@@ -207,7 +236,12 @@
             class="w-full rounded-xl border border-gray-200 px-3 py-2.5 uppercase focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
             @keydown.enter.prevent="applyCoupon()"
           />
-          <button type="button" class="btn-cute-outline shrink-0 !px-5 !py-2.5" :disabled="!couponInput || couponChecking" @click="applyCoupon()">
+          <button
+            type="button"
+            class="btn-cute-outline shrink-0 !px-5 !py-2.5"
+            :disabled="!couponInput || couponChecking"
+            @click="applyCoupon()"
+          >
             <LoadingSpinner v-if="couponChecking" size="sm" />
             <template v-else>套用</template>
           </button>
@@ -256,12 +290,7 @@
       </div>
 
       <div class="flex gap-4 pt-2">
-        <button
-          @click="currentStep = 1"
-          class="btn-cute-outline flex-1"
-        >
-          上一步
-        </button>
+        <button @click="currentStep = 1" class="btn-cute-outline flex-1">上一步</button>
         <button
           @click="submitBooking"
           :disabled="loading"
@@ -303,7 +332,7 @@ const selectedService = ref<any>(null)
 const serviceGroups = computed(() => {
   const groups: { id: number; name: string; services: any[] }[] = []
   for (const s of services.value) {
-    let group = groups.find(g => g.id === s.category_id)
+    let group = groups.find((g) => g.id === s.category_id)
     if (!group) {
       group = { id: s.category_id, name: s.category_name || '其他', services: [] }
       groups.push(group)
@@ -314,11 +343,17 @@ const serviceGroups = computed(() => {
 })
 
 const activeGroupId = ref<number | null>(null)
-const activeGroup = computed(() => serviceGroups.value.find(g => g.id === activeGroupId.value) || serviceGroups.value[0])
+const activeGroup = computed(
+  () => serviceGroups.value.find((g) => g.id === activeGroupId.value) || serviceGroups.value[0]
+)
 // 分類載入後預設第一個
-watch(serviceGroups, (groups) => {
-  if (!groups.some(g => g.id === activeGroupId.value)) activeGroupId.value = groups[0]?.id ?? null
-}, { immediate: true })
+watch(
+  serviceGroups,
+  (groups) => {
+    if (!groups.some((g) => g.id === activeGroupId.value)) activeGroupId.value = groups[0]?.id ?? null
+  },
+  { immediate: true }
+)
 
 // 選了服務就直接進到選時間
 const chooseService = (service: any) => {
@@ -358,17 +393,17 @@ onMounted(async () => {
   // 從服務介紹頁點「預約這個療程」過來時，直接帶入該服務
   const presetId = Number(route.query.serviceId)
   if (presetId) {
-    selectedService.value = services.value.find(s => s.id === presetId) || null
+    selectedService.value = services.value.find((s) => s.id === presetId) || null
     // 帶著療程過來就直接從選時間開始
     if (selectedService.value) {
       activeGroupId.value = selectedService.value.category_id
       currentStep.value = 1
     }
   }
-  
+
   // 載入美容師列表
   try {
-    const response = await apiClient.get('/staff')as any
+    const response = (await apiClient.get('/staff')) as any
     if (response.success) {
       staffList.value = response.data || []
     }
@@ -378,7 +413,7 @@ onMounted(async () => {
 
   // 會員有設定指定美容師就先選好
   const preferred = (authStore.user as any)?.preferred_staff_id
-  if (preferred && staffList.value.some(s => s.id === preferred)) {
+  if (preferred && staffList.value.some((s) => s.id === preferred)) {
     selectedStaff.value = preferred
   }
 })
@@ -392,13 +427,13 @@ watch([selectedDate, selectedStaff], async () => {
   if (!selectedDate.value || !selectedService.value) return
 
   try {
-    const response = await apiClient.get('/appointments/available', {
+    const response = (await apiClient.get('/appointments/available', {
       params: {
         date: selectedDate.value,
         serviceId: selectedService.value.id,
         staffId: selectedStaff.value || undefined
       }
-    }) as any
+    })) as any
     if (response.success) {
       availableSlots.value = response.data || []
       slotMessage.value = response.message || ''
@@ -420,12 +455,12 @@ const couponChecking = ref(false)
 
 const myCoupons = ref<any[]>([])
 // 券夾裡這個療程能用的
-const usableCoupons = computed(() => myCoupons.value.filter(c => c.status === 'available' && c.discount !== null))
+const usableCoupons = computed(() => myCoupons.value.filter((c) => c.status === 'available' && c.discount !== null))
 
 const loadMyCoupons = async () => {
   if (!authStore.isLoggedIn || !selectedService.value) return
   try {
-    const res = await apiClient.get('/coupons/mine', { params: { serviceId: selectedService.value.id } }) as any
+    const res = (await apiClient.get('/coupons/mine', { params: { serviceId: selectedService.value.id } })) as any
     myCoupons.value = res.data || []
   } catch {
     myCoupons.value = []
@@ -441,7 +476,7 @@ const applyCoupon = async (code = couponInput.value) => {
   if (!code || !selectedService.value) return
   couponChecking.value = true
   try {
-    const res = await apiClient.post('/appointments/coupon', { code, serviceId: selectedService.value.id }) as any
+    const res = (await apiClient.post('/appointments/coupon', { code, serviceId: selectedService.value.id })) as any
     coupon.value = res.data
     toast.success(`已折抵 NT$ ${res.data.discount.toLocaleString()}`)
   } catch (error: any) {
@@ -459,7 +494,9 @@ const removeCoupon = () => {
 // 換療程後折扣金額會不同，要重新套用
 watch(selectedService, removeCoupon)
 // 進到確認頁才載入券夾
-watch(currentStep, (step) => { if (step === 2) loadMyCoupons() })
+watch(currentStep, (step) => {
+  if (step === 2) loadMyCoupons()
+})
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('zh-TW', {
@@ -484,7 +521,7 @@ const submitBooking = async () => {
 
   loading.value = true
   try {
-    const response = await apiClient.post('/appointments', {
+    const response = (await apiClient.post('/appointments', {
       serviceId: selectedService.value.id,
       staffId: selectedStaff.value || null,
       couponCode: coupon.value?.code,
@@ -493,8 +530,8 @@ const submitBooking = async () => {
       customerName: customerName.value,
       customerPhone: normalizeTaiwanPhone(customerPhone.value),
       notes: notes.value
-    })as any
-    
+    })) as any
+
     if (response.success) {
       toast.success('預約成功！')
       router.push('/appointments')

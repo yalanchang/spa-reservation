@@ -34,7 +34,7 @@ interface AuthState {
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    user: JSON.parse(localStorage.getItem('user') || 'null'), 
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     token: localStorage.getItem('token'),
     loading: false
   }),
@@ -78,15 +78,15 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchProfile() {
-        try {
-          const response: any = await apiClient.get('/auth/profile')
-          if (response && response.success && response.data) {
-            this.user = response.data
-            localStorage.setItem('user', JSON.stringify(response.data))
-          }
-        } catch (error) {
-          console.error('Fetch profile failed:', error)
+      try {
+        const response: any = await apiClient.get('/auth/profile')
+        if (response && response.success && response.data) {
+          this.user = response.data
+          localStorage.setItem('user', JSON.stringify(response.data))
         }
+      } catch (error) {
+        console.error('Fetch profile failed:', error)
       }
+    }
   }
 })

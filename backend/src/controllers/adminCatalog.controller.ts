@@ -36,10 +36,11 @@ export const saveCategory = async (req: Request, res: Response): Promise<void> =
       if (!result.affectedRows) return fail(res, 404, '分類不存在')
       await logAction(req, '修改分類', name)
     } else {
-      await execute(
-        'INSERT INTO service_categories (name, description, sort_order) VALUES (?, ?, ?)',
-        [name, description || null, sortOrder]
-      )
+      await execute('INSERT INTO service_categories (name, description, sort_order) VALUES (?, ?, ?)', [
+        name,
+        description || null,
+        sortOrder
+      ])
       await logAction(req, '新增分類', name)
     }
     res.json({ success: true, message: '分類已儲存' })
@@ -163,15 +164,23 @@ export const saveStaff = async (req: Request, res: Response): Promise<void> => {
       if (!result.affectedRows) return fail(res, 404, '美容師不存在')
       await logAction(req, '修改美容師資料', name)
     } else {
-      const [result] = await execute(
-        'INSERT INTO staff (name, title, bio, years_experience) VALUES (?, ?, ?, ?)',
-        [name, title || null, bio || null, years]
-      )
+      const [result] = await execute('INSERT INTO staff (name, title, bio, years_experience) VALUES (?, ?, ?, ?)', [
+        name,
+        title || null,
+        bio || null,
+        years
+      ])
       // 新人先帶入預設班表，之後再調整
       await execute(
         `INSERT INTO staff_schedule (staff_id, day_of_week, start_time, end_time, is_working)
          VALUES ${Array.from({ length: 7 }, () => '(?, ?, ?, ?, ?)').join(', ')}`,
-        Array.from({ length: 7 }, (_, day) => [result.insertId, day, '10:00', day === 0 || day === 6 ? '18:00' : '20:00', day === 1 ? 0 : 1]).flat()
+        Array.from({ length: 7 }, (_, day) => [
+          result.insertId,
+          day,
+          '10:00',
+          day === 0 || day === 6 ? '18:00' : '20:00',
+          day === 1 ? 0 : 1
+        ]).flat()
       )
       await logAction(req, '新增美容師', name)
     }
@@ -218,7 +227,7 @@ export const getStaffSchedule = async (req: Request, res: Response): Promise<voi
     )
     // 沒設定的星期補成休假
     const days = Array.from({ length: 7 }, (_, day) => {
-      const row = schedule.find(s => s.day_of_week === day)
+      const row = schedule.find((s) => s.day_of_week === day)
       return {
         day,
         start: row ? String(row.start_time).slice(0, 5) : '10:00',
@@ -230,7 +239,7 @@ export const getStaffSchedule = async (req: Request, res: Response): Promise<voi
       success: true,
       data: {
         schedule: days,
-        leaves: leaves.map(l => ({
+        leaves: leaves.map((l) => ({
           ...l,
           leave_date: formatDate(l.leave_date),
           start_time: l.start_time ? String(l.start_time).slice(0, 5) : null,

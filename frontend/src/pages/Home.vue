@@ -14,167 +14,168 @@
             :key="promoIndex"
             class="absolute inset-0 flex items-center justify-center whitespace-nowrap px-4 text-xs font-medium tracking-wide text-primary-600"
           >
-            <span class="mr-2 text-primary-400" aria-hidden="true">{{ PROMO_SYMBOLS[promoIndex % PROMO_SYMBOLS.length] }}</span>
+            <span class="mr-2 text-primary-400" aria-hidden="true">{{
+              PROMO_SYMBOLS[promoIndex % PROMO_SYMBOLS.length]
+            }}</span>
             {{ marqueeWords[promoIndex % marqueeWords.length] }}
-            <span class="ml-2 text-primary-400" aria-hidden="true">{{ PROMO_SYMBOLS[promoIndex % PROMO_SYMBOLS.length] }}</span>
+            <span class="ml-2 text-primary-400" aria-hidden="true">{{
+              PROMO_SYMBOLS[promoIndex % PROMO_SYMBOLS.length]
+            }}</span>
           </p>
         </Transition>
       </div>
     </section>
 
-  <div class="space-y-20 sm:space-y-28">
-    <section
-      class="relative overflow-hidden rounded-4xl bg-primary-50 px-6 py-14 sm:px-12 sm:py-20"
-      @mousemove="onMouseMove"
-      @mouseleave="mouse = { x: 0, y: 0 }"
-    >
-      <div class="relative grid items-center gap-12 lg:grid-cols-2">
-        <div class="text-center lg:text-left">
-          <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">K-BEAUTY SPA</p>
-          <h1 class="mt-5 text-4xl font-extrabold leading-tight text-cocoa sm:text-5xl">
-            把疲憊交給我們，<br />
-            把<span class="text-primary-600">美麗</span>留給自己
-          </h1>
-          <p class="mt-6 text-base text-gray-500 sm:text-lg">韓式肌膚管理與身體舒壓療程</p>
-          <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-            <router-link to="/booking" class="btn-cute text-lg">立即預約</router-link>
-            <router-link to="/services" class="btn-cute-outline text-lg">服務項目</router-link>
-          </div>
-        </div>
-
-        <!-- 照片牌組：自動輪播，滑過展開、點擊切換 -->
-        <div class="relative mx-auto w-full max-w-md">
-          <div
-            class="relative aspect-[4/5] w-full transition-transform duration-300 ease-out"
-            :style="deckTilt"
-            @mouseenter="deckHover = true"
-            @mouseleave="deckHover = false"
-          >
-            <button
-              v-for="(photo, i) in heroPhotos"
-              :key="photo.src"
-              type="button"
-              class="absolute inset-0 overflow-hidden rounded-[2.5rem] shadow-soft-lg transition-all duration-700 ease-[cubic-bezier(0.34,1.4,0.64,1)]"
-              :class="i === active ? 'cursor-default' : 'cursor-pointer'"
-              :style="cardStyle(i)"
-              :aria-label="`顯示${photo.label}`"
-              @click="active = i"
-            >
-              <img :src="photo.src" :alt="photo.label" class="h-full w-full object-cover" />
-            </button>
-          </div>
-
-          <!-- 進度點 -->
-          <div class="mt-8 flex justify-center gap-2">
-            <button
-              v-for="(photo, i) in heroPhotos"
-              :key="photo.src"
-              type="button"
-              class="h-2 rounded-full transition-all duration-300"
-              :class="i === active ? 'w-8 bg-primary-500' : 'w-2 bg-primary-200'"
-              :aria-label="`切換到${photo.label}`"
-              @click="active = i"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 我們的堅持：左邊照片，右邊條列 -->
-    <section class="grid items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
-      <img
-        v-reveal
-        src="/images/home/why-us.jpg"
-        alt="毛巾、保養品與粉色鬱金香"
-        class="aspect-[4/3] w-full rounded-[2rem] object-cover"
-      />
-      <div>
-        <div v-reveal>
-          <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">WHY US</p>
-          <h2 class="mt-2 text-3xl font-bold text-cocoa">我們的堅持</h2>
-          <p class="mt-3 text-gray-500">從進門到離開，每個細節都為了讓你真正放鬆</p>
-        </div>
-        <ol class="mt-8 divide-y divide-primary-100 border-y border-primary-100">
-          <li v-for="(feature, i) in features" :key="feature.title" v-reveal="i * 120" class="flex gap-5 py-6">
-            <span class="w-10 shrink-0 text-2xl font-extrabold text-primary-300">0{{ i + 1 }}</span>
-            <div>
-              <h3 class="text-lg font-bold text-cocoa">{{ feature.title }}</h3>
-              <p class="mt-1 leading-relaxed text-gray-500">{{ feature.description }}</p>
+    <div class="space-y-20 sm:space-y-28">
+      <section
+        class="relative overflow-hidden rounded-4xl bg-primary-50 px-6 py-14 sm:px-12 sm:py-20"
+        @mousemove="onMouseMove"
+        @mouseleave="mouse = { x: 0, y: 0 }"
+      >
+        <div class="relative grid items-center gap-12 lg:grid-cols-2">
+          <div class="text-center lg:text-left">
+            <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">K-BEAUTY SPA</p>
+            <h1 class="mt-5 text-4xl font-extrabold leading-tight text-cocoa sm:text-5xl">
+              把疲憊交給我們，<br />
+              把<span class="text-primary-600">美麗</span>留給自己
+            </h1>
+            <p class="mt-6 text-base text-gray-500 sm:text-lg">韓式肌膚管理與身體舒壓療程</p>
+            <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+              <router-link to="/booking" class="btn-cute text-lg">立即預約</router-link>
+              <router-link to="/services" class="btn-cute-outline text-lg">服務項目</router-link>
             </div>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- 依心情探索療程 -->
-    <section>
-      <div v-reveal class="text-center">
-        <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">FIND YOUR CARE</p>
-        <h2 class="mt-2 text-3xl font-bold text-cocoa">今天，想怎麼照顧自己？</h2>
-        <p class="mt-3 text-gray-500">依照你現在的感受，找到適合的照顧方式</p>
-      </div>
-
-      <!-- 依心情探索：四張照片對應四個分類，點了帶到服務項目並篩好分類 -->
-      <div v-if="careMoods.length" v-reveal class="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-        <router-link
-          v-for="mood in careMoods"
-          :key="mood.categoryId"
-          :to="{ path: '/services', query: { category: mood.categoryId } }"
-          class="group relative aspect-[3/4] overflow-hidden rounded-3xl"
-        >
-          <img :src="mood.image" :alt="mood.category" class="h-full w-full object-cover" />
-          <div class="absolute bottom-3 left-3 right-3 rounded-2xl bg-white/95 px-4 py-3 sm:bottom-4 sm:left-4 sm:right-4">
-            <p class="font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">{{ mood.title }}</p>
-            <p class="mt-0.5 text-xs text-gray-500 sm:text-sm">{{ mood.line }}</p>
           </div>
-        </router-link>
-      </div>
-    </section>
 
-    <!-- 預約流程 -->
-    <section>
-      <div v-reveal class="text-center">
-        <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">HOW IT WORKS</p>
-        <h2 class="mt-2 text-3xl font-bold text-cocoa">預約流程</h2>
-      </div>
-      <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <div
-          v-for="(step, i) in steps"
-          :key="step.title"
-          v-reveal="i * 120"
-          class="text-center"
-        >
-          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white shadow-soft">
-            {{ i + 1 }}
+          <!-- 照片牌組：自動輪播，滑過展開、點擊切換 -->
+          <div class="relative mx-auto w-full max-w-md">
+            <div
+              class="relative aspect-[4/5] w-full transition-transform duration-300 ease-out"
+              :style="deckTilt"
+              @mouseenter="deckHover = true"
+              @mouseleave="deckHover = false"
+            >
+              <button
+                v-for="(photo, i) in heroPhotos"
+                :key="photo.src"
+                type="button"
+                class="absolute inset-0 overflow-hidden rounded-[2.5rem] shadow-soft-lg transition-all duration-700 ease-[cubic-bezier(0.34,1.4,0.64,1)]"
+                :class="i === active ? 'cursor-default' : 'cursor-pointer'"
+                :style="cardStyle(i)"
+                :aria-label="`顯示${photo.label}`"
+                @click="active = i"
+              >
+                <img :src="photo.src" :alt="photo.label" class="h-full w-full object-cover" />
+              </button>
+            </div>
+
+            <!-- 進度點 -->
+            <div class="mt-8 flex justify-center gap-2">
+              <button
+                v-for="(photo, i) in heroPhotos"
+                :key="photo.src"
+                type="button"
+                class="h-2 rounded-full transition-all duration-300"
+                :class="i === active ? 'w-8 bg-primary-500' : 'w-2 bg-primary-200'"
+                :aria-label="`切換到${photo.label}`"
+                @click="active = i"
+              ></button>
+            </div>
           </div>
-          <h3 class="mt-4 text-lg font-bold text-cocoa">{{ step.title }}</h3>
-          <p class="mt-1 text-sm text-gray-500">{{ step.description }}</p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 行動呼籲 -->
-    <section v-reveal>
-      <div class="group relative overflow-hidden rounded-4xl">
+      <!-- 我們的堅持：左邊照片，右邊條列 -->
+      <section class="grid items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
         <img
-          src="/images/home/space.jpg"
-          alt="舒適的護理空間"
-          class="absolute inset-0 h-full w-full object-cover"
+          v-reveal
+          src="/images/home/why-us.jpg"
+          alt="毛巾、保養品與粉色鬱金香"
+          class="aspect-[4/3] w-full rounded-[2rem] object-cover"
         />
-        <div class="absolute inset-0 bg-cocoa/55"></div>
-        <div class="relative px-8 py-16 text-center text-white sm:px-14 sm:py-20 sm:text-left">
-          <h2 class="text-2xl font-bold sm:text-3xl">今天，就來好好寵愛自己</h2>
-          <p class="mt-2 text-white/85">線上選好時段，到店立即享受</p>
+        <div>
+          <div v-reveal>
+            <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">WHY US</p>
+            <h2 class="mt-2 text-3xl font-bold text-cocoa">我們的堅持</h2>
+            <p class="mt-3 text-gray-500">從進門到離開，每個細節都為了讓你真正放鬆</p>
+          </div>
+          <ol class="mt-8 divide-y divide-primary-100 border-y border-primary-100">
+            <li v-for="(feature, i) in features" :key="feature.title" v-reveal="i * 120" class="flex gap-5 py-6">
+              <span class="w-10 shrink-0 text-2xl font-extrabold text-primary-300">0{{ i + 1 }}</span>
+              <div>
+                <h3 class="text-lg font-bold text-cocoa">{{ feature.title }}</h3>
+                <p class="mt-1 leading-relaxed text-gray-500">{{ feature.description }}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 依心情探索療程 -->
+      <section>
+        <div v-reveal class="text-center">
+          <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">FIND YOUR CARE</p>
+          <h2 class="mt-2 text-3xl font-bold text-cocoa">今天，想怎麼照顧自己？</h2>
+          <p class="mt-3 text-gray-500">依照你現在的感受，找到適合的照顧方式</p>
+        </div>
+
+        <!-- 依心情探索：四張照片對應四個分類，點了帶到服務項目並篩好分類 -->
+        <div v-if="careMoods.length" v-reveal class="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           <router-link
-            to="/booking"
-            class="mt-8 inline-flex rounded-full bg-white px-7 py-3 font-semibold text-primary-600 shadow-soft transition active:scale-95 hover:font-bold"
+            v-for="mood in careMoods"
+            :key="mood.categoryId"
+            :to="{ path: '/services', query: { category: mood.categoryId } }"
+            class="group relative aspect-[3/4] overflow-hidden rounded-3xl"
           >
-            馬上預約
+            <img :src="mood.image" :alt="mood.category" class="h-full w-full object-cover" />
+            <div
+              class="absolute bottom-3 left-3 right-3 rounded-2xl bg-white/95 px-4 py-3 sm:bottom-4 sm:left-4 sm:right-4"
+            >
+              <p class="font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">
+                {{ mood.title }}
+              </p>
+              <p class="mt-0.5 text-xs text-gray-500 sm:text-sm">{{ mood.line }}</p>
+            </div>
           </router-link>
         </div>
-      </div>
-    </section>
-  </div>
+      </section>
+
+      <!-- 預約流程 -->
+      <section>
+        <div v-reveal class="text-center">
+          <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">HOW IT WORKS</p>
+          <h2 class="mt-2 text-3xl font-bold text-cocoa">預約流程</h2>
+        </div>
+        <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div v-for="(step, i) in steps" :key="step.title" v-reveal="i * 120" class="text-center">
+            <div
+              class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white shadow-soft"
+            >
+              {{ i + 1 }}
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-cocoa">{{ step.title }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ step.description }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 行動呼籲 -->
+      <section v-reveal>
+        <div class="group relative overflow-hidden rounded-4xl">
+          <img src="/images/home/space.jpg" alt="舒適的護理空間" class="absolute inset-0 h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-cocoa/55"></div>
+          <div class="relative px-8 py-16 text-center text-white sm:px-14 sm:py-20 sm:text-left">
+            <h2 class="text-2xl font-bold sm:text-3xl">今天，就來好好寵愛自己</h2>
+            <p class="mt-2 text-white/85">線上選好時段，到店立即享受</p>
+            <router-link
+              to="/booking"
+              class="mt-8 inline-flex rounded-full bg-white px-7 py-3 font-semibold text-primary-600 shadow-soft transition active:scale-95 hover:font-bold"
+            >
+              馬上預約
+            </router-link>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -262,7 +263,8 @@ let timer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
   // 活動消息一律輪流顯示（減少動態效果時只是不播滑動動畫）
   promoTimer = setInterval(() => {
-    if (!promoPaused.value && marqueeWords.value.length) promoIndex.value = (promoIndex.value + 1) % marqueeWords.value.length
+    if (!promoPaused.value && marqueeWords.value.length)
+      promoIndex.value = (promoIndex.value + 1) % marqueeWords.value.length
   }, 3500)
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   timer = setInterval(() => {
@@ -281,7 +283,7 @@ const PROMO_SYMBOLS = ['✦', '♡', '✿', '★', '❀']
 const marqueeWords = ref<string[]>([])
 onMounted(async () => {
   try {
-    const res = await apiClient.get('/site/announcements') as any
+    const res = (await apiClient.get('/site/announcements')) as any
     marqueeWords.value = (res.data || []).map((a: any) => a.content)
   } catch {
     // 載入失敗就不顯示跑馬燈
@@ -305,7 +307,9 @@ const steps = [
 /* 活動消息：舊的往左滑出、新的從右邊滑入 */
 .promo-enter-active,
 .promo-leave-active {
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
 }
 .promo-enter-from {
   transform: translateX(60%);

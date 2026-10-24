@@ -7,7 +7,13 @@
       </div>
       <div>
         <label class="admin-label" for="closure-reason">原因</label>
-        <input id="closure-reason" v-model="form.reason" maxlength="100" placeholder="例如：員工旅遊、農曆春節" class="admin-input" />
+        <input
+          id="closure-reason"
+          v-model="form.reason"
+          maxlength="100"
+          placeholder="例如：員工旅遊、農曆春節"
+          class="admin-input"
+        />
         <p class="admin-hint">會顯示在前台預約頁</p>
       </div>
       <button type="submit" class="admin-btn sm:mt-5" :disabled="saving">新增</button>
@@ -25,8 +31,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="4" class="py-12"><LoadingSpinner /></td></tr>
-          <tr v-else-if="!rows.length"><td colspan="4" class="py-12 text-center text-gray-400">近期沒有公休日</td></tr>
+          <tr v-if="loading">
+            <td colspan="4" class="py-12"><LoadingSpinner /></td>
+          </tr>
+          <tr v-else-if="!rows.length">
+            <td colspan="4" class="py-12 text-center text-gray-400">近期沒有公休日</td>
+          </tr>
           <tr v-for="r in rows" v-else :key="r.closure_date">
             <td class="whitespace-nowrap tabular-nums">{{ r.closure_date }}（{{ weekday(r.closure_date) }}）</td>
             <td class="text-gray-600">{{ r.reason || '—' }}</td>
@@ -62,7 +72,7 @@ const weekday = (date: string) => `週${WEEKDAYS[new Date(`${date}T00:00:00`).ge
 
 const load = async () => {
   try {
-    const res = await apiClient.get('/admin/closures') as any
+    const res = (await apiClient.get('/admin/closures')) as any
     rows.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '公休日載入失敗')
@@ -74,7 +84,7 @@ const load = async () => {
 const add = async () => {
   saving.value = true
   try {
-    const res = await apiClient.post('/admin/closures', form.value) as any
+    const res = (await apiClient.post('/admin/closures', form.value)) as any
     // 當天還有預約時用警告提醒
     if (res.message.includes('記得')) toast.warning(res.message)
     else toast.success(res.message)

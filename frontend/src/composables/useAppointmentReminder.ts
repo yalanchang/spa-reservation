@@ -20,7 +20,7 @@ const loadShown = (): number[] => {
 
 export const refreshReminders = async () => {
   try {
-    const res = await apiClient.get('/appointments/my') as any
+    const res = (await apiClient.get('/appointments/my')) as any
     appointments.value = res.data || []
   } catch (error) {
     console.error('Load reminders failed:', error)
@@ -51,8 +51,7 @@ export const useReminders = () => {
   // 已體驗但還沒寫心得
   const toReview = computed(() =>
     appointments.value.filter(
-      (appt) =>
-        Number(appt.is_past) && !appt.review_rating && !['cancelled', 'no_show'].includes(appt.status)
+      (appt) => Number(appt.is_past) && !appt.review_rating && !['cancelled', 'no_show'].includes(appt.status)
     )
   )
 

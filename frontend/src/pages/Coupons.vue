@@ -7,14 +7,22 @@
     </div>
 
     <div class="mb-5 flex flex-wrap items-center gap-3">
-      <select v-model="filter" class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-cocoa focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200" aria-label="篩選">
+      <select
+        v-model="filter"
+        class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-cocoa focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
+        aria-label="篩選"
+      >
         <option value="">全部優惠券</option>
         <option value="eligible">我可以領的</option>
         <option v-for="(label, value) in AUDIENCE_OPTIONS" :key="value" :value="value">{{ label }}</option>
       </select>
       <span class="text-sm text-gray-500">共 {{ visible.length }} 張</span>
       <div class="ml-auto flex items-center gap-4">
-        <router-link v-if="authStore.isLoggedIn" :to="{ path: '/profile', query: { tab: 'coupons' } }" class="text-sm font-medium text-primary-600 hover:text-primary-700">
+        <router-link
+          v-if="authStore.isLoggedIn"
+          :to="{ path: '/profile', query: { tab: 'coupons' } }"
+          class="text-sm font-medium text-primary-600 hover:text-primary-700"
+        >
           我的優惠券
         </router-link>
         <button
@@ -36,7 +44,11 @@
     <ul v-else class="space-y-4">
       <li v-for="c in visible" :key="c.id">
         <CouponTicket :coupon="c" :muted="c.claimed || !!c.problem" :note="c.claimed ? null : c.problem">
-          <span v-if="c.claimed" class="whitespace-nowrap rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500">已領取</span>
+          <span
+            v-if="c.claimed"
+            class="whitespace-nowrap rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500"
+            >已領取</span
+          >
           <router-link
             v-else-if="!authStore.isLoggedIn"
             :to="{ path: '/login', query: { redirect: '/coupons' } }"
@@ -101,18 +113,18 @@ const rank = (c: any) => (c.claimed ? 2 : c.problem ? 1 : 0)
 
 const visible = computed(() => {
   let list = coupons.value
-  if (filter.value === 'eligible') list = list.filter(c => !c.problem && !c.claimed)
-  else if (filter.value) list = list.filter(c => c.audience === filter.value)
+  if (filter.value === 'eligible') list = list.filter((c) => !c.problem && !c.claimed)
+  else if (filter.value) list = list.filter((c) => c.audience === filter.value)
   return [...list].sort((a, b) => rank(a) - rank(b))
 })
 
 const claimingAll = ref(false)
-const claimableCount = computed(() => coupons.value.filter(c => !c.claimed && !c.problem).length)
+const claimableCount = computed(() => coupons.value.filter((c) => !c.claimed && !c.problem).length)
 
 const claimAll = async () => {
   claimingAll.value = true
   try {
-    const res = await apiClient.post('/coupons/claim-all') as any
+    const res = (await apiClient.post('/coupons/claim-all')) as any
     toast.success(res.message)
     await load()
   } catch (error: any) {
@@ -124,7 +136,7 @@ const claimAll = async () => {
 
 const load = async () => {
   try {
-    const res = await apiClient.get('/coupons/center') as any
+    const res = (await apiClient.get('/coupons/center')) as any
     coupons.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '優惠券載入失敗')
@@ -136,7 +148,7 @@ const load = async () => {
 const claim = async (c: any) => {
   claimingId.value = c.id
   try {
-    const res = await apiClient.post(`/coupons/${c.id}/claim`) as any
+    const res = (await apiClient.post(`/coupons/${c.id}/claim`)) as any
     c.claimed = true
     toast.success(res.message)
   } catch (error: any) {

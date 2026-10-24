@@ -150,27 +150,27 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-        path: '/appointments',
-        name: 'appointments',
-        component: () => import('@/pages/Appointments.vue'),
-        meta: { requiresAuth: true }
-      },
-      {
-        path: '/services/:id',
-        name: 'service-detail',
-        component: () => import('@/pages/ServiceDetail.vue')
-      },
-      {
-        path: '/register',
-        name: 'register',
-        component: () => import('@/pages/Register.vue'),
-        meta: { guest: true }
-      },
-      {
-        path: '/oauth/callback',
-        name: 'oauth-callback',
-        component: () => import('@/pages/OAuthCallback.vue')
-      }
+      path: '/appointments',
+      name: 'appointments',
+      component: () => import('@/pages/Appointments.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/services/:id',
+      name: 'service-detail',
+      component: () => import('@/pages/ServiceDetail.vue')
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/pages/Register.vue'),
+      meta: { guest: true }
+    },
+    {
+      path: '/oauth/callback',
+      name: 'oauth-callback',
+      component: () => import('@/pages/OAuthCallback.vue')
+    }
   ]
 })
 

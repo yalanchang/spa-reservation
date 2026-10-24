@@ -3,7 +3,9 @@
     <!-- 新增 -->
     <form class="rounded-md border border-gray-200 bg-white p-4 lg:p-5" @submit.prevent="createUser">
       <h2 class="text-sm font-medium text-gray-900">新增後台帳號</h2>
-      <p class="mt-1 text-xs text-gray-500">後台帳號與前台會員分開，建立後請把電子郵件與初始密碼交給對方，對方可再用「忘記密碼」自行更改</p>
+      <p class="mt-1 text-xs text-gray-500">
+        後台帳號與前台會員分開，建立後請把電子郵件與初始密碼交給對方，對方可再用「忘記密碼」自行更改
+      </p>
       <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1.4fr_1fr_8rem_auto] lg:items-end">
         <div>
           <label for="new-name" class="mb-1 block text-xs text-gray-500">姓名</label>
@@ -110,12 +112,12 @@ const menuItems = (user: any) =>
     { value: 'admin', label: '設為管理員' },
     { value: 'staff', label: '設為美容師' },
     { value: 'deactivate', label: '停用帳號', danger: true }
-  ].filter(item => item.value !== user.role)
+  ].filter((item) => item.value !== user.role)
 
 const fetchUsers = async () => {
   loading.value = true
   try {
-    const res = await apiClient.get('/admin/users') as any
+    const res = (await apiClient.get('/admin/users')) as any
     users.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '帳號載入失敗')

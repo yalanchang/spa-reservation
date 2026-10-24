@@ -2,7 +2,7 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 const apiClient = axios.create({
-  baseURL: API_URL,  
+  baseURL: API_URL,
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('user')
       window.location.href = window.location.pathname.startsWith('/admin') ? '/admin/login' : '/login'
     }
-    
+
     // 後台 API 需要後台登入（含驗證碼）才能用
     if (error.response?.status === 403 && error.response.data?.code === 'ADMIN_LOGIN_REQUIRED') {
       window.location.href = '/admin/login'

@@ -14,7 +14,9 @@
         <label class="admin-label" for="ab-service">療程</label>
         <select id="ab-service" v-model="form.serviceId" required class="admin-input">
           <option :value="null" disabled>請選擇</option>
-          <option v-for="s in services" :key="s.id" :value="s.id">{{ s.category_name }}｜{{ s.name }}（{{ s.duration }} 分）</option>
+          <option v-for="s in services" :key="s.id" :value="s.id">
+            {{ s.category_name }}｜{{ s.name }}（{{ s.duration }} 分）
+          </option>
         </select>
       </div>
       <div>
@@ -80,8 +82,14 @@ const slotsLoading = ref(false)
 const saving = ref(false)
 
 const empty = () => ({
-  customerName: '', customerPhone: '', serviceId: null as number | null, staffId: null as number | null,
-  date: today, time: '', source: 'phone', notes: ''
+  customerName: '',
+  customerPhone: '',
+  serviceId: null as number | null,
+  staffId: null as number | null,
+  date: today,
+  time: '',
+  source: 'phone',
+  notes: ''
 })
 const form = ref(empty())
 
@@ -91,33 +99,39 @@ const slotHint = computed(() => {
   return slots.value.length ? '請選擇' : '這天沒有空檔'
 })
 
-watch(() => props.open, async (open) => {
-  if (!open) return
-  form.value = empty()
-  if (services.value.length) return
-  try {
-    const [svc, st] = await Promise.all([apiClient.get('/admin/services'), apiClient.get('/admin/staff')]) as any[]
-    services.value = (svc.data || []).filter((s: any) => Number(s.is_active))
-    staff.value = (st.data || []).filter((s: any) => Number(s.is_active))
-  } catch (error: any) {
-    toast.error(error?.message || '資料載入失敗')
+watch(
+  () => props.open,
+  async (open) => {
+    if (!open) return
+    form.value = empty()
+    if (services.value.length) return
+    try {
+      const [svc, st] = (await Promise.all([apiClient.get('/admin/services'), apiClient.get('/admin/staff')])) as any[]
+      services.value = (svc.data || []).filter((s: any) => Number(s.is_active))
+      staff.value = (st.data || []).filter((s: any) => Number(s.is_active))
+    } catch (error: any) {
+      toast.error(error?.message || '資料載入失敗')
+    }
   }
-})
+)
 
-watch(() => [form.value.serviceId, form.value.staffId, form.value.date], async () => {
-  form.value.time = ''
-  slots.value = []
-  if (!form.value.serviceId || !form.value.date) return
-  slotsLoading.value = true
-  try {
-    const res = await apiClient.get('/admin/appointments/slots', {
-      params: { date: form.value.date, serviceId: form.value.serviceId, staffId: form.value.staffId || undefined }
-    }) as any
-    slots.value = res.data || []
-  } finally {
-    slotsLoading.value = false
+watch(
+  () => [form.value.serviceId, form.value.staffId, form.value.date],
+  async () => {
+    form.value.time = ''
+    slots.value = []
+    if (!form.value.serviceId || !form.value.date) return
+    slotsLoading.value = true
+    try {
+      const res = (await apiClient.get('/admin/appointments/slots', {
+        params: { date: form.value.date, serviceId: form.value.serviceId, staffId: form.value.staffId || undefined }
+      })) as any
+      slots.value = res.data || []
+    } finally {
+      slotsLoading.value = false
+    }
   }
-})
+)
 
 const submit = async () => {
   if (!isValidTaiwanPhone(form.value.customerPhone)) {
@@ -126,7 +140,7 @@ const submit = async () => {
   }
   saving.value = true
   try {
-    const res = await apiClient.post('/admin/appointments', form.value) as any
+    const res = (await apiClient.post('/admin/appointments', form.value)) as any
     toast.success(res.message)
     emit('created')
   } catch (error: any) {

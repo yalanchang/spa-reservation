@@ -35,21 +35,17 @@ export const googleCallback = async (req: Request, res: Response) => {
       headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
     })
 
-    
     const googleId = userRes.data.id
-    const email = userRes.data.email || null  
+    const email = userRes.data.email || null
     const name = userRes.data.name || 'Google'
     const picture = userRes.data.picture || null
-  
+
     // 檢查必要欄位
     if (!googleId) {
       throw new Error('Google ID is missing')
     }
     // 查找或建立用戶
-    let user = await queryOne<any>(
-      'SELECT * FROM users WHERE email = ? OR google_id = ?',
-      [email, googleId]
-    )
+    let user = await queryOne<any>('SELECT * FROM users WHERE email = ? OR google_id = ?', [email, googleId])
 
     if (!user) {
       const result = await execute(
@@ -62,7 +58,9 @@ export const googleCallback = async (req: Request, res: Response) => {
     }
 
     const token = signToken({ userId: user.id, email: user.email, role: user.role })
-    res.redirect(`${frontendUrl}/oauth/callback?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&role=${user.role}&id=${user.id}&avatar=${encodeURIComponent(user.avatar || '')}`)
+    res.redirect(
+      `${frontendUrl}/oauth/callback?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&role=${user.role}&id=${user.id}&avatar=${encodeURIComponent(user.avatar || '')}`
+    )
   } catch (err) {
     console.error('Google callback error:', err)
     res.redirect(`${frontendUrl}/login?error=google_failed`)
@@ -88,14 +86,15 @@ export const lineCallback = async (req: Request, res: Response) => {
 
   try {
     // 換取 token
-    const tokenRes = await axios.post('https://api.line.me/oauth2/v2.1/token',
+    const tokenRes = await axios.post(
+      'https://api.line.me/oauth2/v2.1/token',
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: code as string,
         redirect_uri: process.env.LINE_CALLBACK_URL!,
         client_id: process.env.LINE_CHANNEL_ID!,
         client_secret: process.env.LINE_CHANNEL_SECRET!
-      }).toString(), 
+      }).toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     )
 
@@ -110,12 +109,12 @@ export const lineCallback = async (req: Request, res: Response) => {
     let user = await queryOne<any>('SELECT * FROM users WHERE line_id = ?', [lineId])
 
     if (!user) {
-        const nameSlug = name
+      const nameSlug = name
         .toLowerCase()
-        .replace(/\s+/g, '.')     // 空白變點
+        .replace(/\s+/g, '.') // 空白變點
         .replace(/[^a-z0-9.]/g, '') // 移除特殊字元
-        .substring(0, 20)         // 限制長度
-      
+        .substring(0, 20) // 限制長度
+
       const fakeEmail = `${nameSlug}.${Math.floor(Math.random() * 1000)}@line.user`
       const result = await execute(
         `INSERT INTO users (name, email, line_id, avatar, role, is_active, password) VALUES (?, ?, ?, ?, 'customer', 1, '')`,
@@ -126,14 +125,15 @@ export const lineCallback = async (req: Request, res: Response) => {
 
     const token = signToken({ userId: user.id, email: user.email, role: user.role })
     res.redirect(
-        `${frontendUrl}/oauth/callback?` +
+      `${frontendUrl}/oauth/callback?` +
         `token=${token}&` +
         `name=${encodeURIComponent(user.name)}&` +
         `email=${encodeURIComponent(user.email)}&` +
         `role=${user.role}&` +
         `id=${user.id}&` +
         `avatar=${encodeURIComponent(user.avatar || '')}`
-      )  } catch (err) {
+    )
+  } catch (err) {
     console.error('LINE callback error:', err)
     res.redirect(`${frontendUrl}/login?error=line_failed`)
   }

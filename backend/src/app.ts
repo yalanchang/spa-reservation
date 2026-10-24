@@ -20,12 +20,12 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // 中間件
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.ALLOWED_ORIGIN 
-    : 'http://localhost:3000',
-  credentials: true
-}))
+app.use(
+  cors({
+    origin: process.env.NODE_ENV === 'production' ? process.env.ALLOWED_ORIGIN : 'http://localhost:3000',
+    credentials: true
+  })
+)
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -51,21 +51,20 @@ app.get('/api/health', async (req, res) => {
   }
 })
 
-
 // 404 處理
 app.use('*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: '找不到此路由' 
+  res.status(404).json({
+    success: false,
+    message: '找不到此路由'
   })
 })
 
 // 錯誤
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Server error:', err.stack)
-  res.status(500).json({ 
-    success: false, 
-    message: '伺服器錯誤' 
+  res.status(500).json({
+    success: false,
+    message: '伺服器錯誤'
   })
 })
 

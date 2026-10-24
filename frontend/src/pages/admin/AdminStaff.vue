@@ -19,7 +19,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="7" class="py-12"><LoadingSpinner /></td></tr>
+          <tr v-if="loading">
+            <td colspan="7" class="py-12"><LoadingSpinner /></td>
+          </tr>
           <tr v-for="s in staff" v-else :key="s.id">
             <td>
               <p class="font-medium text-gray-900">{{ s.name }}</p>
@@ -32,21 +34,27 @@
                   :key="day"
                   class="flex h-6 w-6 items-center justify-center rounded text-xs"
                   :class="s.working_days.includes(day) ? 'bg-blue-50 text-blue-700' : 'text-gray-300'"
-                >{{ label }}</span>
+                  >{{ label }}</span
+                >
               </div>
             </td>
             <td class="text-right tabular-nums">{{ s.years_experience ?? 0 }} 年</td>
             <td class="text-right tabular-nums">{{ s.today_count }}</td>
             <td class="text-right tabular-nums">{{ s.average_rating ?? '—' }}</td>
             <td>
-              <span class="admin-tag" :class="Number(s.is_active) ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'">
+              <span
+                class="admin-tag"
+                :class="Number(s.is_active) ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+              >
                 {{ Number(s.is_active) ? '在職' : '停用' }}
               </span>
             </td>
             <td class="whitespace-nowrap text-right">
               <button type="button" class="admin-link" @click="openSchedule(s)">班表與請假</button>
               <button type="button" class="admin-link ml-3" @click="openProfile(s)">資料</button>
-              <button type="button" class="admin-link ml-3" @click="toggleActive(s)">{{ Number(s.is_active) ? '停用' : '啟用' }}</button>
+              <button type="button" class="admin-link ml-3" @click="toggleActive(s)">
+                {{ Number(s.is_active) ? '停用' : '啟用' }}
+              </button>
             </td>
           </tr>
         </tbody>
@@ -54,7 +62,11 @@
     </div>
 
     <!-- 基本資料 -->
-    <AdminModal :open="!!profileForm" :title="profileForm?.id ? '編輯美容師' : '新增美容師'" @close="profileForm = null">
+    <AdminModal
+      :open="!!profileForm"
+      :title="profileForm?.id ? '編輯美容師' : '新增美容師'"
+      @close="profileForm = null"
+    >
       <form v-if="profileForm" class="space-y-4" @submit.prevent="saveProfile">
         <div>
           <label class="admin-label" for="staff-name">姓名</label>
@@ -67,7 +79,14 @@
           </div>
           <div>
             <label class="admin-label" for="staff-years">年資</label>
-            <input id="staff-years" v-model.number="profileForm.yearsExperience" type="number" min="0" max="60" class="admin-input" />
+            <input
+              id="staff-years"
+              v-model.number="profileForm.yearsExperience"
+              type="number"
+              min="0"
+              max="60"
+              class="admin-input"
+            />
           </div>
         </div>
         <div>
@@ -75,7 +94,9 @@
           <textarea id="staff-bio" v-model="profileForm.bio" rows="3" class="admin-input"></textarea>
           <p class="admin-hint">會顯示在前台</p>
         </div>
-        <p v-if="!profileForm.id" class="text-xs text-gray-500">新增後會先套用預設班表（週一休），可再到「班表與請假」調整</p>
+        <p v-if="!profileForm.id" class="text-xs text-gray-500">
+          新增後會先套用預設班表（週一休），可再到「班表與請假」調整
+        </p>
         <div class="flex justify-end gap-2">
           <button type="button" class="admin-btn-outline" @click="profileForm = null">取消</button>
           <button type="submit" class="admin-btn" :disabled="saving">
@@ -87,7 +108,12 @@
     </AdminModal>
 
     <!-- 班表與請假 -->
-    <AdminModal :open="!!scheduleStaff" :title="`${scheduleStaff?.name || ''} 的班表與請假`" wide @close="scheduleStaff = null">
+    <AdminModal
+      :open="!!scheduleStaff"
+      :title="`${scheduleStaff?.name || ''} 的班表與請假`"
+      wide
+      @close="scheduleStaff = null"
+    >
       <div v-if="scheduleLoading" class="py-10"><LoadingSpinner /></div>
       <div v-else class="space-y-6">
         <section>
@@ -104,9 +130,21 @@
                 </td>
                 <td>
                   <div v-if="d.working" class="flex items-center gap-2">
-                    <input v-model="d.start" type="time" step="1800" class="admin-input !w-32" :aria-label="`週${WEEKDAYS[d.day]}上班時間`" />
+                    <input
+                      v-model="d.start"
+                      type="time"
+                      step="1800"
+                      class="admin-input !w-32"
+                      :aria-label="`週${WEEKDAYS[d.day]}上班時間`"
+                    />
                     <span class="text-gray-400">–</span>
-                    <input v-model="d.end" type="time" step="1800" class="admin-input !w-32" :aria-label="`週${WEEKDAYS[d.day]}下班時間`" />
+                    <input
+                      v-model="d.end"
+                      type="time"
+                      step="1800"
+                      class="admin-input !w-32"
+                      :aria-label="`週${WEEKDAYS[d.day]}下班時間`"
+                    />
                   </div>
                 </td>
               </tr>
@@ -135,14 +173,32 @@
                   <option :value="false">部分</option>
                 </select>
                 <template v-if="!leaveForm.fullDay">
-                  <input v-model="leaveForm.start" type="time" step="1800" class="admin-input !w-28" aria-label="請假開始" />
-                  <input v-model="leaveForm.end" type="time" step="1800" class="admin-input !w-28" aria-label="請假結束" />
+                  <input
+                    v-model="leaveForm.start"
+                    type="time"
+                    step="1800"
+                    class="admin-input !w-28"
+                    aria-label="請假開始"
+                  />
+                  <input
+                    v-model="leaveForm.end"
+                    type="time"
+                    step="1800"
+                    class="admin-input !w-28"
+                    aria-label="請假結束"
+                  />
                 </template>
               </div>
             </div>
             <div>
               <label class="admin-label" for="leave-reason">原因</label>
-              <input id="leave-reason" v-model="leaveForm.reason" maxlength="255" placeholder="選填" class="admin-input" />
+              <input
+                id="leave-reason"
+                v-model="leaveForm.reason"
+                maxlength="255"
+                placeholder="選填"
+                class="admin-input"
+              />
             </div>
             <button type="submit" class="admin-btn">新增</button>
           </form>
@@ -150,10 +206,14 @@
           <ul class="mt-4 divide-y divide-gray-100 rounded-md border border-gray-200">
             <li v-if="!leaves.length" class="px-4 py-6 text-center text-gray-400">沒有排定的請假</li>
             <li v-for="l in leaves" :key="l.id" class="flex items-center gap-3 px-4 py-2.5">
-              <span class="tabular-nums">{{ l.leave_date }}（週{{ WEEKDAYS[new Date(`${l.leave_date}T00:00:00`).getDay()] }}）</span>
+              <span class="tabular-nums"
+                >{{ l.leave_date }}（週{{ WEEKDAYS[new Date(`${l.leave_date}T00:00:00`).getDay()] }}）</span
+              >
               <span class="text-gray-500">{{ Number(l.is_full_day) ? '整天' : `${l.start_time}–${l.end_time}` }}</span>
               <span class="flex-1 truncate text-gray-500">{{ l.reason }}</span>
-              <button type="button" class="text-sm text-red-600 hover:text-red-800" @click="deleteLeave(l)">刪除</button>
+              <button type="button" class="text-sm text-red-600 hover:text-red-800" @click="deleteLeave(l)">
+                刪除
+              </button>
             </li>
           </ul>
         </section>
@@ -182,7 +242,7 @@ const saving = ref(false)
 
 const load = async () => {
   try {
-    const res = await apiClient.get('/admin/staff') as any
+    const res = (await apiClient.get('/admin/staff')) as any
     staff.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '資料載入失敗')
@@ -219,11 +279,16 @@ const saveProfile = async () => {
 const toggleActive = async (s: any) => {
   const active = !Number(s.is_active)
   if (!active) {
-    const ok = await confirm({ title: `確定要停用 ${s.name} 嗎？`, message: '停用後前台不能再選這位美容師', confirmText: '停用', danger: true })
+    const ok = await confirm({
+      title: `確定要停用 ${s.name} 嗎？`,
+      message: '停用後前台不能再選這位美容師',
+      confirmText: '停用',
+      danger: true
+    })
     if (!ok) return
   }
   try {
-    const res = await apiClient.patch(`/admin/staff/${s.id}/active`, { active }) as any
+    const res = (await apiClient.patch(`/admin/staff/${s.id}/active`, { active })) as any
     toast.success(res.message)
     await load()
   } catch (error: any) {
@@ -239,7 +304,7 @@ const leaves = ref<any[]>([])
 const leaveForm = ref({ date: '', fullDay: true, start: '13:00', end: '18:00', reason: '' })
 
 const loadSchedule = async () => {
-  const res = await apiClient.get(`/admin/staff/${scheduleStaff.value.id}/schedule`) as any
+  const res = (await apiClient.get(`/admin/staff/${scheduleStaff.value.id}/schedule`)) as any
   schedule.value = res.data.schedule
   leaves.value = res.data.leaves
 }
@@ -259,7 +324,9 @@ const openSchedule = async (s: any) => {
 const saveSchedule = async () => {
   saving.value = true
   try {
-    const res = await apiClient.put(`/admin/staff/${scheduleStaff.value.id}/schedule`, { schedule: schedule.value }) as any
+    const res = (await apiClient.put(`/admin/staff/${scheduleStaff.value.id}/schedule`, {
+      schedule: schedule.value
+    })) as any
     toast.success(res.message)
     await load()
   } catch (error: any) {

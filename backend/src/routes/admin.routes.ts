@@ -11,14 +11,37 @@ import {
   deactivateStaffUser
 } from '../controllers/admin.controller'
 import {
-  listCategories, saveCategory, listAdminServices, saveService, setServiceActive,
-  listAdminStaff, saveStaff, setStaffActive, getStaffSchedule, saveStaffSchedule, addStaffLeave, deleteStaffLeave
+  listCategories,
+  saveCategory,
+  listAdminServices,
+  saveService,
+  setServiceActive,
+  listAdminStaff,
+  saveStaff,
+  setStaffActive,
+  getStaffSchedule,
+  saveStaffSchedule,
+  addStaffLeave,
+  deleteStaffLeave
 } from '../controllers/adminCatalog.controller'
 import {
-  listCustomers, getCustomer, updateCustomerNote, setCustomerActive,
-  getAdminSlots, createAdminAppointment, exportAppointments,
-  listCoupons, saveCoupon, listAnnouncements, saveAnnouncement, deleteAnnouncement,
-  listClosures, addClosure, deleteClosure, getReports, listLogs
+  listCustomers,
+  getCustomer,
+  updateCustomerNote,
+  setCustomerActive,
+  getAdminSlots,
+  createAdminAppointment,
+  exportAppointments,
+  listCoupons,
+  saveCoupon,
+  listAnnouncements,
+  saveAnnouncement,
+  deleteAnnouncement,
+  listClosures,
+  addClosure,
+  deleteClosure,
+  getReports,
+  listLogs
 } from '../controllers/adminOps.controller'
 import { authenticate, requireStaff, requireAdmin } from '../middleware/auth.middleware'
 

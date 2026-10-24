@@ -4,11 +4,21 @@
     <aside class="card-cute mb-6 md:mb-0">
       <div class="flex items-center gap-4 border-b border-primary-50 p-5 md:flex-col md:text-center">
         <div class="relative shrink-0">
-          <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-100 ring-4 ring-primary-50 md:h-20 md:w-20">
-            <img v-if="avatarPreview || user?.avatar" :src="avatarPreview || user?.avatar || ''" class="h-full w-full object-cover" alt="大頭貼" />
+          <div
+            class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-100 ring-4 ring-primary-50 md:h-20 md:w-20"
+          >
+            <img
+              v-if="avatarPreview || user?.avatar"
+              :src="avatarPreview || user?.avatar || ''"
+              class="h-full w-full object-cover"
+              alt="大頭貼"
+            />
             <span v-else class="text-3xl text-primary-600">{{ user?.name?.charAt(0) || 'U' }}</span>
           </div>
-          <div v-if="avatarUploading" class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white">
+          <div
+            v-if="avatarUploading"
+            class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white"
+          >
             <LoadingSpinner size="sm" />
           </div>
           <label
@@ -23,7 +33,9 @@
           <p class="truncate font-bold text-cocoa">{{ user?.name }}</p>
           <p class="truncate text-xs text-gray-500">{{ user?.email }}</p>
           <div class="mt-2 flex flex-wrap items-center gap-2 md:justify-center">
-            <span class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-600">{{ roleLabel }}</span>
+            <span class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-600">{{
+              roleLabel
+            }}</span>
             <button
               v-if="user?.avatar && !avatarUploading"
               type="button"
@@ -131,13 +143,13 @@ const tabs = [
 ]
 
 // 分頁記在網址，重新整理或分享連結都會停在同一頁
-const tab = ref(tabs.some(t => t.value === route.query.tab) ? (route.query.tab as string) : 'overview')
-const currentTab = computed(() => tabs.find(t => t.value === tab.value) || tabs[0])
+const tab = ref(tabs.some((t) => t.value === route.query.tab) ? (route.query.tab as string) : 'overview')
+const currentTab = computed(() => tabs.find((t) => t.value === tab.value) || tabs[0])
 // 從頁面內的連結改變網址（例如基本資料的「更換」信箱）時，分頁也要跟著切換
 watch(
   () => route.query.tab,
   (value) => {
-    tab.value = tabs.some(t => t.value === value) ? (value as string) : 'overview'
+    tab.value = tabs.some((t) => t.value === value) ? (value as string) : 'overview'
   }
 )
 const selectTab = (value: string) => {
@@ -145,7 +157,9 @@ const selectTab = (value: string) => {
   router.replace({ query: value === 'overview' ? {} : { tab: value } })
 }
 
-const roleLabel = computed(() => ({ admin: '管理員', staff: '美容師' } as Record<string, string>)[user.value?.role || ''] || '一般會員')
+const roleLabel = computed(
+  () => (({ admin: '管理員', staff: '美容師' }) as Record<string, string>)[user.value?.role || ''] || '一般會員'
+)
 
 // ---- 大頭貼
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -204,7 +218,7 @@ const removeAvatar = async () => {
   const ok = await confirm({ title: '確定要移除大頭貼嗎？', confirmText: '移除' })
   if (!ok) return
   try {
-    const res = await apiClient.delete('/auth/avatar') as any
+    const res = (await apiClient.delete('/auth/avatar')) as any
     authStore.setSession(authStore.token!, res.data)
     toast.success('大頭貼已移除')
   } catch (error: any) {

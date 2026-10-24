@@ -1,5 +1,9 @@
 <template>
-  <div :class="isAdmin ? 'flex min-h-screen items-center justify-center bg-gray-100 px-4 text-gray-800' : 'max-w-md mx-auto'">
+  <div
+    :class="
+      isAdmin ? 'flex min-h-screen items-center justify-center bg-gray-100 px-4 text-gray-800' : 'max-w-md mx-auto'
+    "
+  >
     <div class="w-full" :class="{ 'max-w-sm': isAdmin }">
       <div v-if="isAdmin" class="mb-6 text-center">
         <p class="text-lg font-semibold text-gray-900">美容預約系統</p>
@@ -7,18 +11,31 @@
       </div>
 
       <div :class="isAdmin ? 'rounded-md border border-gray-200 bg-white p-6' : 'card-cute p-8'">
-        <h2 :class="isAdmin ? 'text-base font-semibold text-gray-900' : 'text-2xl font-bold text-center text-cocoa'">忘記密碼</h2>
+        <h2 :class="isAdmin ? 'text-base font-semibold text-gray-900' : 'text-2xl font-bold text-center text-cocoa'">
+          忘記密碼
+        </h2>
 
         <!-- 第一步：輸入信箱 -->
         <form v-if="step === 'email'" class="mt-4 space-y-4" @submit.prevent="sendCode">
-          <p class="text-sm text-gray-500" :class="{ 'text-center': !isAdmin }">輸入註冊時的電子郵件，我們會寄出 6 位數驗證碼</p>
+          <p class="text-sm text-gray-500" :class="{ 'text-center': !isAdmin }">
+            輸入註冊時的電子郵件，我們會寄出 6 位數驗證碼
+          </p>
           <p v-if="emailError" class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
             {{ emailError }}
-            <router-link v-if="emailNotFound && !isAdmin" to="/register" class="ml-1 font-medium underline">立即註冊</router-link>
+            <router-link v-if="emailNotFound && !isAdmin" to="/register" class="ml-1 font-medium underline"
+              >立即註冊</router-link
+            >
           </p>
           <div>
             <label for="forgot-email" class="mb-1 block text-sm text-gray-600">電子郵件</label>
-            <input id="forgot-email" v-model="email" type="email" required :autocomplete="isAdmin ? 'off' : 'email'" :class="inputClass" />
+            <input
+              id="forgot-email"
+              v-model="email"
+              type="email"
+              required
+              :autocomplete="isAdmin ? 'off' : 'email'"
+              :class="inputClass"
+            />
           </div>
           <button type="submit" :disabled="loading" :class="buttonClass">
             <LoadingSpinner v-if="loading" size="sm" />
@@ -32,13 +49,21 @@
         <!-- 第二步：核對驗證碼 -->
         <form v-else-if="step === 'code'" class="mt-4 space-y-4" @submit.prevent="verifyCode">
           <p class="text-sm text-gray-500">
-            驗證碼已寄到 <span class="font-medium text-gray-700">{{ email }}</span>，10 分鐘內有效。沒收到請查看垃圾郵件。
+            驗證碼已寄到 <span class="font-medium text-gray-700">{{ email }}</span
+            >，10 分鐘內有效。沒收到請查看垃圾郵件。
           </p>
           <p v-if="error" class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{{ error }}</p>
 
           <div>
             <label for="reset-code" class="mb-1 block text-sm text-gray-600">驗證碼</label>
-            <VerificationCode id="reset-code" v-model="code" :email="email" purpose="reset" :variant="variant" :initial-wait="waitSeconds" />
+            <VerificationCode
+              id="reset-code"
+              v-model="code"
+              :email="email"
+              purpose="reset"
+              :variant="variant"
+              :initial-wait="waitSeconds"
+            />
           </div>
 
           <button type="submit" :disabled="loading" :class="buttonClass">
@@ -55,7 +80,9 @@
           <p class="text-sm text-gray-500">驗證成功，請在 10 分鐘內設定新密碼</p>
           <p v-if="error" class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
             {{ error }}
-            <button v-if="expired" type="button" class="ml-1 font-medium underline" @click="restart">重新取得驗證碼</button>
+            <button v-if="expired" type="button" class="ml-1 font-medium underline" @click="restart">
+              重新取得驗證碼
+            </button>
           </p>
 
           <div>
@@ -64,8 +91,15 @@
           </div>
           <div>
             <label for="confirm-password" class="mb-1 block text-sm text-gray-600">再輸入一次</label>
-            <PasswordInput id="confirm-password" v-model="confirmPassword" :variant="variant" autocomplete="new-password" />
-            <p v-if="confirmPassword && confirmPassword !== password" class="mt-1 text-xs text-red-500">兩次輸入的密碼不一樣</p>
+            <PasswordInput
+              id="confirm-password"
+              v-model="confirmPassword"
+              :variant="variant"
+              autocomplete="new-password"
+            />
+            <p v-if="confirmPassword && confirmPassword !== password" class="mt-1 text-xs text-red-500">
+              兩次輸入的密碼不一樣
+            </p>
           </div>
 
           <button type="submit" :disabled="loading" :class="buttonClass">
@@ -123,10 +157,10 @@ const sendCode = async () => {
   emailError.value = ''
   emailNotFound.value = false
   try {
-    const res = await apiClient.post('/auth/forgot-password', {
+    const res = (await apiClient.post('/auth/forgot-password', {
       email: email.value,
       scope: isAdmin.value ? 'admin' : 'site'
-    }) as any
+    })) as any
     waitSeconds.value = res.data?.waitSeconds ?? 60
     code.value = ''
     error.value = ''
@@ -153,7 +187,7 @@ const verifyCode = async () => {
   }
   loading.value = true
   try {
-    const res = await apiClient.post('/auth/verify-reset-code', { email: email.value, code: code.value }) as any
+    const res = (await apiClient.post('/auth/verify-reset-code', { email: email.value, code: code.value })) as any
     resetToken.value = res.data.resetToken
     password.value = ''
     confirmPassword.value = ''
@@ -180,11 +214,11 @@ const resetPassword = async () => {
 
   loading.value = true
   try {
-    const res = await apiClient.post('/auth/reset-password', {
+    const res = (await apiClient.post('/auth/reset-password', {
       email: email.value,
       resetToken: resetToken.value,
       password: password.value
-    }) as any
+    })) as any
     toast.success(res.message || '密碼已重設')
     router.replace(loginPath.value)
   } catch (e: any) {

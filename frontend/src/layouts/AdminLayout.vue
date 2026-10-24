@@ -19,7 +19,9 @@
             >
               <component :is="item.icon" class="h-5 w-5 text-gray-400" />
               <span class="flex-1">{{ item.label }}</span>
-              <span v-if="item.badge" class="rounded-full bg-red-500 px-1.5 text-xs leading-5 text-white">{{ item.badge }}</span>
+              <span v-if="item.badge" class="rounded-full bg-red-500 px-1.5 text-xs leading-5 text-white">{{
+                item.badge
+              }}</span>
             </router-link>
           </div>
         </div>
@@ -28,7 +30,9 @@
       <div class="border-t border-gray-200 p-3 text-sm">
         <p class="truncate px-3 py-1 text-gray-500">{{ authStore.user?.name }}（{{ roleLabel }}）</p>
         <router-link to="/" class="block rounded-md px-3 py-2 text-gray-600 hover:bg-gray-100">回到前台</router-link>
-        <button class="block w-full rounded-md px-3 py-2 text-left text-gray-600 hover:bg-gray-100" @click="logout">登出</button>
+        <button class="block w-full rounded-md px-3 py-2 text-left text-gray-600 hover:bg-gray-100" @click="logout">
+          登出
+        </button>
       </div>
     </aside>
 
@@ -43,7 +47,12 @@
         </div>
         <!-- 手機：下拉選單切換頁面 -->
         <div class="px-4 pb-3 lg:hidden">
-          <select :value="route.path" class="admin-input" aria-label="切換頁面" @change="router.push(($event.target as HTMLSelectElement).value)">
+          <select
+            :value="route.path"
+            class="admin-input"
+            aria-label="切換頁面"
+            @change="router.push(($event.target as HTMLSelectElement).value)"
+          >
             <optgroup v-for="group in menuGroups" :key="group.label" :label="group.label">
               <option v-for="item in group.items" :key="item.to" :value="item.to">
                 {{ item.label }}{{ item.badge ? `（${item.badge}）` : '' }}
@@ -64,8 +73,17 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  CalendarDaysIcon, ChatBubbleLeftRightIcon, UserGroupIcon, UsersIcon, SparklesIcon, IdentificationIcon,
-  CalendarIcon, TicketIcon, MegaphoneIcon, ChartBarIcon, ClipboardDocumentListIcon
+  CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
+  UserGroupIcon,
+  UsersIcon,
+  SparklesIcon,
+  IdentificationIcon,
+  CalendarIcon,
+  TicketIcon,
+  MegaphoneIcon,
+  ChartBarIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { useAdminStats } from '@/composables/useAdminStats'
@@ -85,7 +103,12 @@ const menuGroups = computed(() => {
     {
       label: '日常營運',
       items: [
-        { to: '/admin/appointments', label: '預約管理', icon: CalendarDaysIcon, badge: (stats.value?.pending || 0) + (stats.value?.toFinish || 0) },
+        {
+          to: '/admin/appointments',
+          label: '預約管理',
+          icon: CalendarDaysIcon,
+          badge: (stats.value?.pending || 0) + (stats.value?.toFinish || 0)
+        },
         { to: '/admin/reviews', label: '心得管理', icon: ChatBubbleLeftRightIcon, badge: stats.value?.unreplied || 0 },
         { to: '/admin/customers', label: '會員管理', icon: UsersIcon, badge: 0 }
       ]

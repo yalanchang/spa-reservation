@@ -63,14 +63,19 @@ const describeAvatarError = (err: any): { message: string; hint: string } => {
   return { message: '圖片儲存服務暫時無法使用', hint: '請稍後再試，若一直失敗請聯絡我們' }
 }
 
-router.post('/avatar', authenticate, (req, res, next) => {
-  upload.single('avatar')(req, res, (err) => {
-    if (err) {
-      const { message, hint } = describeAvatarError(err)
-      return res.status(400).json({ success: false, message, hint })
-    }
-    next()
-  })
-}, uploadAvatar)
+router.post(
+  '/avatar',
+  authenticate,
+  (req, res, next) => {
+    upload.single('avatar')(req, res, (err) => {
+      if (err) {
+        const { message, hint } = describeAvatarError(err)
+        return res.status(400).json({ success: false, message, hint })
+      }
+      next()
+    })
+  },
+  uploadAvatar
+)
 
 export default router

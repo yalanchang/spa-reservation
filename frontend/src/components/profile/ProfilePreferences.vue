@@ -34,7 +34,11 @@
     </div>
 
     <div class="flex justify-end">
-      <button type="submit" class="btn-cute px-8 py-2.5 disabled:opacity-50 disabled:pointer-events-none" :disabled="saving">
+      <button
+        type="submit"
+        class="btn-cute px-8 py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+        :disabled="saving"
+      >
         <LoadingSpinner v-if="saving" size="sm" />
         <template v-else>儲存偏好</template>
       </button>
@@ -70,7 +74,7 @@ const saving = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await apiClient.get('/staff') as any
+    const res = (await apiClient.get('/staff')) as any
     staffList.value = res.data || []
   } catch (error) {
     console.error('Failed to load staff:', error)
@@ -80,7 +84,7 @@ onMounted(async () => {
 const save = async () => {
   saving.value = true
   try {
-    const res = await apiClient.put('/auth/profile/preferences', form.value) as any
+    const res = (await apiClient.put('/auth/profile/preferences', form.value)) as any
     authStore.setSession(authStore.token!, res.data)
     toast.success('偏好已更新')
   } catch (error: any) {

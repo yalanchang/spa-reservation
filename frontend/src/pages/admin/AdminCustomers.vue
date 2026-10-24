@@ -1,7 +1,13 @@
 <template>
   <div class="space-y-4">
     <div class="flex flex-wrap items-center gap-2">
-      <input v-model.trim="keyword" type="search" placeholder="搜尋姓名、信箱、電話" class="admin-input sm:!w-64" @keyup.enter="load" />
+      <input
+        v-model.trim="keyword"
+        type="search"
+        placeholder="搜尋姓名、信箱、電話"
+        class="admin-input sm:!w-64"
+        @keyup.enter="load"
+      />
       <select v-model="status" class="admin-input !w-auto" aria-label="狀態" @change="load">
         <option value="active">正常</option>
         <option value="inactive">已停權</option>
@@ -32,8 +38,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="8" class="py-12"><LoadingSpinner /></td></tr>
-          <tr v-else-if="!customers.length"><td colspan="8" class="py-12 text-center text-gray-400">沒有符合的會員</td></tr>
+          <tr v-if="loading">
+            <td colspan="8" class="py-12"><LoadingSpinner /></td>
+          </tr>
+          <tr v-else-if="!customers.length">
+            <td colspan="8" class="py-12 text-center text-gray-400">沒有符合的會員</td>
+          </tr>
           <tr v-for="c in customers" v-else :key="c.id">
             <td>
               <p class="font-medium text-gray-900">
@@ -45,7 +55,9 @@
             <td class="tabular-nums text-gray-600">{{ c.phone || '—' }}</td>
             <td class="text-right tabular-nums">{{ c.visit_count }}</td>
             <td class="text-right tabular-nums">{{ Number(c.total_spend).toLocaleString() }}</td>
-            <td class="text-right tabular-nums" :class="{ 'text-red-600': Number(c.no_show_count) }">{{ c.no_show_count }}</td>
+            <td class="text-right tabular-nums" :class="{ 'text-red-600': Number(c.no_show_count) }">
+              {{ c.no_show_count }}
+            </td>
             <td class="tabular-nums text-gray-600">{{ c.last_visit || '—' }}</td>
             <td class="tabular-nums text-gray-600">{{ formatDate(c.created_at) }}</td>
             <td class="text-right"><button type="button" class="admin-link" @click="openDetail(c.id)">查看</button></td>
@@ -71,10 +83,22 @@
 
         <div>
           <label class="admin-label" for="customer-note">店內備註</label>
-          <textarea id="customer-note" v-model="note" rows="3" maxlength="1000" class="admin-input" placeholder="例如：偏好安靜、怕癢、常改期"></textarea>
+          <textarea
+            id="customer-note"
+            v-model="note"
+            rows="3"
+            maxlength="1000"
+            class="admin-input"
+            placeholder="例如：偏好安靜、怕癢、常改期"
+          ></textarea>
           <p class="admin-hint">只有後台看得到</p>
           <div class="mt-2 flex justify-end">
-            <button type="button" class="admin-btn" :disabled="savingNote || note === (detail.admin_note || '')" @click="saveNote">
+            <button
+              type="button"
+              class="admin-btn"
+              :disabled="savingNote || note === (detail.admin_note || '')"
+              @click="saveNote"
+            >
               <LoadingSpinner v-if="savingNote" size="sm" />
               <template v-else>儲存備註</template>
             </button>
@@ -86,13 +110,19 @@
           <div class="max-h-72 overflow-y-auto rounded-md border border-gray-200">
             <table class="admin-table">
               <tbody>
-                <tr v-if="!detail.appointments.length"><td class="py-6 text-center text-gray-400">還沒有預約</td></tr>
+                <tr v-if="!detail.appointments.length">
+                  <td class="py-6 text-center text-gray-400">還沒有預約</td>
+                </tr>
                 <tr v-for="a in detail.appointments" :key="a.id">
-                  <td class="whitespace-nowrap tabular-nums">{{ a.appointment_date }} {{ a.start_time.slice(0, 5) }}</td>
+                  <td class="whitespace-nowrap tabular-nums">
+                    {{ a.appointment_date }} {{ a.start_time.slice(0, 5) }}
+                  </td>
                   <td>{{ a.service_name }}</td>
                   <td class="text-gray-500">{{ a.staff_name }}</td>
                   <td class="text-right tabular-nums">{{ Number(a.price).toLocaleString() }}</td>
-                  <td><span class="admin-tag" :class="STATUS_CLASSES[a.status]">{{ STATUS_LABELS[a.status] }}</span></td>
+                  <td>
+                    <span class="admin-tag" :class="STATUS_CLASSES[a.status]">{{ STATUS_LABELS[a.status] }}</span>
+                  </td>
                   <td class="text-right text-amber-500">{{ a.rating ? '★'.repeat(a.rating) : '' }}</td>
                 </tr>
               </tbody>
@@ -127,7 +157,13 @@ import AdminModal from '@/components/admin/AdminModal.vue'
 import { STATUS_LABELS, STATUS_CLASSES } from '@/utils/appointmentStatus'
 
 const GENDERS: Record<string, string> = { female: '女', male: '男', other: '不透露' }
-const SKIN_TYPES: Record<string, string> = { dry: '乾性', oily: '油性', combination: '混合性', normal: '中性', sensitive: '敏感性' }
+const SKIN_TYPES: Record<string, string> = {
+  dry: '乾性',
+  oily: '油性',
+  combination: '混合性',
+  normal: '中性',
+  sensitive: '敏感性'
+}
 
 const toast = useToast()
 const confirm = useConfirm()
@@ -144,7 +180,9 @@ const formatDate = (value: string) => new Date(value).toLocaleDateString('sv-SE'
 const load = async () => {
   loading.value = true
   try {
-    const res = await apiClient.get('/admin/customers', { params: { q: keyword.value, status: status.value, sort: sort.value } }) as any
+    const res = (await apiClient.get('/admin/customers', {
+      params: { q: keyword.value, status: status.value, sort: sort.value }
+    })) as any
     customers.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '會員載入失敗')
@@ -178,7 +216,7 @@ const detailFields = computed(() => {
 const openDetail = async (id: number) => {
   detailLoading.value = true
   try {
-    const res = await apiClient.get(`/admin/customers/${id}`) as any
+    const res = (await apiClient.get(`/admin/customers/${id}`)) as any
     detail.value = res.data
     note.value = res.data.admin_note || ''
   } catch (error: any) {
@@ -204,11 +242,16 @@ const saveNote = async () => {
 const toggleActive = async () => {
   const active = !Number(detail.value.is_active)
   if (!active) {
-    const ok = await confirm({ title: `確定要停權 ${detail.value.name} 嗎？`, message: '停權後對方無法登入', confirmText: '停權', danger: true })
+    const ok = await confirm({
+      title: `確定要停權 ${detail.value.name} 嗎？`,
+      message: '停權後對方無法登入',
+      confirmText: '停權',
+      danger: true
+    })
     if (!ok) return
   }
   try {
-    const res = await apiClient.patch(`/admin/customers/${detail.value.id}/active`, { active }) as any
+    const res = (await apiClient.patch(`/admin/customers/${detail.value.id}/active`, { active })) as any
     toast.success(res.message)
     detail.value.is_active = active ? 1 : 0
     await load()

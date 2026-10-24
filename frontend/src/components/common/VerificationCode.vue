@@ -10,9 +10,11 @@
       placeholder="6 位數驗證碼"
       required
       class="w-full text-center text-xl tracking-[0.5em] placeholder:text-base placeholder:tracking-normal"
-      :class="variant === 'admin'
-        ? 'rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
-        : 'rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary-500'"
+      :class="
+        variant === 'admin'
+          ? 'rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
+          : 'rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary-500'
+      "
       @input="model = model.replace(/\D/g, '').slice(0, 6)"
     />
     <p class="mt-2 text-xs text-gray-400">收到多封信時，請用最新一封的驗證碼，舊的會失效</p>
@@ -72,7 +74,7 @@ const resend = async () => {
     if (props.resendFn) {
       wait = await props.resendFn()
     } else {
-      const res = await apiClient.post('/auth/resend-code', { email: props.email, purpose: props.purpose }) as any
+      const res = (await apiClient.post('/auth/resend-code', { email: props.email, purpose: props.purpose })) as any
       wait = res.data?.waitSeconds || 60
     }
     toast.success('已重新寄送驗證碼')

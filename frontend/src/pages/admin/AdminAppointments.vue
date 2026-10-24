@@ -6,7 +6,11 @@
         v-for="v in views"
         :key="v.value"
         class="-mb-px whitespace-nowrap border-b-2 px-3 pb-2.5 pt-1"
-        :class="view === v.value ? 'border-blue-600 font-medium text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'"
+        :class="
+          view === v.value
+            ? 'border-blue-600 font-medium text-gray-900'
+            : 'border-transparent text-gray-500 hover:text-gray-800'
+        "
         @click="selectView(v.value)"
       >
         {{ v.label }}
@@ -36,11 +40,21 @@
         placeholder="搜尋姓名、電話"
         class="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-64"
       />
-      <button v-if="date || status || keyword" class="px-2 py-1.5 text-gray-500 hover:text-gray-900" @click="resetFilters">
+      <button
+        v-if="date || status || keyword"
+        class="px-2 py-1.5 text-gray-500 hover:text-gray-900"
+        @click="resetFilters"
+      >
         清除篩選
       </button>
       <div class="ml-auto flex gap-2">
-        <button type="button" class="admin-btn-outline" :disabled="exporting" :title="date ? '匯出這一天的預約' : '匯出本月的預約'" @click="exportCsv">
+        <button
+          type="button"
+          class="admin-btn-outline"
+          :disabled="exporting"
+          :title="date ? '匯出這一天的預約' : '匯出本月的預約'"
+          @click="exportCsv"
+        >
           <LoadingSpinner v-if="exporting" size="sm" />
           <template v-else>匯出 CSV</template>
         </button>
@@ -79,10 +93,17 @@
               <p class="text-gray-500">{{ appt.customer_phone }}</p>
             </td>
             <td class="px-4 py-3">
-              <p>{{ appt.service_name }}<span class="ml-2 text-gray-400">{{ appt.duration }} 分鐘</span></p>
+              <p>
+                {{ appt.service_name }}<span class="ml-2 text-gray-400">{{ appt.duration }} 分鐘</span>
+              </p>
               <p v-if="appt.notes" class="mt-0.5 max-w-xs text-xs text-gray-500">備註：{{ appt.notes }}</p>
-              <p v-if="appt.customer_skin_type || appt.customer_care_notes" class="mt-0.5 max-w-xs text-xs text-amber-700">
-                顧客資料：{{ [SKIN_LABELS[appt.customer_skin_type], appt.customer_care_notes].filter(Boolean).join('，') }}
+              <p
+                v-if="appt.customer_skin_type || appt.customer_care_notes"
+                class="mt-0.5 max-w-xs text-xs text-amber-700"
+              >
+                顧客資料：{{
+                  [SKIN_LABELS[appt.customer_skin_type], appt.customer_care_notes].filter(Boolean).join('，')
+                }}
               </p>
             </td>
             <td class="whitespace-nowrap px-4 py-3">{{ appt.staff_name }}</td>
@@ -109,7 +130,9 @@
       </table>
     </div>
     <p v-if="!loading && appointments.length" class="text-xs text-gray-500">
-      共 {{ appointments.length }} 筆<template v-if="appointments.length >= 200">，只顯示前 200 筆，請縮小篩選範圍</template>
+      共 {{ appointments.length }} 筆<template v-if="appointments.length >= 200"
+        >，只顯示前 200 筆，請縮小篩選範圍</template
+      >
     </p>
     <AdminBookingModal :open="bookingOpen" @close="bookingOpen = false" @created="onBooked" />
   </div>
@@ -189,7 +212,7 @@ const fetchAppointments = async () => {
   loading.value = true
   const params = VIEW_PARAMS[view.value]
   try {
-    const res = await apiClient.get('/admin/appointments', {
+    const res = (await apiClient.get('/admin/appointments', {
       params: {
         // 指定日期時不限即將到來或已過
         range: date.value ? 'all' : params.range,
@@ -197,7 +220,7 @@ const fetchAppointments = async () => {
         status: status.value || params.status || undefined,
         q: keyword.value.trim() || undefined
       }
-    }) as any
+    })) as any
     appointments.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '預約載入失敗')

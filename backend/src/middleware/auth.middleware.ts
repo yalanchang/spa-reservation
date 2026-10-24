@@ -11,11 +11,7 @@ declare global {
   }
 }
 
-export const authenticate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -49,7 +45,8 @@ export const optionalAuth = (req: Request, _res: Response, next: NextFunction): 
 }
 
 // 店家後台：每次都從資料庫確認角色，權限被移除後舊 token 立即失效
-const requireRole = (roles: string[]) =>
+const requireRole =
+  (roles: string[]) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user) {
@@ -63,10 +60,7 @@ const requireRole = (roles: string[]) =>
         return
       }
 
-      const user = await queryOne<any>(
-        'SELECT role, is_active FROM users WHERE id = ?',
-        [req.user.userId]
-      )
+      const user = await queryOne<any>('SELECT role, is_active FROM users WHERE id = ?', [req.user.userId])
 
       if (!user || !user.is_active || !roles.includes(user.role)) {
         res.status(403).json({ success: false, message: '權限不足' })

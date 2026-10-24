@@ -28,7 +28,9 @@
         <div>
           <div class="mb-1 flex items-center justify-between">
             <label for="admin-password" class="block text-sm text-gray-600">密碼</label>
-            <router-link to="/admin/forgot-password" class="text-sm text-blue-600 hover:underline">忘記密碼？</router-link>
+            <router-link to="/admin/forgot-password" class="text-sm text-blue-600 hover:underline"
+              >忘記密碼？</router-link
+            >
           </div>
           <PasswordInput id="admin-password" v-model="form.password" variant="admin" autocomplete="off" />
         </div>
@@ -76,7 +78,7 @@ const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
-    const res = await apiClient.post('/auth/admin/login', form.value) as any
+    const res = (await apiClient.post('/auth/admin/login', form.value)) as any
     authStore.setSession(res.data.token, res.data.user)
     toast.success(`歡迎回來，${res.data.user.name}`)
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''

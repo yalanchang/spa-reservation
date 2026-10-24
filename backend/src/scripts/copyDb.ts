@@ -24,7 +24,9 @@ const main = async () => {
   const missing = ['TARGET_DB_HOST', 'TARGET_DB_USER', 'TARGET_DB_NAME'].filter((key) => !process.env[key])
   if (missing.length) {
     console.log(`缺少 ${missing.join('、')}`)
-    console.log('用法：TARGET_DB_HOST=… TARGET_DB_PORT=… TARGET_DB_USER=… TARGET_DB_PASSWORD=… TARGET_DB_NAME=… npm run db:copy')
+    console.log(
+      '用法：TARGET_DB_HOST=… TARGET_DB_PORT=… TARGET_DB_USER=… TARGET_DB_PASSWORD=… TARGET_DB_NAME=… npm run db:copy'
+    )
     process.exitCode = 1
     return
   }
@@ -51,7 +53,9 @@ const main = async () => {
 
     const [existing] = await target.query<any[]>("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")
     if (existing.length) {
-      console.log(`目標資料庫已經有 ${existing.length} 張資料表（${existing.map((r) => Object.values(r)[0]).join('、')}），為了避免覆蓋資料已停止`)
+      console.log(
+        `目標資料庫已經有 ${existing.length} 張資料表（${existing.map((r) => Object.values(r)[0]).join('、')}），為了避免覆蓋資料已停止`
+      )
       process.exitCode = 1
       return
     }

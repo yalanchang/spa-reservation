@@ -1,10 +1,5 @@
 <template>
-  <div
-    ref="root"
-    class="relative"
-    @mouseenter="onEnter"
-    @mouseleave="onLeave"
-  >
+  <div ref="root" class="relative" @mouseenter="onEnter" @mouseleave="onLeave">
     <button
       class="group relative flex h-10 w-10 items-center justify-center rounded-full text-cocoa transition hover:text-primary-600 hover:font-bold"
       :class="{ 'bg-primary-50 text-primary-600': open }"
@@ -47,12 +42,19 @@
                 class="flex gap-3 px-4 py-3 transition hover:font-bold"
                 @click="open = false"
               >
-                <img :src="serviceImage({ name: appt.service_name })" alt="" class="h-11 w-11 flex-shrink-0 rounded-xl object-cover" />
+                <img
+                  :src="serviceImage({ name: appt.service_name })"
+                  alt=""
+                  class="h-11 w-11 flex-shrink-0 rounded-xl object-cover"
+                />
                 <div class="min-w-0 flex-1">
                   <p class="truncate font-medium text-cocoa">{{ appt.service_name }}</p>
                   <p class="text-xs text-gray-500">
                     {{ formatDate(appt.appointment_date) }} {{ appt.start_time.slice(0, 5) }} 的預約
-                    <span class="font-semibold" :class="appt.status_notice === 'cancelled' ? 'text-gray-600' : 'text-primary-600'">
+                    <span
+                      class="font-semibold"
+                      :class="appt.status_notice === 'cancelled' ? 'text-gray-600' : 'text-primary-600'"
+                    >
                       {{ appt.status_notice === 'cancelled' ? '已被店家取消' : '店家已確認' }}
                     </span>
                   </p>
@@ -69,11 +71,17 @@
                 class="flex gap-3 px-4 py-3 transition hover:font-bold"
                 @click="open = false"
               >
-                <img :src="serviceImage({ name: appt.service_name })" alt="" class="h-11 w-11 flex-shrink-0 rounded-xl object-cover" />
+                <img
+                  :src="serviceImage({ name: appt.service_name })"
+                  alt=""
+                  class="h-11 w-11 flex-shrink-0 rounded-xl object-cover"
+                />
                 <div class="min-w-0 flex-1">
                   <p class="truncate font-medium text-cocoa">{{ appt.service_name }}</p>
                   <p class="text-xs text-gray-500">
-                    <span class="font-semibold text-primary-600">{{ upcomingLabel(appt) }} {{ appt.start_time.slice(0, 5) }}</span>
+                    <span class="font-semibold text-primary-600"
+                      >{{ upcomingLabel(appt) }} {{ appt.start_time.slice(0, 5) }}</span
+                    >
                     ，美容師 {{ appt.staff_name }}
                   </p>
                 </div>
@@ -89,7 +97,11 @@
                 class="flex gap-3 px-4 py-3 transition hover:font-bold"
                 @click="open = false"
               >
-                <img :src="serviceImage({ name: appt.service_name })" alt="" class="h-11 w-11 flex-shrink-0 rounded-xl object-cover" />
+                <img
+                  :src="serviceImage({ name: appt.service_name })"
+                  alt=""
+                  class="h-11 w-11 flex-shrink-0 rounded-xl object-cover"
+                />
                 <div class="min-w-0 flex-1">
                   <p class="truncate font-medium text-cocoa">{{ appt.service_name }}</p>
                   <p class="text-xs text-gray-500">{{ formatDate(appt.appointment_date) }} 體驗完成，留下你的感想</p>

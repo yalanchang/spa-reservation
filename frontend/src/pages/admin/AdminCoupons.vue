@@ -1,7 +1,9 @@
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <p class="text-sm text-gray-500">開放領取的券會出現在前台「領券中心」，符合資格的會員才能領；預約時系統會再檢查一次</p>
+      <p class="text-sm text-gray-500">
+        開放領取的券會出現在前台「領券中心」，符合資格的會員才能領；預約時系統會再檢查一次
+      </p>
       <button type="button" class="admin-btn" @click="openForm()">新增優惠碼</button>
     </div>
 
@@ -22,8 +24,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading"><td colspan="10" class="py-12"><LoadingSpinner /></td></tr>
-          <tr v-else-if="!coupons.length"><td colspan="10" class="py-12 text-center text-gray-400">還沒有優惠碼</td></tr>
+          <tr v-if="loading">
+            <td colspan="10" class="py-12"><LoadingSpinner /></td>
+          </tr>
+          <tr v-else-if="!coupons.length">
+            <td colspan="10" class="py-12 text-center text-gray-400">還沒有優惠碼</td>
+          </tr>
           <tr v-for="c in coupons" v-else :key="c.id">
             <td>
               <p class="font-mono font-medium text-gray-900">{{ c.code }}</p>
@@ -32,17 +38,25 @@
             <td>{{ discountText(c) }}</td>
             <td>
               {{ AUDIENCES[c.audience] }}
-              <p class="text-xs text-gray-500">{{ Number(c.is_claimable) ? '開放領取' : '只能輸入代碼' }}，每人 {{ c.per_user_limit }} 次</p>
+              <p class="text-xs text-gray-500">
+                {{ Number(c.is_claimable) ? '開放領取' : '只能輸入代碼' }}，每人 {{ c.per_user_limit }} 次
+              </p>
             </td>
-            <td class="text-right tabular-nums">{{ Number(c.min_spend) ? Number(c.min_spend).toLocaleString() : '—' }}</td>
+            <td class="text-right tabular-nums">
+              {{ Number(c.min_spend) ? Number(c.min_spend).toLocaleString() : '—' }}
+            </td>
             <td class="whitespace-nowrap tabular-nums text-gray-600">{{ periodText(c) }}</td>
             <td class="text-right tabular-nums">{{ c.claimed_count }}</td>
             <td class="text-right tabular-nums">{{ c.used_count }}{{ c.usage_limit ? ` / ${c.usage_limit}` : '' }}</td>
             <td class="text-right tabular-nums">{{ Number(c.total_discount).toLocaleString() }}</td>
-            <td><span class="admin-tag" :class="state(c).class">{{ state(c).label }}</span></td>
+            <td>
+              <span class="admin-tag" :class="state(c).class">{{ state(c).label }}</span>
+            </td>
             <td class="whitespace-nowrap text-right">
               <button type="button" class="admin-link" @click="openForm(c)">編輯</button>
-              <button type="button" class="admin-link ml-3" @click="toggle(c)">{{ Number(c.is_active) ? '停用' : '啟用' }}</button>
+              <button type="button" class="admin-link ml-3" @click="toggle(c)">
+                {{ Number(c.is_active) ? '停用' : '啟用' }}
+              </button>
             </td>
           </tr>
         </tbody>
@@ -68,11 +82,24 @@
         </div>
         <div>
           <label class="admin-label" for="coupon-name">活動名稱</label>
-          <input id="coupon-name" v-model="form.name" required maxlength="100" placeholder="例如 春季限定 折 NT$200" class="admin-input" />
+          <input
+            id="coupon-name"
+            v-model="form.name"
+            required
+            maxlength="100"
+            placeholder="例如 春季限定 折 NT$200"
+            class="admin-input"
+          />
         </div>
         <div class="sm:col-span-2">
           <label class="admin-label" for="coupon-desc">說明</label>
-          <input id="coupon-desc" v-model="form.description" maxlength="200" placeholder="例如 第一次預約就能用" class="admin-input" />
+          <input
+            id="coupon-desc"
+            v-model="form.description"
+            maxlength="200"
+            placeholder="例如 第一次預約就能用"
+            class="admin-input"
+          />
           <p class="admin-hint">顯示在前台領券中心</p>
         </div>
 
@@ -84,7 +111,9 @@
           </select>
         </div>
         <div>
-          <label class="admin-label" for="coupon-value">{{ form.discountType === 'percent' ? '折數' : '折抵金額' }}</label>
+          <label class="admin-label" for="coupon-value">{{
+            form.discountType === 'percent' ? '折數' : '折抵金額'
+          }}</label>
           <div class="admin-input-group">
             <span v-if="form.discountType !== 'percent'">NT$</span>
             <input
@@ -97,7 +126,15 @@
               required
               placeholder="85"
             />
-            <input v-else id="coupon-value" v-model.number="form.discountValue" type="number" min="1" required placeholder="200" />
+            <input
+              v-else
+              id="coupon-value"
+              v-model.number="form.discountValue"
+              type="number"
+              min="1"
+              required
+              placeholder="200"
+            />
             <span v-if="form.discountType === 'percent'">折</span>
           </div>
           <p v-if="form.discountType === 'percent'" class="admin-hint">85 折請填 85，9 折請填 90</p>
@@ -144,7 +181,13 @@
           <div class="flex items-center gap-2">
             <input v-model="form.startDate" type="date" class="admin-input" aria-label="開始日期" />
             <span class="text-gray-400">~</span>
-            <input v-model="form.endDate" type="date" :min="form.startDate || undefined" class="admin-input" aria-label="結束日期" />
+            <input
+              v-model="form.endDate"
+              type="date"
+              :min="form.startDate || undefined"
+              class="admin-input"
+              aria-label="結束日期"
+            />
           </div>
           <p class="admin-hint">不填開始日期即刻生效，不填結束日期則長期有效</p>
         </div>
@@ -195,7 +238,7 @@ const discountText = (c: any) => {
 // 代碼重複：直接擋下
 const duplicateCode = computed(() => {
   const code = form.value?.code?.trim()
-  return !!code && coupons.value.some(c => c.code === code && c.id !== form.value.id)
+  return !!code && coupons.value.some((c) => c.code === code && c.id !== form.value.id)
 })
 
 // 內容重複（同資格、同折扣、都還在使用）：提醒但可以繼續建立
@@ -203,14 +246,17 @@ const similarCoupon = computed(() => {
   const f = form.value
   if (!f) return null
   const value = f.discountType === 'percent' ? 100 - Number(f.percentRate) : Number(f.discountValue)
-  return coupons.value.find(c =>
-    c.id !== f.id &&
-    Number(c.is_active) &&
-    c.audience === f.audience &&
-    c.discount_type === f.discountType &&
-    Number(c.discount_value) === value &&
-    state(c).label === '使用中'
-  ) || null
+  return (
+    coupons.value.find(
+      (c) =>
+        c.id !== f.id &&
+        Number(c.is_active) &&
+        c.audience === f.audience &&
+        c.discount_type === f.discountType &&
+        Number(c.discount_value) === value &&
+        state(c).label === '使用中'
+    ) || null
+  )
 })
 
 const periodText = (c: any) => {
@@ -222,13 +268,14 @@ const state = (c: any) => {
   if (!Number(c.is_active)) return { label: '已停用', class: 'bg-gray-100 text-gray-500' }
   if (c.end_date && c.end_date < today) return { label: '已過期', class: 'bg-gray-100 text-gray-500' }
   if (c.start_date && c.start_date > today) return { label: '尚未開始', class: 'bg-amber-50 text-amber-700' }
-  if (c.usage_limit && Number(c.used_count) >= Number(c.usage_limit)) return { label: '已用完', class: 'bg-gray-100 text-gray-500' }
+  if (c.usage_limit && Number(c.used_count) >= Number(c.usage_limit))
+    return { label: '已用完', class: 'bg-gray-100 text-gray-500' }
   return { label: '使用中', class: 'bg-green-50 text-green-700' }
 }
 
 const load = async () => {
   try {
-    const res = await apiClient.get('/admin/coupons') as any
+    const res = (await apiClient.get('/admin/coupons')) as any
     coupons.value = res.data || []
   } catch (error: any) {
     toast.error(error?.message || '優惠碼載入失敗')
@@ -238,15 +285,40 @@ const load = async () => {
 }
 
 const toBody = (c: any) => ({
-  code: c.code, name: c.name, description: c.description || '', audience: c.audience,
-  isClaimable: !!Number(c.is_claimable), perUserLimit: Number(c.per_user_limit), discountType: c.discount_type, discountValue: c.discount_value, minSpend: Number(c.min_spend),
-  startDate: c.start_date || '', endDate: c.end_date || '', usageLimit: c.usage_limit ?? '', isActive: !!Number(c.is_active)
+  code: c.code,
+  name: c.name,
+  description: c.description || '',
+  audience: c.audience,
+  isClaimable: !!Number(c.is_claimable),
+  perUserLimit: Number(c.per_user_limit),
+  discountType: c.discount_type,
+  discountValue: c.discount_value,
+  minSpend: Number(c.min_spend),
+  startDate: c.start_date || '',
+  endDate: c.end_date || '',
+  usageLimit: c.usage_limit ?? '',
+  isActive: !!Number(c.is_active)
 })
 
 const openForm = (c?: any) => {
   form.value = c
     ? { id: c.id, ...toBody(c), percentRate: c.discount_type === 'percent' ? 100 - Number(c.discount_value) : 85 }
-    : { code: '', name: '', description: '', audience: 'all', isClaimable: true, perUserLimit: 1, discountType: 'amount', discountValue: 200, percentRate: 85, minSpend: '', startDate: '', endDate: '', usageLimit: '', isActive: true }
+    : {
+        code: '',
+        name: '',
+        description: '',
+        audience: 'all',
+        isClaimable: true,
+        perUserLimit: 1,
+        discountType: 'amount',
+        discountValue: 200,
+        percentRate: 85,
+        minSpend: '',
+        startDate: '',
+        endDate: '',
+        usageLimit: '',
+        isActive: true
+      }
 }
 
 const save = async () => {

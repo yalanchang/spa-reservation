@@ -8,21 +8,34 @@
 
     <div class="lg:grid lg:grid-cols-[16rem_1fr] lg:items-start lg:gap-8">
       <!-- 手機：遮罩 -->
-      <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-200" leave-to-class="opacity-0">
+      <Transition
+        enter-active-class="transition-opacity duration-200"
+        enter-from-class="opacity-0"
+        leave-active-class="transition-opacity duration-200"
+        leave-to-class="opacity-0"
+      >
         <div v-if="filtersOpen" class="fixed inset-0 z-40 bg-black/40 lg:hidden" @click="filtersOpen = false"></div>
       </Transition>
 
       <!-- 篩選：桌機是左側欄，手機是從下方滑出的面板 -->
       <aside
-        class="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white shadow-2xl
-          lg:static lg:z-auto lg:max-h-none lg:overflow-visible lg:rounded-none lg:bg-transparent lg:shadow-none"
+        class="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white shadow-2xl lg:static lg:z-auto lg:max-h-none lg:overflow-visible lg:rounded-none lg:bg-transparent lg:shadow-none"
         :class="filtersOpen ? 'block' : 'hidden lg:block'"
         aria-label="篩選條件"
       >
-        <div class="sticky top-0 z-10 flex items-center justify-between bg-white px-5 py-4 lg:static lg:bg-transparent lg:px-0 lg:pt-0">
+        <div
+          class="sticky top-0 z-10 flex items-center justify-between bg-white px-5 py-4 lg:static lg:bg-transparent lg:px-0 lg:pt-0"
+        >
           <h2 class="text-lg font-bold text-cocoa">篩選</h2>
           <div class="flex items-center gap-3">
-            <button v-if="hasFilters" type="button" class="text-sm text-primary-600 hover:font-bold" @click="resetFilters">清除全部</button>
+            <button
+              v-if="hasFilters"
+              type="button"
+              class="text-sm text-primary-600 hover:font-bold"
+              @click="resetFilters"
+            >
+              清除全部
+            </button>
             <button type="button" class="text-gray-400 lg:hidden" aria-label="關閉" @click="filtersOpen = false">
               <XMarkIcon class="h-6 w-6" />
             </button>
@@ -32,7 +45,9 @@
         <div class="px-5 lg:px-0">
           <!-- 搜尋 -->
           <div class="relative mb-2">
-            <MagnifyingGlassIcon class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <MagnifyingGlassIcon
+              class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+            />
             <input
               v-model="keyword"
               type="search"
@@ -53,9 +68,17 @@
 
           <!-- 分類 -->
           <section class="filter-section">
-            <button type="button" class="filter-toggle" :aria-expanded="openSections.category" @click="toggleSection('category')">
+            <button
+              type="button"
+              class="filter-toggle"
+              :aria-expanded="openSections.category"
+              @click="toggleSection('category')"
+            >
               分類
-              <ChevronDownIcon class="h-5 w-5 text-gray-400 transition" :class="{ 'rotate-180': openSections.category }" />
+              <ChevronDownIcon
+                class="h-5 w-5 text-gray-400 transition"
+                :class="{ 'rotate-180': openSections.category }"
+              />
             </button>
             <div v-show="openSections.category" class="mt-3 space-y-1">
               <label
@@ -72,7 +95,9 @@
                   :disabled="!category.count && selectedCategory !== category.id"
                   @change="selectedCategory = category.id"
                 />
-                <span class="flex-1" :class="{ 'font-bold text-primary-600': selectedCategory === category.id }">{{ category.name }}</span>
+                <span class="flex-1" :class="{ 'font-bold text-primary-600': selectedCategory === category.id }">{{
+                  category.name
+                }}</span>
                 <span class="text-xs text-gray-400">{{ category.count }}</span>
               </label>
             </div>
@@ -80,7 +105,12 @@
 
           <!-- 價格 -->
           <section class="filter-section">
-            <button type="button" class="filter-toggle" :aria-expanded="openSections.price" @click="toggleSection('price')">
+            <button
+              type="button"
+              class="filter-toggle"
+              :aria-expanded="openSections.price"
+              @click="toggleSection('price')"
+            >
               價格
               <ChevronDownIcon class="h-5 w-5 text-gray-400 transition" :class="{ 'rotate-180': openSections.price }" />
             </button>
@@ -94,11 +124,15 @@
                     :checked="isPresetActive(preset)"
                     @change="applyPreset(preset)"
                   />
-                  <span class="flex-1" :class="{ 'font-bold text-primary-600': isPresetActive(preset) }">{{ preset.label }}</span>
+                  <span class="flex-1" :class="{ 'font-bold text-primary-600': isPresetActive(preset) }">{{
+                    preset.label
+                  }}</span>
                 </label>
               </div>
 
-              <p class="mb-2 mt-4 text-xs text-gray-500">自訂範圍：NT$ {{ priceMin.toLocaleString() }} – {{ priceMax.toLocaleString() }}</p>
+              <p class="mb-2 mt-4 text-xs text-gray-500">
+                自訂範圍：NT$ {{ priceMin.toLocaleString() }} – {{ priceMax.toLocaleString() }}
+              </p>
               <div class="price-slider relative h-6 w-full">
                 <div class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary-100"></div>
                 <div
@@ -152,9 +186,17 @@
 
           <!-- 時長（可複選） -->
           <section class="filter-section">
-            <button type="button" class="filter-toggle" :aria-expanded="openSections.duration" @click="toggleSection('duration')">
+            <button
+              type="button"
+              class="filter-toggle"
+              :aria-expanded="openSections.duration"
+              @click="toggleSection('duration')"
+            >
               時長
-              <ChevronDownIcon class="h-5 w-5 text-gray-400 transition" :class="{ 'rotate-180': openSections.duration }" />
+              <ChevronDownIcon
+                class="h-5 w-5 text-gray-400 transition"
+                :class="{ 'rotate-180': openSections.duration }"
+              />
             </button>
             <div v-show="openSections.duration" class="mt-3 space-y-1">
               <label
@@ -170,7 +212,9 @@
                   :disabled="!d.count && !durations.includes(d.value)"
                   @change="toggleDuration(d.value)"
                 />
-                <span class="flex-1" :class="{ 'font-bold text-primary-600': durations.includes(d.value) }">{{ d.label }}</span>
+                <span class="flex-1" :class="{ 'font-bold text-primary-600': durations.includes(d.value) }">{{
+                  d.label
+                }}</span>
                 <span class="text-xs text-gray-400">{{ d.count }}</span>
               </label>
             </div>
@@ -195,7 +239,11 @@
           >
             <AdjustmentsHorizontalIcon class="h-5 w-5" />
             篩選
-            <span v-if="appliedFilters.length" class="rounded-full bg-primary-600 px-1.5 text-xs leading-5 text-white">{{ appliedFilters.length }}</span>
+            <span
+              v-if="appliedFilters.length"
+              class="rounded-full bg-primary-600 px-1.5 text-xs leading-5 text-white"
+              >{{ appliedFilters.length }}</span
+            >
           </button>
 
           <select v-model="sort" class="filter-field ml-auto" aria-label="排序">
@@ -277,7 +325,7 @@ const durations = ref<string[]>(query('duration') ? query('duration').split(',')
 
 const toggleDuration = (value: string) => {
   durations.value = durations.value.includes(value)
-    ? durations.value.filter(d => d !== value)
+    ? durations.value.filter((d) => d !== value)
     : [...durations.value, value].sort((a, b) => Number(a) - Number(b))
 }
 
@@ -292,7 +340,7 @@ const categories = computed(() => servicesStore.categories)
 
 // 價格範圍依現有服務決定，取到百位數
 const priceBounds = computed(() => {
-  const prices = servicesStore.services.map(s => Number(s.price))
+  const prices = servicesStore.services.map((s) => Number(s.price))
   if (!prices.length) return { min: 0, max: 5000 }
   return {
     min: Math.floor(Math.min(...prices) / PRICE_STEP) * PRICE_STEP,
@@ -358,17 +406,25 @@ const matches = (s: any, skip: 'category' | 'duration' | null = null) => {
 
 // 每個分類、時長在其他條件下還有幾項，0 項的會變灰
 const categoryOptions = computed(() => {
-  const pool = servicesStore.services.filter(s => matches(s, 'category'))
+  const pool = servicesStore.services.filter((s) => matches(s, 'category'))
   return [
     { id: undefined as number | undefined, name: '全部', count: pool.length },
-    ...categories.value.map((c: any) => ({ id: c.id as number | undefined, name: c.name, count: pool.filter(s => s.category_id === c.id).length }))
+    ...categories.value.map((c: any) => ({
+      id: c.id as number | undefined,
+      name: c.name,
+      count: pool.filter((s) => s.category_id === c.id).length
+    }))
   ]
 })
 
 const durationOptions = computed(() => {
-  const pool = servicesStore.services.filter(s => matches(s, 'duration'))
-  const values = [...new Set(servicesStore.services.map(s => Number(s.duration)))].sort((a, b) => a - b)
-  return values.map(v => ({ value: String(v), label: `${v} 分鐘`, count: pool.filter(s => Number(s.duration) === v).length }))
+  const pool = servicesStore.services.filter((s) => matches(s, 'duration'))
+  const values = [...new Set(servicesStore.services.map((s) => Number(s.duration)))].sort((a, b) => a - b)
+  return values.map((v) => ({
+    value: String(v),
+    label: `${v} 分鐘`,
+    count: pool.filter((s) => Number(s.duration) === v).length
+  }))
 })
 
 // 已套用的條件（排序不算），可個別移除
@@ -376,7 +432,8 @@ const appliedFilters = computed(() => {
   const list: { key: string; label: string; clear: () => void }[] = []
   const category = categories.value.find((c: any) => c.id === selectedCategory.value)
   if (category) list.push({ key: 'category', label: category.name, clear: () => (selectedCategory.value = undefined) })
-  if (keyword.value.trim()) list.push({ key: 'q', label: `「${keyword.value.trim()}」`, clear: () => (keyword.value = '') })
+  if (keyword.value.trim())
+    list.push({ key: 'q', label: `「${keyword.value.trim()}」`, clear: () => (keyword.value = '') })
   if (priceMinQuery.value || priceMaxQuery.value) {
     list.push({
       key: 'price',
@@ -396,7 +453,7 @@ const appliedFilters = computed(() => {
 const hasFilters = computed(() => appliedFilters.value.length > 0)
 
 const filteredServices = computed(() => {
-  const list = servicesStore.services.filter(s => matches(s))
+  const list = servicesStore.services.filter((s) => matches(s))
 
   if (sort.value === 'price-asc') list.sort((a, b) => Number(a.price) - Number(b.price))
   if (sort.value === 'price-desc') list.sort((a, b) => Number(b.price) - Number(a.price))
@@ -433,13 +490,9 @@ watch([selectedCategory, keyword, priceMinQuery, priceMaxQuery, durations, sort]
 
 onMounted(async () => {
   loading.value = true
-  await Promise.all([
-    servicesStore.fetchServices(),
-    servicesStore.fetchCategories()
-  ])
+  await Promise.all([servicesStore.fetchServices(), servicesStore.fetchCategories()])
   loading.value = false
 })
-
 </script>
 
 <style scoped>
@@ -480,7 +533,9 @@ onMounted(async () => {
 }
 .card-enter-active {
   /* 一張接一張由下往上淡入 */
-  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: calc(var(--i, 0) * 60ms);
 }
 .card-enter-from {
