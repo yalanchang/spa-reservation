@@ -37,3 +37,15 @@ describe('sendMail（Brevo）', () => {
     await expect(sendMail(mail)).rejects.toThrow('Brevo 寄信失敗（401）')
   })
 })
+
+describe('sendMail（沒有設定寄信）', () => {
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('正式環境直接報錯，不假裝寄成功', async () => {
+    vi.stubEnv('BREVO_API_KEY', '')
+    vi.stubEnv('SMTP_HOST', '')
+    vi.stubEnv('NODE_ENV', 'production')
+
+    await expect(sendMail(mail)).rejects.toThrow('正式環境沒有設定寄信')
+  })
+})

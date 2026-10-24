@@ -63,6 +63,10 @@ export const sendMail = async (mail: Mail): Promise<void> => {
   if (process.env.BREVO_API_KEY) return sendWithBrevo(mail, process.env.BREVO_API_KEY)
 
   if (!process.env.SMTP_HOST) {
+    // 正式環境不能假裝寄成功，不然使用者收不到信也查不出原因
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('正式環境沒有設定寄信（BREVO_API_KEY 或 SMTP_HOST），信沒有寄出')
+    }
     const entry = `[${new Date().toLocaleString('zh-TW')}] 收件人：${mail.to}\n主旨：${mail.subject}\n${mail.text}\n\n`
     fs.mkdirSync(path.dirname(DEV_MAIL_LOG), { recursive: true })
     fs.appendFileSync(DEV_MAIL_LOG, entry)
