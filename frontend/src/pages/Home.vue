@@ -3,7 +3,7 @@
     <!-- 活動消息：一次一則，停留後快速切換下一則；細條貼在導覽列下方 -->
     <section
       v-if="marqueeWords.length"
-      class="marquee-bleed -mt-8 mb-8 bg-primary-100/70"
+      class="full-bleed -mt-8 bg-primary-100/70"
       aria-label="活動消息"
       @mouseenter="promoPaused = true"
       @mouseleave="promoPaused = false"
@@ -27,12 +27,14 @@
     </section>
 
     <div class="space-y-20 sm:space-y-28">
+      <!-- 主視覺：滿版粉色底，緊貼跑馬燈；桌機一個畫面內看得到完整照片 -->
       <section
-        class="relative overflow-hidden rounded-4xl bg-primary-50 px-6 py-14 sm:px-12 sm:py-20"
+        class="full-bleed relative flex items-center overflow-hidden bg-primary-50 py-10 sm:py-12 lg:min-h-[calc(100svh-4rem-1.75rem)]"
+        :class="{ '-mt-8': !marqueeWords.length }"
         @mousemove="onMouseMove"
         @mouseleave="mouse = { x: 0, y: 0 }"
       >
-        <div class="relative grid items-center gap-12 lg:grid-cols-2">
+        <div class="container relative mx-auto grid items-center gap-10 px-6 sm:px-12 lg:grid-cols-2">
           <div class="text-center lg:text-left">
             <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">K-BEAUTY SPA</p>
             <h1 class="mt-5 text-4xl font-extrabold leading-tight text-cocoa sm:text-5xl">
@@ -47,7 +49,8 @@
           </div>
 
           <!-- 照片牌組：自動輪播，滑過展開、點擊切換 -->
-          <div class="relative mx-auto w-full max-w-md">
+          <!-- 寬度跟著螢幕高度縮，照片加進度點不超出一個畫面 -->
+          <div class="relative mx-auto w-full max-w-md lg:max-w-[min(28rem,calc((100svh-13rem)*0.8))]">
             <div
               class="relative aspect-[4/5] w-full transition-transform duration-300 ease-out"
               :style="deckTilt"
@@ -69,7 +72,7 @@
             </div>
 
             <!-- 進度點 -->
-            <div class="mt-8 flex justify-center gap-2">
+            <div class="mt-6 flex justify-center gap-2">
               <button
                 v-for="(photo, i) in heroPhotos"
                 :key="photo.src"
@@ -327,7 +330,7 @@ const steps = [
 }
 
 /* 跑馬燈撐滿整個視窗寬度，不受內容容器限制 */
-.marquee-bleed {
+.full-bleed {
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
 }
