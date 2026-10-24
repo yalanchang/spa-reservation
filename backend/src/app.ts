@@ -12,6 +12,7 @@ import { warmUpMailer } from './utils/mailer'
 import staffRoutes from './routes/staff.routes'
 import siteRoutes from './routes/site.routes'
 import couponsRoutes from './routes/coupons.routes'
+import { query } from './models/db'
 
 dotenv.config()
 
@@ -40,6 +41,15 @@ app.use('/api/staff', staffRoutes)
 app.use('/api/site', siteRoutes)
 app.use('/api/coupons', couponsRoutes)
 
+// 健康檢查：GitHub Actions 定時呼叫，讓 Render 和 Aiven 資料庫保持活動
+app.get('/api/health', async (req, res) => {
+  try {
+    await query('SELECT 1')
+    res.json({ success: true, db: 'ok' })
+  } catch (error: any) {
+    res.status(503).json({ success: false, db: error.code || error.message })
+  }
+})
 
 
 // 404 處理
