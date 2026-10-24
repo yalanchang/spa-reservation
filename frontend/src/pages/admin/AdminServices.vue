@@ -21,6 +21,7 @@
       <table class="admin-table min-w-[820px]">
         <thead>
           <tr>
+            <th class="w-12"><span class="sr-only">排序</span></th>
             <th>療程</th>
             <th>分類</th>
             <th class="text-right">價格</th>
@@ -31,14 +32,22 @@
             <th class="text-right">操作</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody ref="serviceBody">
           <tr v-if="loading">
-            <td colspan="8" class="py-12"><LoadingSpinner /></td>
+            <td colspan="9" class="py-12"><LoadingSpinner /></td>
           </tr>
           <tr v-else-if="!filtered.length">
-            <td colspan="8" class="py-12 text-center text-gray-400">沒有符合的療程</td>
+            <td colspan="9" class="py-12 text-center text-gray-400">沒有符合的療程</td>
           </tr>
-          <tr v-for="s in filtered" v-else :key="s.id">
+          <tr v-for="s in filtered" v-else :key="s.id" data-sortable :data-id="s.id" :data-category="s.category_id">
+            <td class="!px-2">
+              <DragHandle
+                :label="s.name"
+                :disabled="sortLocked"
+                disabled-hint="清除狀態篩選與搜尋後才能調整順序"
+                @move="nudgeService(s, $event)"
+              />
+            </td>
             <td>
               <p class="font-medium text-gray-900">{{ s.name }}</p>
               <p class="max-w-xs truncate text-xs text-gray-500">{{ s.description }}</p>
@@ -66,7 +75,11 @@
         </tbody>
       </table>
     </div>
-    <p class="text-xs text-gray-500">下架的療程前台不會顯示，已經預約的不受影響</p>
+    <div class="space-y-1 text-xs text-gray-500">
+      <p v-if="sortLocked" class="text-amber-700">正在篩選狀態或搜尋，暫時無法調整順序</p>
+      <p v-else>拖曳左側把手可調整前台顯示順序（僅限同一分類內），放開後立即儲存</p>
+      <p>下架的療程前台不會顯示，已經預約的不受影響</p>
+    </div>
 
     <!-- 療程表單 -->
     <AdminModal
@@ -85,11 +98,6 @@
           <select id="svc-category" v-model="serviceForm.categoryId" required class="admin-input">
             <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
           </select>
-        </div>
-        <div>
-          <label class="admin-label" for="svc-sort">排序</label>
-          <input id="svc-sort" v-model.number="serviceForm.sortOrder" type="number" class="admin-input" />
-          <p class="admin-hint">數字越小越前面</p>
         </div>
         <div>
           <label class="admin-label" for="svc-price">價格</label>
@@ -123,36 +131,65 @@
       <table class="admin-table">
         <thead>
           <tr>
+            <th class="w-12"><span class="sr-only">排序</span></th>
             <th>名稱</th>
-            <th class="w-24">排序</th>
             <th class="w-20 text-right">療程數</th>
             <th class="w-20 text-right"></th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="c in categoryRows" :key="c.id ?? 'new'">
-            <td><input v-model="c.name" class="admin-input" :placeholder="c.id ? '' : '新分類名稱'" /></td>
-            <td><input v-model.number="c.sort_order" type="number" class="admin-input" /></td>
-            <td class="text-right tabular-nums text-gray-500">{{ c.id ? c.service_count : '' }}</td>
+        <tbody ref="categoryBody">
+          <tr v-for="(c, i) in categories" :key="c.id" data-sortable :data-id="c.id">
+            <td class="!px-2"><DragHandle :label="c.name" @move="nudgeCategory(i, $event)" /></td>
+            <td><input v-model="c.name" class="admin-input" aria-label="分類名稱" /></td>
+            <td class="text-right tabular-nums text-gray-500">{{ c.service_count }}</td>
             <td class="text-right">
               <button type="button" class="admin-link" :disabled="!c.name?.trim()" @click="saveCategory(c)">
-                {{ c.id ? '儲存' : '新增' }}
+                儲存
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <!-- 新增列固定在最下面，不參與拖曳 -->
+        <tbody>
+          <tr>
+            <td></td>
+            <td>
+              <input
+                v-model="newCategory.name"
+                class="admin-input"
+                placeholder="輸入新分類名稱"
+                aria-label="新分類名稱"
+                @keydown.enter.prevent="newCategory.name.trim() && saveCategory(newCategory)"
+              />
+            </td>
+            <td></td>
+            <td class="text-right">
+              <button
+                type="button"
+                class="admin-link"
+                :disabled="!newCategory.name.trim()"
+                @click="saveCategory(newCategory)"
+              >
+                新增
               </button>
             </td>
           </tr>
         </tbody>
       </table>
+      <p class="admin-hint mt-3">拖曳左側把手調整分類順序，放開後立即儲存，前台會依此順序顯示；新分類會排在最後</p>
     </AdminModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import { useServicesStore } from '@/stores/services'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
+import DragHandle from '@/components/admin/DragHandle.vue'
+import { useSortable, moveItem } from '@/composables/useSortable'
 
 const DURATIONS = [15, 30, 45, 60, 75, 90, 105, 120, 150, 180]
 
@@ -177,6 +214,21 @@ const filtered = computed(() =>
       (!keyword.value || s.name.includes(keyword.value))
   )
 )
+
+// 依分類順序、療程順序排列，跟後端回傳的順序一致
+const sortServices = () => {
+  const categoryIndex = new Map(categories.value.map((c, i) => [c.id, i]))
+  services.value = [...services.value].sort(
+    (a, b) =>
+      (categoryIndex.get(a.category_id) ?? 0) - (categoryIndex.get(b.category_id) ?? 0) ||
+      a.sort_order - b.sort_order ||
+      a.id - b.id
+  )
+}
+
+// 鍵盤移動後畫面會重新排列，把焦點放回同一列的把手
+const focusHandle = (id: number) =>
+  nextTick(() => document.querySelector<HTMLElement>(`[data-id="${id}"] [data-drag-handle]`)?.focus())
 
 const load = async () => {
   try {
@@ -207,10 +259,9 @@ const openService = (s?: any) => {
         categoryId: s.category_id,
         price: Number(s.price),
         duration: s.duration,
-        sortOrder: s.sort_order,
         description: s.description || ''
       }
-    : { name: '', categoryId: categories.value[0]?.id, price: 1000, duration: 60, sortOrder: 0, description: '' }
+    : { name: '', categoryId: categories.value[0]?.id, price: 1000, duration: 60, description: '' }
 }
 
 const saveService = async () => {
@@ -244,18 +295,80 @@ const toggleActive = async (s: any) => {
   }
 }
 
+// ---- 療程排序：只能在同一分類內移動；篩選狀態或搜尋時看不到完整清單，先鎖住
+const serviceBody = ref<HTMLElement | null>(null)
+const sortLocked = computed(() => !!activeFilter.value || !!keyword.value)
+
+const reorderServices = async (from: number, to: number) => {
+  const list = moveItem(filtered.value, from, to)
+  const moved = list[to]
+  const ids = list.filter((s) => s.category_id === moved.category_id).map((s) => s.id)
+  // 先更新畫面再存檔，失敗就重新載入還原
+  ids.forEach((id, i) => {
+    const s = services.value.find((x) => x.id === id)
+    if (s) s.sort_order = i + 1
+  })
+  sortServices()
+  try {
+    await apiClient.put('/admin/services/order', { ids })
+    toast.success('排序已更新', { timeout: 1500 })
+    refreshStorefront()
+  } catch (error: any) {
+    toast.error(error?.message || '排序儲存失敗，已還原')
+    await load()
+  }
+}
+
+useSortable(serviceBody, {
+  onMove: reorderServices,
+  canDrop: (dragged, related) => dragged.dataset.category === related.dataset.category,
+  disabled: sortLocked
+})
+
+const nudgeService = async (s: any, delta: number) => {
+  const from = filtered.value.indexOf(s)
+  const to = from + delta
+  if (filtered.value[to]?.category_id !== s.category_id) return
+  await reorderServices(from, to)
+  focusHandle(s.id)
+}
+
 // ---- 分類
 const categoryModal = ref(false)
-const newCategory = ref({ id: null, name: '', sort_order: 0, service_count: 0 })
-const categoryRows = computed(() => [...categories.value, newCategory.value])
+const categoryBody = ref<HTMLElement | null>(null)
+const newCategory = ref({ id: null, name: '' })
+
+const reorderCategories = async (from: number, to: number) => {
+  categories.value = moveItem(categories.value, from, to)
+  sortServices()
+  try {
+    await apiClient.put('/admin/categories/order', { ids: categories.value.map((c) => c.id) })
+    toast.success('排序已更新', { timeout: 1500 })
+    servicesStore.fetchCategories().catch(() => {})
+    refreshStorefront()
+  } catch (error: any) {
+    toast.error(error?.message || '排序儲存失敗，已還原')
+    await load()
+  }
+}
+
+useSortable(categoryBody, { onMove: reorderCategories })
+
+const nudgeCategory = async (index: number, delta: number) => {
+  const to = index + delta
+  if (to < 0 || to >= categories.value.length) return
+  const id = categories.value[index].id
+  await reorderCategories(index, to)
+  focusHandle(id)
+}
 
 const saveCategory = async (c: any) => {
   try {
-    const body = { name: c.name, description: c.description, sortOrder: c.sort_order }
+    const body = { name: c.name, description: c.description }
     if (c.id) await apiClient.put(`/admin/categories/${c.id}`, body)
     else await apiClient.post('/admin/categories', body)
     toast.success('分類已儲存')
-    newCategory.value = { id: null, name: '', sort_order: 0, service_count: 0 }
+    newCategory.value = { id: null, name: '' }
     await load()
     servicesStore.fetchCategories().catch(() => {})
   } catch (error: any) {

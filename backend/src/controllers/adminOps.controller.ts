@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { query, queryOne, execute, withBookingLock } from '../models/db'
 import { fail, serverError, text, isDate, isTime, formatDate } from '../utils/http'
 import { logAction } from '../utils/adminLog'
+import { optionalSortOrder } from '../utils/sortOrder'
 import { isValidTaiwanPhone, normalizeTaiwanPhone } from '../utils/phone'
 import { getSlotStaff, findFreeStaff, addMinutes } from '../utils/availability'
 import { AUDIENCES } from '../utils/coupon'
@@ -401,7 +402,7 @@ export const saveAnnouncement = async (req: Request, res: Response): Promise<voi
     const content = text(req.body.content)
     const startDate = req.body.startDate || null
     const endDate = req.body.endDate || null
-    const sortOrder = Number(req.body.sortOrder) || 0
+    const sortOrder = optionalSortOrder(req.body.sortOrder)
     if (!content || content.length > 40) return fail(res, 400, '公告內容請在 40 字以內，跑馬燈才放得下')
     if (
       (startDate && !isDate(startDate)) ||
@@ -413,14 +414,15 @@ export const saveAnnouncement = async (req: Request, res: Response): Promise<voi
     const values = [content, startDate, endDate, sortOrder, req.body.isActive === false ? 0 : 1]
     if (req.params.id) {
       const [result] = await execute(
-        'UPDATE announcements SET content = ?, start_date = ?, end_date = ?, sort_order = ?, is_active = ? WHERE id = ?',
+        'UPDATE announcements SET content = ?, start_date = ?, end_date = ?, sort_order = COALESCE(?, sort_order), is_active = ? WHERE id = ?',
         [...values, req.params.id]
       )
       if (!result.affectedRows) return fail(res, 404, '公告不存在')
       await logAction(req, '修改公告', content)
     } else {
       await execute(
-        'INSERT INTO announcements (content, start_date, end_date, sort_order, is_active) VALUES (?, ?, ?, ?, ?)',
+        `INSERT INTO announcements (content, start_date, end_date, sort_order, is_active)
+         SELECT ?, ?, ?, COALESCE(?, MAX(sort_order) + 1, 1), ? FROM announcements`,
         values
       )
       await logAction(req, '新增公告', content)

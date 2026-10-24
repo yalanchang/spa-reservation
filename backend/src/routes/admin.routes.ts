@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { reorderHandler } from '../utils/sortOrder'
 import {
   getStats,
   listAppointments,
@@ -72,8 +73,10 @@ router.get('/staff/:id/schedule', getStaffSchedule)
 // 管理員專用：療程、美容師排班
 router.get('/categories', requireAdmin, listCategories)
 router.post('/categories', requireAdmin, saveCategory)
+router.put('/categories/order', requireAdmin, reorderHandler('service_categories', '分類'))
 router.put('/categories/:id', requireAdmin, saveCategory)
 router.post('/services', requireAdmin, saveService)
+router.put('/services/order', requireAdmin, reorderHandler('services', '療程'))
 router.put('/services/:id', requireAdmin, saveService)
 router.patch('/services/:id/active', requireAdmin, setServiceActive)
 router.post('/staff', requireAdmin, saveStaff)
@@ -89,6 +92,7 @@ router.post('/coupons', requireAdmin, saveCoupon)
 router.put('/coupons/:id', requireAdmin, saveCoupon)
 router.get('/announcements', requireAdmin, listAnnouncements)
 router.post('/announcements', requireAdmin, saveAnnouncement)
+router.put('/announcements/order', requireAdmin, reorderHandler('announcements', '公告'))
 router.put('/announcements/:id', requireAdmin, saveAnnouncement)
 router.delete('/announcements/:id', requireAdmin, deleteAnnouncement)
 router.get('/closures', requireAdmin, listClosures)

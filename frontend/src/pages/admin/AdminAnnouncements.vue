@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <form
-      class="admin-panel grid gap-3 p-4 lg:grid-cols-[1fr_9.5rem_9.5rem_5rem_auto] lg:items-start"
+      class="admin-panel grid gap-3 p-4 lg:grid-cols-[1fr_9.5rem_9.5rem_auto] lg:items-start"
       @submit.prevent="save"
     >
       <div>
@@ -24,10 +24,6 @@
         <label class="admin-label" for="ann-end">結束日期</label>
         <input id="ann-end" v-model="form.endDate" type="date" class="admin-input" />
       </div>
-      <div>
-        <label class="admin-label" for="ann-sort">排序</label>
-        <input id="ann-sort" v-model.number="form.sortOrder" type="number" class="admin-input" />
-      </div>
       <div class="flex gap-2 lg:mt-5">
         <button v-if="form.id" type="button" class="admin-btn-outline" @click="reset">取消</button>
         <button type="submit" class="admin-btn" :disabled="saving">{{ form.id ? '儲存' : '新增' }}</button>
@@ -38,22 +34,22 @@
       <table class="admin-table min-w-[680px]">
         <thead>
           <tr>
-            <th class="w-16">排序</th>
+            <th class="w-12"><span class="sr-only">排序</span></th>
             <th>內容</th>
             <th>顯示期間</th>
             <th>狀態</th>
             <th class="text-right">操作</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody ref="tableBody">
           <tr v-if="loading">
             <td colspan="5" class="py-12"><LoadingSpinner /></td>
           </tr>
           <tr v-else-if="!rows.length">
             <td colspan="5" class="py-12 text-center text-gray-400">還沒有公告，首頁不會顯示跑馬燈</td>
           </tr>
-          <tr v-for="r in rows" v-else :key="r.id">
-            <td class="tabular-nums text-gray-500">{{ r.sort_order }}</td>
+          <tr v-for="(r, i) in rows" v-else :key="r.id" data-sortable :data-id="r.id">
+            <td class="!px-2"><DragHandle :label="r.content" @move="nudge(i, $event)" /></td>
             <td class="text-gray-900">{{ r.content }}</td>
             <td class="whitespace-nowrap tabular-nums text-gray-600">
               {{ r.start_date || r.end_date ? `${r.start_date || '即日起'} ~ ${r.end_date || '不限'}` : '不限' }}
@@ -74,15 +70,18 @@
         </tbody>
       </table>
     </div>
+    <p class="text-xs text-gray-500">拖曳左側把手調整跑馬燈的輪播順序，放開後立即儲存；新公告會排在最後</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import { useConfirm } from '@/composables/useConfirm'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import DragHandle from '@/components/admin/DragHandle.vue'
+import { useSortable, moveItem } from '@/composables/useSortable'
 
 const toast = useToast()
 const confirm = useConfirm()
@@ -91,7 +90,7 @@ const today = new Date().toLocaleDateString('sv-SE')
 const rows = ref<any[]>([])
 const loading = ref(true)
 const saving = ref(false)
-const empty = () => ({ id: 0, content: '', startDate: '', endDate: '', sortOrder: 0, isActive: true })
+const empty = () => ({ id: 0, content: '', startDate: '', endDate: '', isActive: true })
 const form = ref(empty())
 
 const state = (r: any) => {
@@ -116,7 +115,6 @@ const toBody = (r: any) => ({
   content: r.content,
   startDate: r.start_date || '',
   endDate: r.end_date || '',
-  sortOrder: r.sort_order,
   isActive: !!Number(r.is_active)
 })
 
@@ -162,6 +160,31 @@ const remove = async (r: any) => {
   } catch (error: any) {
     toast.error(error?.message || '刪除失敗')
   }
+}
+
+// ---- 拖曳排序
+const tableBody = ref<HTMLElement | null>(null)
+
+const reorder = async (from: number, to: number) => {
+  rows.value = moveItem(rows.value, from, to)
+  try {
+    await apiClient.put('/admin/announcements/order', { ids: rows.value.map((r) => r.id) })
+    toast.success('排序已更新', { timeout: 1500 })
+  } catch (error: any) {
+    toast.error(error?.message || '排序儲存失敗，已還原')
+    await load()
+  }
+}
+
+useSortable(tableBody, { onMove: reorder })
+
+// 鍵盤移動後把焦點放回同一列的把手
+const nudge = async (index: number, delta: number) => {
+  const to = index + delta
+  if (to < 0 || to >= rows.value.length) return
+  const id = rows.value[index].id
+  await reorder(index, to)
+  nextTick(() => document.querySelector<HTMLElement>(`[data-id="${id}"] [data-drag-handle]`)?.focus())
 }
 
 onMounted(load)

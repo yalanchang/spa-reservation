@@ -95,6 +95,13 @@
   .admin-table tbody tr:hover {
     @apply bg-gray-50;
   }
+  /* 拖曳排序：原位置留下淡色佔位，拿起的那列加陰影 */
+  .sortable-ghost {
+    @apply bg-blue-50 opacity-60;
+  }
+  .sortable-chosen {
+    @apply bg-white shadow-md;
+  }
   .admin-tag {
     @apply inline-block rounded px-2 py-0.5 text-xs font-medium;
   }

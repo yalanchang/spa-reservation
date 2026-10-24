@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { query, queryOne, execute } from '../models/db'
 import { fail, serverError, text, isDate, isTime, formatDate } from '../utils/http'
 import { logAction } from '../utils/adminLog'
+import { optionalSortOrder } from '../utils/sortOrder'
 
 // ---------- 分類 ----------
 
@@ -25,22 +26,23 @@ export const saveCategory = async (req: Request, res: Response): Promise<void> =
   try {
     const name = text(req.body.name)
     const description = text(req.body.description)
-    const sortOrder = Number(req.body.sortOrder) || 0
+    const sortOrder = optionalSortOrder(req.body.sortOrder)
     if (!name || name.length > 100) return fail(res, 400, '請填寫分類名稱（100 字以內）')
 
     if (req.params.id) {
       const [result] = await execute(
-        'UPDATE service_categories SET name = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?',
+        'UPDATE service_categories SET name = ?, description = ?, sort_order = COALESCE(?, sort_order), is_active = ? WHERE id = ?',
         [name, description || null, sortOrder, req.body.isActive === false ? 0 : 1, req.params.id]
       )
       if (!result.affectedRows) return fail(res, 404, '分類不存在')
       await logAction(req, '修改分類', name)
     } else {
-      await execute('INSERT INTO service_categories (name, description, sort_order) VALUES (?, ?, ?)', [
-        name,
-        description || null,
-        sortOrder
-      ])
+      // 沒指定排序就排在最後
+      await execute(
+        `INSERT INTO service_categories (name, description, sort_order)
+         SELECT ?, ?, COALESCE(?, MAX(sort_order) + 1, 1) FROM service_categories`,
+        [name, description || null, sortOrder]
+      )
       await logAction(req, '新增分類', name)
     }
     res.json({ success: true, message: '分類已儲存' })
@@ -75,7 +77,7 @@ export const saveService = async (req: Request, res: Response): Promise<void> =>
     const price = Number(req.body.price)
     const duration = Number(req.body.duration)
     const categoryId = Number(req.body.categoryId)
-    const sortOrder = Number(req.body.sortOrder) || 0
+    const sortOrder = optionalSortOrder(req.body.sortOrder)
 
     if (!name || name.length > 200) return fail(res, 400, '請填寫療程名稱（200 字以內）')
     if (!Number.isInteger(price) || price < 0 || price > 1000000) return fail(res, 400, '價格請填 0 以上的整數')
@@ -88,7 +90,8 @@ export const saveService = async (req: Request, res: Response): Promise<void> =>
 
     if (req.params.id) {
       const [result] = await execute(
-        `UPDATE services SET category_id = ?, name = ?, description = ?, price = ?, duration = ?, sort_order = ?
+        `UPDATE services SET category_id = ?, name = ?, description = ?, price = ?, duration = ?,
+                sort_order = COALESCE(?, sort_order)
          WHERE id = ?`,
         [categoryId, name, description || null, price, duration, sortOrder, req.params.id]
       )
@@ -97,8 +100,8 @@ export const saveService = async (req: Request, res: Response): Promise<void> =>
     } else {
       await execute(
         `INSERT INTO services (category_id, name, description, price, duration, sort_order)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [categoryId, name, description || null, price, duration, sortOrder]
+         SELECT ?, ?, ?, ?, ?, COALESCE(?, MAX(sort_order) + 1, 1) FROM services WHERE category_id = ?`,
+        [categoryId, name, description || null, price, duration, sortOrder, categoryId]
       )
       await logAction(req, '新增療程', name, `NT$ ${price}，${duration} 分鐘`)
     }
