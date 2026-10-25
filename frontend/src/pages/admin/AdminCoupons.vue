@@ -187,7 +187,7 @@
               aria-label="結束日期"
             />
           </div>
-          <p class="admin-hint">不填開始日期即刻生效，不填結束日期則長期有效</p>
+          <p class="admin-hint">不填開始日期即刻生效，不填結束日期則永久有效</p>
         </div>
         <p v-if="similarCoupon" class="rounded-md bg-amber-50 px-4 py-3 text-amber-800 sm:col-span-2">
           已經有相同資格、相同折扣的優惠券「{{ similarCoupon.name }}」（{{ similarCoupon.code }}），確定要再建立一張嗎？

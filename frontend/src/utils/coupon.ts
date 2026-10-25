@@ -12,7 +12,7 @@ export const couponConditionText = (c: { min_spend: number; per_user_limit: numb
   ].join('，')
 
 export const couponPeriodText = (c: { start_date: string | null; end_date: string | null }) => {
-  if (!c.start_date && !c.end_date) return '長期有效'
+  if (!c.start_date && !c.end_date) return '永久有效'
   if (!c.end_date) return `${c.start_date} 起`
   return `${c.start_date ? `${c.start_date} ~ ` : ''}${c.end_date} 止`
 }

@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center">
     <div class="text-center">
       <div
-        class="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+        class="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"
       ></div>
       <p class="text-gray-600">登入中，請稍候</p>
     </div>

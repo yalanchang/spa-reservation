@@ -40,7 +40,7 @@
           <div class="text-center lg:text-left">
             <p class="text-sm font-semibold tracking-[0.2em] text-primary-500">K-BEAUTY SPA</p>
             <h1 class="mt-5 text-4xl font-extrabold leading-tight text-cocoa sm:text-5xl">
-              把疲憊交給我們，<br />
+              把疲憊交給我們<br />
               把<span class="text-primary-600">美麗</span>留給自己
             </h1>
             <p class="mt-6 text-base text-gray-500 sm:text-lg">韓式肌膚管理與身體舒壓療程</p>

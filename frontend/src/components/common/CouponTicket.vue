@@ -20,9 +20,9 @@
       <span class="absolute -bottom-2 -right-2 h-4 w-4 rounded-full bg-cream"></span>
     </div>
 
-    <!-- 右邊：名稱與條件 -->
+    <!-- 右邊：名稱與條件；手機上按鈕放到文字下方，文字才有完整寬度 -->
     <div
-      class="flex min-w-0 flex-1 items-center gap-3 border-l-2 border-dashed px-4 py-3"
+      class="flex min-w-0 flex-1 flex-col gap-3 border-l-2 border-dashed px-4 py-4 sm:flex-row sm:items-center sm:px-5"
       :class="muted ? 'border-gray-200' : 'border-primary-100'"
     >
       <div class="min-w-0 flex-1">
@@ -32,12 +32,17 @@
         >
           {{ coupon.audience_label }}
         </span>
-        <p class="mt-1 truncate font-bold" :class="muted ? 'text-gray-400' : 'text-cocoa'">{{ coupon.name }}</p>
-        <p class="mt-0.5 text-xs text-gray-500">{{ couponConditionText(coupon) }}</p>
-        <p class="text-xs text-gray-400">{{ couponPeriodText(coupon) }}</p>
-        <p v-if="note" class="mt-1 text-xs" :class="muted ? 'text-gray-500' : 'text-primary-600'">{{ note }}</p>
+        <!-- 券名完整顯示，太長就換行，不截成「…」 -->
+        <p class="mt-2 break-words font-bold leading-snug" :class="muted ? 'text-gray-400' : 'text-cocoa'">
+          {{ coupon.name }}
+        </p>
+        <p class="mt-1.5 text-xs leading-relaxed text-gray-500">{{ couponConditionText(coupon) }}</p>
+        <p class="mt-0.5 text-xs leading-relaxed text-gray-400">{{ couponPeriodText(coupon) }}</p>
+        <p v-if="note" class="mt-1.5 text-xs leading-relaxed" :class="muted ? 'text-gray-500' : 'text-primary-600'">
+          {{ note }}
+        </p>
       </div>
-      <div class="shrink-0">
+      <div class="shrink-0 self-end sm:self-auto">
         <slot />
       </div>
     </div>

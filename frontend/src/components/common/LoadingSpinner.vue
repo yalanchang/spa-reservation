@@ -1,13 +1,14 @@
 <template>
+  <!-- 粗一點的圓環：淡色底圈＋主色轉動的一段 -->
   <div class="flex justify-center items-center" :style="size === 'sm' ? { height: '1.5em' } : undefined">
     <div
       class="animate-spin rounded-full"
       :class="
         size === 'sm'
-          ? 'h-5 w-5 border-2 border-current border-t-transparent'
+          ? 'h-5 w-5 border-[3px] border-current border-t-transparent'
           : tone === 'admin'
-            ? 'h-10 w-10 border-b-2 border-blue-600'
-            : 'h-12 w-12 border-b-2 border-primary-600'
+            ? 'h-10 w-10 border-4 border-blue-100 border-t-blue-600'
+            : 'h-12 w-12 border-4 border-primary-100 border-t-primary-600'
       "
     ></div>
   </div>
