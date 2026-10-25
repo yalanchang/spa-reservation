@@ -160,7 +160,10 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
       if (await bcrypt.compare(newPassword, user.password)) return fail(res, 400, '新密碼不能跟目前的密碼一樣')
     }
 
-    await execute('UPDATE users SET password = ? WHERE id = ?', [await bcrypt.hash(newPassword, 12), req.user!.userId])
+    await execute('UPDATE users SET password = ?, must_change_password = 0 WHERE id = ?', [
+      await bcrypt.hash(newPassword, 12),
+      req.user!.userId
+    ])
     res.json({ success: true, message: user.password ? '密碼已更新' : '密碼已設定，之後也可以用信箱和密碼登入' })
   } catch (error) {
     serverError(res, 'Change password error', error)

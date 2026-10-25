@@ -340,7 +340,13 @@ export const createStaffUser = async (req: Request, res: Response): Promise<void
     }
 
     const hashed = await bcrypt.hash(password, 12)
-    await execute('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [name, email, hashed, role])
+    // 初始密碼是管理員設定的，對方第一次登入時會被提醒更改
+    await execute('INSERT INTO users (name, email, password, role, must_change_password) VALUES (?, ?, ?, ?, 1)', [
+      name,
+      email,
+      hashed,
+      role
+    ])
     await logAction(req, '新增後台帳號', name, email)
 
     res.json({

@@ -212,7 +212,7 @@
     grid-row: 1 / span 9;
     @apply pt-0.5 text-left text-xs text-gray-400;
   }
-  .stack-table td[data-label] > * {
+  .stack-table td[data-label]:not([data-stack-title]) > * {
     grid-column: 2;
     justify-self: end;
   }

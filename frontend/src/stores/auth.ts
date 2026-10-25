@@ -24,6 +24,8 @@ export interface User {
   has_password?: boolean
   google_linked?: boolean
   line_linked?: boolean
+  // 後台幫忙建立的帳號，首次登入要提醒改密碼
+  must_change_password?: number | boolean
 }
 
 interface AuthState {

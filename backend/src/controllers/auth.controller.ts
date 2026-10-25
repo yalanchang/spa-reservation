@@ -23,7 +23,7 @@ const sessionResponse = (res: Response, user: any, message: string, mfa = false)
 
 const findActiveUser = (email: unknown) =>
   queryOne<any>(
-    `SELECT id, name, email, password, role, phone, avatar, email_verified
+    `SELECT id, name, email, password, role, phone, avatar, email_verified, must_change_password
      FROM users WHERE email = ? AND is_active = 1`,
     [typeof email === 'string' ? email.trim().toLowerCase() : '']
   )
@@ -287,7 +287,10 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 
     const hashed = await bcrypt.hash(password, 12)
     // 能收到驗證碼就代表信箱是本人的，順便標為已驗證
-    await execute('UPDATE users SET password = ?, email_verified = 1 WHERE id = ?', [hashed, user.id])
+    await execute('UPDATE users SET password = ?, email_verified = 1, must_change_password = 0 WHERE id = ?', [
+      hashed,
+      user.id
+    ])
 
     res.json({ success: true, message: '密碼已重設，請用新密碼登入' })
   } catch (error) {

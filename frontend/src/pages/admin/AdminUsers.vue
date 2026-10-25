@@ -4,7 +4,7 @@
     <form class="rounded-md border border-gray-200 bg-white p-4 lg:p-5" @submit.prevent="createUser">
       <h2 class="text-sm font-medium text-gray-900">新增後台帳號</h2>
       <p class="mt-1 text-xs text-gray-500">
-        後台帳號與前台會員分開，建立後請把電子郵件與初始密碼交給對方，對方可再用「忘記密碼」自行更改
+        後台帳號與前台會員分開，建立後請把電子郵件與初始密碼交給對方；對方第一次登入時會被提醒更改密碼
       </p>
       <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1.4fr_1fr_8rem_auto] lg:items-end">
         <div>

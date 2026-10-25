@@ -85,6 +85,7 @@
         </p>
         <router-view />
       </main>
+      <AdminChangePasswordModal />
     </div>
   </div>
 </template>
@@ -109,6 +110,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { isDemoSession } from '@/utils/token'
+import AdminChangePasswordModal from '@/components/admin/AdminChangePasswordModal.vue'
 import { useAdminStats } from '@/composables/useAdminStats'
 
 const route = useRoute()
