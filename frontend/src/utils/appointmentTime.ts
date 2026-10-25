@@ -17,3 +17,13 @@ export const upcomingLabel = (appt: { appointment_date: string; start_time: stri
   const days = Math.round((day.getTime() - today.getTime()) / 86400000)
   return ['今天', '明天', '後天'][days] || ''
 }
+
+// 今天的本地日期 YYYY-MM-DD（不能用 toISOString，台灣早上 8 點前會變成昨天）
+export const todayLocal = () => new Date().toLocaleDateString('sv-SE')
+
+// 手動輸入的日期不受 <input min> 限制，選到過去時提醒並退回上一個有效日期
+export const PAST_DATE_MESSAGE = '不能選擇今天以前的日期，請重新選擇'
+export const rejectPastDate = (value: string, previous: string | undefined) => {
+  if (!value || value >= todayLocal()) return null
+  return previous && previous >= todayLocal() ? previous : ''
+}

@@ -132,6 +132,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { useToast } from 'vue-toastification'
+import { todayLocal, rejectPastDate, PAST_DATE_MESSAGE } from '@/utils/appointmentTime'
 import apiClient from '@/api/client'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { isValidTaiwanPhone, normalizeTaiwanPhone } from '@/utils/phone'
@@ -147,7 +148,7 @@ const toLocalDate = (value: string) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const minDate = toLocalDate(new Date().toISOString())
+const minDate = todayLocal()
 
 const form = ref({
   staffId: props.appointment.staff_id as number,
@@ -196,6 +197,17 @@ const loadSlots = async () => {
     slotsLoading.value = false
   }
 }
+
+// 選到過去的日期：提醒並退回
+watch(
+  () => form.value.date,
+  (value, previous) => {
+    const fallback = rejectPastDate(value, previous)
+    if (fallback === null) return
+    toast.warning(PAST_DATE_MESSAGE)
+    form.value.date = fallback
+  }
+)
 
 watch(() => [form.value.date, form.value.staffId], loadSlots)
 

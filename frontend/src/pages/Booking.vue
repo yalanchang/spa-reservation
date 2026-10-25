@@ -40,7 +40,7 @@
       </template>
     </ol>
 
-    <!-- 步驟 1: 選擇服務（一次只看一個分類，點了就進到選時間） -->
+    <!-- 步驟 1: 選擇服務（預設看全部，可切換分類；點了就進到選時間） -->
     <div v-if="currentStep === 0">
       <div class="mb-5 flex items-center justify-between gap-4">
         <label for="booking-category" class="text-sm text-gray-500">療程分類</label>
@@ -49,34 +49,42 @@
           v-model="activeGroupId"
           class="w-48 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-cocoa focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
+          <option :value="0">全部（{{ services.length }}）</option>
           <option v-for="group in serviceGroups" :key="group.id" :value="group.id">
             {{ group.name }}（{{ group.services.length }}）
           </option>
         </select>
       </div>
 
-      <ul class="space-y-3">
-        <li v-for="service in activeGroup?.services" :key="service.id">
-          <button
-            type="button"
-            class="group flex w-full items-center gap-6 rounded-2xl border bg-white px-5 py-5 text-left transition-colors sm:px-7 sm:py-6"
-            :class="
-              selectedService?.id === service.id ? 'border-primary-400' : 'border-transparent hover:border-primary-200'
-            "
-            @click="chooseService(service)"
-          >
-            <div class="min-w-0 flex-1">
-              <p class="text-base font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">
-                {{ service.name }}
+      <section v-for="group in visibleGroups" :key="group.id" class="mb-8 last:mb-0">
+        <h3 v-if="activeGroupId === 0" class="mb-3 text-sm font-semibold tracking-wide text-primary-500">
+          {{ group.name }}
+        </h3>
+        <ul class="space-y-3">
+          <li v-for="service in group.services" :key="service.id">
+            <button
+              type="button"
+              class="group flex w-full items-center gap-6 rounded-2xl border bg-white px-5 py-5 text-left transition-colors sm:px-7 sm:py-6"
+              :class="
+                selectedService?.id === service.id
+                  ? 'border-primary-400'
+                  : 'border-transparent hover:border-primary-200'
+              "
+              @click="chooseService(service)"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="text-base font-bold text-cocoa transition-colors group-hover:text-primary-600 sm:text-lg">
+                  {{ service.name }}
+                </p>
+                <p class="mt-1.5 text-sm text-gray-500">{{ service.duration }} 分鐘</p>
+              </div>
+              <p class="shrink-0 text-lg font-bold text-primary-600">
+                <span class="text-sm font-medium">NT$</span> {{ Number(service.price).toLocaleString() }}
               </p>
-              <p class="mt-1.5 text-sm text-gray-500">{{ service.duration }} 分鐘</p>
-            </div>
-            <p class="shrink-0 text-lg font-bold text-primary-600">
-              <span class="text-sm font-medium">NT$</span> {{ Number(service.price).toLocaleString() }}
-            </p>
-          </button>
-        </li>
-      </ul>
+            </button>
+          </li>
+        </ul>
+      </section>
     </div>
 
     <!-- 步驟 2: 選擇時間 -->
@@ -314,6 +322,7 @@ import { useToast } from 'vue-toastification'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import { isValidTaiwanPhone, normalizeTaiwanPhone } from '@/utils/phone'
+import { todayLocal, rejectPastDate, PAST_DATE_MESSAGE } from '@/utils/appointmentTime'
 
 const authStore = useAuthStore()
 const servicesStore = useServicesStore()
@@ -342,18 +351,15 @@ const serviceGroups = computed(() => {
   return groups
 })
 
-const activeGroupId = ref<number | null>(null)
-const activeGroup = computed(
-  () => serviceGroups.value.find((g) => g.id === activeGroupId.value) || serviceGroups.value[0]
+// 0 代表「全部療程」，依分類分段列出
+const activeGroupId = ref(0)
+const visibleGroups = computed(() =>
+  activeGroupId.value === 0 ? serviceGroups.value : serviceGroups.value.filter((g) => g.id === activeGroupId.value)
 )
-// 分類載入後預設第一個
-watch(
-  serviceGroups,
-  (groups) => {
-    if (!groups.some((g) => g.id === activeGroupId.value)) activeGroupId.value = groups[0]?.id ?? null
-  },
-  { immediate: true }
-)
+// 選的分類不存在（例如被下架）就回到全部
+watch(serviceGroups, (groups) => {
+  if (activeGroupId.value && !groups.some((g) => g.id === activeGroupId.value)) activeGroupId.value = 0
+})
 
 // 選了服務就直接進到選時間
 const chooseService = (service: any) => {
@@ -369,7 +375,15 @@ const selectedStaff = ref<number | null>(null)
 const selectedDate = ref('')
 const selectedTime = ref('')
 const availableSlots = ref<string[]>([])
-const minDate = new Date().toISOString().split('T')[0]
+const minDate = todayLocal()
+
+// 選到過去的日期：提醒並退回
+watch(selectedDate, (value, previous) => {
+  const fallback = rejectPastDate(value, previous)
+  if (fallback === null) return
+  toast.warning(PAST_DATE_MESSAGE)
+  selectedDate.value = fallback
+})
 
 // 客戶資訊
 const customerName = ref(authStore.user?.name || '')

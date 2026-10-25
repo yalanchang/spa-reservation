@@ -72,6 +72,7 @@ import { ref, computed, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import { isValidTaiwanPhone } from '@/utils/phone'
+import { todayLocal, rejectPastDate, PAST_DATE_MESSAGE } from '@/utils/appointmentTime'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 
@@ -79,7 +80,7 @@ const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: []; created: [] }>()
 
 const toast = useToast()
-const today = new Date().toLocaleDateString('sv-SE')
+const today = todayLocal()
 
 const services = ref<any[]>([])
 const staff = ref<any[]>([])
@@ -98,6 +99,17 @@ const empty = () => ({
   notes: ''
 })
 const form = ref(empty())
+
+// 選到過去的日期：提醒並退回
+watch(
+  () => form.value.date,
+  (value, previous) => {
+    const fallback = rejectPastDate(value, previous)
+    if (fallback === null) return
+    toast.warning(PAST_DATE_MESSAGE)
+    form.value.date = fallback
+  }
+)
 
 const slotHint = computed(() => {
   if (!form.value.serviceId) return '請先選擇療程'
