@@ -1,6 +1,6 @@
 # SPA 預約系統 - Spa Reservation System
 
-一個美容院 / SPA 中心的線上預約系統，支援 Google 和 LINE 第三方登入，提供完整的預約管理流程。
+美容院 / SPA 中心的線上預約系統，支援 Google 和 LINE 第三方登入，提供完整的預約管理流程。
 
 ---
 

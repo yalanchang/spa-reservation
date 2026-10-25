@@ -9,12 +9,10 @@
       <LoadingSpinner />
     </div>
 
-    <!-- 沒有收藏：推薦評價最好的療程 -->
     <div v-else-if="!favoriteServices.length">
       <div class="card-cute mx-auto max-w-md p-10 text-center">
         <HeartIcon class="mx-auto h-12 w-12 text-primary-200" />
         <p class="mt-4 font-semibold text-cocoa">還沒有收藏任何療程</p>
-        <p class="mt-1 text-sm text-gray-500">在療程卡片點愛心，就會出現在這裡</p>
         <router-link to="/services" class="btn-cute mt-6">瀏覽服務項目</router-link>
       </div>
       <section v-if="recommended.length" class="mt-14">
@@ -26,7 +24,6 @@
     </div>
 
     <template v-else>
-      <!-- 工具列：數量、管理、排序 -->
       <div class="mb-4 flex flex-wrap items-center gap-3 border-b border-primary-100 pb-4">
         <template v-if="managing">
           <label class="flex cursor-pointer items-center gap-2 text-sm text-cocoa">
@@ -72,7 +69,6 @@
         </select>
       </div>
 
-      <!-- 收藏清單 -->
       <TransitionGroup tag="ul" name="fav" class="relative space-y-3">
         <li
           v-for="service in visibleServices"

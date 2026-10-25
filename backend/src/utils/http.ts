@@ -17,7 +17,6 @@ export const isDate = (value: unknown): value is string =>
 export const isTime = (value: unknown): value is string =>
   typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d(:00)?$/.test(value)
 
-// DATE 欄位轉成 YYYY-MM-DD（用本地時間，避免時區差一天）
 export const formatDate = (value: Date | string | null) => {
   if (!value) return null
   const d = new Date(value)
