@@ -46,8 +46,9 @@
   }
 
   /* ---- 店家後台：灰藍色系，跟前台分開 ---- */
+  /* 手機用 16px，iPhone 點輸入框才不會自動放大畫面 */
   .admin-input {
-    @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500;
+    @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-800 sm:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500;
   }
   .admin-label {
     @apply mb-1 block text-xs text-gray-500;
@@ -57,7 +58,7 @@
   }
   /* 輸入框前後帶單位（NT$、次、張） */
   .admin-input-group {
-    @apply flex w-full items-center overflow-hidden rounded-md border border-gray-300 bg-white text-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500;
+    @apply flex w-full items-center overflow-hidden rounded-md border border-gray-300 bg-white text-base sm:text-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500;
   }
   .admin-input-group > input {
     @apply min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-gray-800 focus:outline-none focus:ring-0;
@@ -94,6 +95,13 @@
   }
   .admin-table tbody tr:hover {
     @apply bg-gray-50;
+  }
+  /* 彈出視窗底部的按鈕列：內容很長時固定在底部；手機上按鈕平分寬度，比較好按 */
+  .admin-modal-actions {
+    @apply sticky bottom-0 z-10 -mx-5 -mb-5 flex gap-2 border-t border-gray-100 bg-white px-5 py-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:justify-end;
+  }
+  .admin-modal-actions > * {
+    @apply max-sm:flex-1;
   }
   /* 拖曳排序：原位置留下淡色佔位，拿起的那列加陰影 */
   .sortable-ghost {
@@ -170,4 +178,58 @@
 }
 .Vue-Toastification__toast--info .Vue-Toastification__icon {
   @apply text-primary-500;
+}
+
+/* 後台表格（v-stack-table）：手機上每一列變成一張卡片，欄位名稱在左、值在右，不用左右捲動 */
+@media (max-width: 767px) {
+  .stack-table {
+    min-width: 0 !important;
+  }
+  .stack-table thead {
+    display: none;
+  }
+  .stack-table,
+  .stack-table tbody,
+  .stack-table tr {
+    display: block;
+  }
+  .stack-table tr {
+    @apply px-4 py-3;
+  }
+  .stack-table td {
+    @apply flex items-start justify-between gap-4;
+    padding: 0.25rem 0 !important;
+    text-align: right !important;
+    white-space: normal !important;
+  }
+  .stack-table td[data-label]::before {
+    content: attr(data-label);
+    @apply shrink-0 pt-0.5 text-left text-xs text-gray-400;
+  }
+  /* 卡片標題（第一個有名稱的欄位）：不顯示欄位名稱，靠左加粗 */
+  .stack-table td[data-stack-title] {
+    @apply block pb-1 text-left text-base;
+    text-align: left !important;
+  }
+  .stack-table td[data-stack-title]::before {
+    content: none;
+  }
+  /* 沒有欄位名稱的格子（拖曳把手等）靠左；空格子不佔位 */
+  .stack-table td:not([data-label]) {
+    justify-content: flex-start;
+    text-align: left !important;
+  }
+  .stack-table td:empty {
+    display: none;
+  }
+  /* 載入中、沒有資料的整列訊息 */
+  .stack-table td[colspan] {
+    display: block;
+    text-align: center !important;
+    padding: 3rem 0 !important;
+  }
+  /* 欄位裡的長文字不要撐寬卡片 */
+  .stack-table td > * {
+    @apply min-w-0 max-w-full;
+  }
 }

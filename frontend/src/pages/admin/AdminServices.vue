@@ -18,7 +18,7 @@
     </div>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[820px]">
+      <table v-stack-table class="admin-table min-w-[820px]">
         <thead>
           <tr>
             <th class="w-12"><span class="sr-only">排序</span></th>
@@ -116,7 +116,7 @@
           <label class="admin-label" for="svc-desc">介紹</label>
           <textarea id="svc-desc" v-model="serviceForm.description" rows="3" class="admin-input"></textarea>
         </div>
-        <div class="flex justify-end gap-2 sm:col-span-2">
+        <div class="admin-modal-actions sm:col-span-2">
           <button type="button" class="admin-btn-outline" @click="serviceForm = null">取消</button>
           <button type="submit" class="admin-btn" :disabled="saving">
             <LoadingSpinner v-if="saving" size="sm" />

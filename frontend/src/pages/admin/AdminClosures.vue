@@ -21,7 +21,7 @@
     <p class="text-xs text-gray-500">設為公休後，前台這天不能預約；已經預約的不會自動取消，請記得聯絡顧客</p>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[560px]">
+      <table v-stack-table class="admin-table min-w-[560px]">
         <thead>
           <tr>
             <th>日期</th>

@@ -23,7 +23,7 @@
     <template v-else-if="data">
       <!-- 摘要：一列數字，不做卡片 -->
       <div class="admin-panel overflow-x-auto">
-        <table class="admin-table min-w-[760px]">
+        <table v-stack-table.notitle class="admin-table min-w-[760px]">
           <thead>
             <tr>
               <th class="text-right">營收</th>
@@ -113,8 +113,12 @@
               {{ metric === 'revenue' ? shortMoney(t) : t }}
             </span>
           </div>
-          <div class="min-w-0 flex-1 overflow-x-auto">
-            <div :style="{ minWidth: `${buckets.length * (byMonth ? 40 : 12)}px` }">
+          <!-- 手機上長條縮窄塞進畫面；平板以上才保留最小寬度，太多天時左右捲動 -->
+          <div class="min-w-0 flex-1 sm:overflow-x-auto">
+            <div
+              class="sm:[min-width:var(--chart-min)]"
+              :style="{ '--chart-min': `${buckets.length * (byMonth ? 40 : 12)}px` }"
+            >
               <div class="relative h-48">
                 <!-- 格線 -->
                 <div
@@ -310,7 +314,7 @@
         <div v-if="detail.loading" class="py-10"><LoadingSpinner /></div>
         <p v-else-if="!detail.rows.length" class="py-10 text-center text-gray-400">沒有資料</p>
         <div v-else class="max-h-[60vh] overflow-auto rounded-md border border-gray-200">
-          <table class="admin-table min-w-[640px]">
+          <table v-stack-table class="admin-table min-w-[640px]">
             <thead class="sticky top-0">
               <tr>
                 <th>時間</th>
@@ -353,7 +357,7 @@
         <div v-if="members.loading" class="py-10"><LoadingSpinner /></div>
         <p v-else-if="!members.rows.length" class="py-10 text-center text-gray-400">這段期間沒有新會員</p>
         <div v-else class="max-h-[60vh] overflow-auto rounded-md border border-gray-200">
-          <table class="admin-table min-w-[600px]">
+          <table v-stack-table class="admin-table min-w-[600px]">
             <thead class="sticky top-0">
               <tr>
                 <th>會員</th>

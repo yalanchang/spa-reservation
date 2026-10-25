@@ -5,6 +5,7 @@ import router from './router'
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { reveal } from './directives/reveal'
+import { stackTable } from './directives/stackTable'
 import './style.css'
 
 const app = createApp(App)
@@ -22,6 +23,7 @@ app.use(Toast, {
   newestOnTop: true
 })
 app.directive('reveal', reveal)
+app.directive('stack-table', stackTable)
 
 // 日期、時間欄位點任何地方都直接打開選擇器，不用對準右邊的小圖示
 document.addEventListener('click', (event) => {

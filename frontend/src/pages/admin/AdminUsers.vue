@@ -39,7 +39,7 @@
 
     <!-- 列表 -->
     <div class="overflow-x-auto rounded-md border border-gray-200 bg-white">
-      <table class="w-full min-w-[640px] text-left text-sm">
+      <table v-stack-table class="w-full min-w-[640px] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
           <tr>
             <th class="px-4 py-2.5 font-medium">姓名</th>

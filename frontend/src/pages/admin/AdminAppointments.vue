@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <!-- 快速檢視 -->
-    <div class="flex gap-1 overflow-x-auto border-b border-gray-200 text-sm">
+    <div class="flex flex-wrap gap-x-1 border-b border-gray-200 text-sm">
       <button
         v-for="v in views"
         :key="v.value"
@@ -64,7 +64,7 @@
 
     <!-- 表格 -->
     <div class="overflow-x-auto rounded-md border border-gray-200 bg-white">
-      <table class="w-full min-w-[960px] text-left text-sm">
+      <table v-stack-table class="w-full min-w-[960px] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
           <tr>
             <th class="px-4 py-2.5 font-medium">預約時間</th>

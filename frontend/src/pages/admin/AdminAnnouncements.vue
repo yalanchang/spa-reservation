@@ -31,7 +31,7 @@
     </form>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[680px]">
+      <table v-stack-table class="admin-table min-w-[680px]">
         <thead>
           <tr>
             <th class="w-12"><span class="sr-only">排序</span></th>

@@ -13,7 +13,7 @@
     </div>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[720px]">
+      <table v-stack-table class="admin-table min-w-[720px]">
         <thead>
           <tr>
             <th class="w-44">時間</th>

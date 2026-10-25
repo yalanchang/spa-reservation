@@ -6,7 +6,7 @@
     </div>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[760px]">
+      <table v-stack-table class="admin-table min-w-[760px]">
         <thead>
           <tr>
             <th>美容師</th>
@@ -97,7 +97,7 @@
         <p v-if="!profileForm.id" class="text-xs text-gray-500">
           新增後會先套用預設班表（週一休），可再到「班表與請假」調整
         </p>
-        <div class="flex justify-end gap-2">
+        <div class="admin-modal-actions">
           <button type="button" class="admin-btn-outline" @click="profileForm = null">取消</button>
           <button type="submit" class="admin-btn" :disabled="saving">
             <LoadingSpinner v-if="saving" size="sm" />
@@ -118,11 +118,11 @@
       <div v-else class="space-y-6">
         <section>
           <h4 class="mb-2 text-sm font-medium text-gray-900">每週班表</h4>
-          <table class="admin-table">
+          <table class="admin-table max-sm:[&_td]:px-2">
             <tbody>
               <tr v-for="d in schedule" :key="d.day">
-                <td class="w-16">週{{ WEEKDAYS[d.day] }}</td>
-                <td class="w-24">
+                <td class="w-12 whitespace-nowrap sm:w-16">週{{ WEEKDAYS[d.day] }}</td>
+                <td class="w-20 whitespace-nowrap sm:w-24">
                   <label class="flex items-center gap-2">
                     <input v-model="d.working" type="checkbox" class="h-4 w-4 accent-blue-600" />
                     {{ d.working ? '上班' : '休假' }}
@@ -134,7 +134,7 @@
                       v-model="d.start"
                       type="time"
                       step="1800"
-                      class="admin-input !w-32"
+                      class="admin-input min-w-0 flex-1 sm:!w-32 sm:flex-none"
                       :aria-label="`週${WEEKDAYS[d.day]}上班時間`"
                     />
                     <span class="text-gray-400">–</span>
@@ -142,7 +142,7 @@
                       v-model="d.end"
                       type="time"
                       step="1800"
-                      class="admin-input !w-32"
+                      class="admin-input min-w-0 flex-1 sm:!w-32 sm:flex-none"
                       :aria-label="`週${WEEKDAYS[d.day]}下班時間`"
                     />
                   </div>
@@ -151,7 +151,7 @@
             </tbody>
           </table>
           <div class="mt-3 flex justify-end">
-            <button type="button" class="admin-btn" :disabled="saving" @click="saveSchedule">
+            <button type="button" class="admin-btn max-sm:w-full" :disabled="saving" @click="saveSchedule">
               <LoadingSpinner v-if="saving" size="sm" />
               <template v-else>儲存班表</template>
             </button>
@@ -167,7 +167,7 @@
             </div>
             <div>
               <label class="admin-label" for="leave-type">時段</label>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <select id="leave-type" v-model="leaveForm.fullDay" class="admin-input !w-24">
                   <option :value="true">整天</option>
                   <option :value="false">部分</option>
@@ -200,17 +200,17 @@
                 class="admin-input"
               />
             </div>
-            <button type="submit" class="admin-btn">新增</button>
+            <button type="submit" class="admin-btn max-sm:w-full">新增請假</button>
           </form>
 
           <ul class="mt-4 divide-y divide-gray-100 rounded-md border border-gray-200">
             <li v-if="!leaves.length" class="px-4 py-6 text-center text-gray-400">沒有排定的請假</li>
-            <li v-for="l in leaves" :key="l.id" class="flex items-center gap-3 px-4 py-2.5">
+            <li v-for="l in leaves" :key="l.id" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5">
               <span class="tabular-nums"
                 >{{ l.leave_date }}（週{{ WEEKDAYS[new Date(`${l.leave_date}T00:00:00`).getDay()] }}）</span
               >
               <span class="text-gray-500">{{ Number(l.is_full_day) ? '整天' : `${l.start_time}–${l.end_time}` }}</span>
-              <span class="flex-1 truncate text-gray-500">{{ l.reason }}</span>
+              <span class="min-w-0 flex-1 truncate text-gray-500">{{ l.reason }}</span>
               <button type="button" class="text-sm text-red-600 hover:text-red-800" @click="deleteLeave(l)">
                 刪除
               </button>

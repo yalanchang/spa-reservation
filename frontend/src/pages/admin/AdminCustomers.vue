@@ -24,7 +24,7 @@
     </div>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[820px]">
+      <table v-stack-table class="admin-table min-w-[820px]">
         <thead>
           <tr>
             <th>會員</th>

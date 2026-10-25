@@ -8,7 +8,7 @@
     </div>
 
     <div class="admin-panel overflow-x-auto">
-      <table class="admin-table min-w-[860px]">
+      <table v-stack-table class="admin-table min-w-[860px]">
         <thead>
           <tr>
             <th>優惠碼</th>
@@ -194,7 +194,7 @@
         <p v-if="similarCoupon" class="rounded-md bg-amber-50 px-4 py-3 text-amber-800 sm:col-span-2">
           已經有相同資格、相同折扣的優惠券「{{ similarCoupon.name }}」（{{ similarCoupon.code }}），確定要再建立一張嗎？
         </p>
-        <div class="flex justify-end gap-2 sm:col-span-2">
+        <div class="admin-modal-actions sm:col-span-2">
           <button type="button" class="admin-btn-outline" @click="form = null">取消</button>
           <button type="submit" class="admin-btn" :disabled="saving || duplicateCode">
             <LoadingSpinner v-if="saving" size="sm" />
