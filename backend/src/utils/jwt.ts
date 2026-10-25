@@ -9,6 +9,8 @@ export interface TokenPayload {
   role: string
   // 從後台登入頁登入才有，後台 API 只認這種 token
   mfa?: boolean
+  // 展示帳號：不能變更帳號權限與個人資料
+  demo?: boolean
 }
 
 export const signToken = (payload: TokenPayload): string => {

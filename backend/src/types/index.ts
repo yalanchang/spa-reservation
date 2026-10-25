@@ -16,4 +16,5 @@ export interface JwtPayload {
   email: string
   role: string
   mfa?: boolean
+  demo?: boolean
 }

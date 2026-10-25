@@ -55,8 +55,8 @@
           class="admin-input"
         />
       </div>
-      <p class="text-xs text-gray-500 sm:col-span-2">由後台建立的預約會直接設為「已確認」，無需再審核</p>
-      <div class="admin-modal-actions sm:col-span-2">
+      <div class="admin-modal-actions flex-wrap sm:col-span-2">
+        <p class="!basis-full text-xs text-gray-500">由後台建立的預約會直接設為「已確認」，無需再審核</p>
         <button type="button" class="admin-btn-outline" @click="emit('close')">取消</button>
         <button type="submit" class="admin-btn" :disabled="saving || !form.time">
           <LoadingSpinner v-if="saving" size="sm" />

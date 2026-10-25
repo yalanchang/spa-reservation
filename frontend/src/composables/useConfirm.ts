@@ -6,6 +6,8 @@ interface ConfirmOptions {
   confirmText?: string
   cancelText?: string
   danger?: boolean
+  // 只有一個「知道了」按鈕的提示視窗
+  alert?: boolean
 }
 
 export const confirmState = reactive({

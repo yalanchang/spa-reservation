@@ -15,3 +15,6 @@ export const hasAdminSession = (token: string | null) => {
   const payload = readPayload(token)
   return !!payload?.mfa && (!payload.exp || payload.exp * 1000 > Date.now())
 }
+
+// 是否為後台展示帳號的登入
+export const isDemoSession = (token: string | null) => !!readPayload(token)?.demo

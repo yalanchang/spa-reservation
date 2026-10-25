@@ -107,30 +107,31 @@
 
         <div>
           <h4 class="mb-2 text-sm font-medium text-gray-900">預約紀錄（{{ detail.appointments.length }}）</h4>
-          <div class="max-h-72 overflow-y-auto rounded-md border border-gray-200">
-            <table class="admin-table">
-              <tbody>
-                <tr v-if="!detail.appointments.length">
-                  <td class="py-6 text-center text-gray-400">還沒有預約</td>
-                </tr>
-                <tr v-for="a in detail.appointments" :key="a.id">
-                  <td class="whitespace-nowrap tabular-nums">
-                    {{ a.appointment_date }} {{ a.start_time.slice(0, 5) }}
-                  </td>
-                  <td>{{ a.service_name }}</td>
-                  <td class="text-gray-500">{{ a.staff_name }}</td>
-                  <td class="text-right tabular-nums">{{ Number(a.price).toLocaleString() }}</td>
-                  <td>
-                    <span class="admin-tag" :class="STATUS_CLASSES[a.status]">{{ STATUS_LABELS[a.status] }}</span>
-                  </td>
-                  <td class="text-right text-amber-500">{{ a.rating ? '★'.repeat(a.rating) : '' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <!-- 一筆一列：上面時間與狀態，下面療程、美容師、金額；手機也不會擠成直排 -->
+          <ul class="max-h-72 divide-y divide-gray-100 overflow-y-auto rounded-md border border-gray-200">
+            <li v-if="!detail.appointments.length" class="py-6 text-center text-gray-400">還沒有預約</li>
+            <li v-for="a in detail.appointments" :key="a.id" class="px-4 py-3">
+              <div class="flex items-center justify-between gap-3">
+                <span class="tabular-nums text-gray-900">{{ a.appointment_date }} {{ a.start_time.slice(0, 5) }}</span>
+                <span class="admin-tag shrink-0" :class="STATUS_CLASSES[a.status]">{{ STATUS_LABELS[a.status] }}</span>
+              </div>
+              <div class="mt-1 flex items-center justify-between gap-3 text-gray-500">
+                <span class="min-w-0 truncate">{{ a.service_name }}・{{ a.staff_name }}</span>
+                <span class="shrink-0 tabular-nums">
+                  <span v-if="a.rating" class="mr-2 text-amber-500" :aria-label="`${a.rating} 星`">{{
+                    '★'.repeat(a.rating)
+                  }}</span>
+                  NT$ {{ Number(a.price).toLocaleString() }}
+                </span>
+              </div>
+            </li>
+          </ul>
         </div>
 
-        <div v-if="authStore.user?.role === 'admin'" class="flex justify-between border-t border-gray-200 pt-4">
+        <div
+          v-if="authStore.user?.role === 'admin'"
+          class="flex items-center justify-between gap-4 border-t border-gray-200 pt-4"
+        >
           <p class="text-xs text-gray-500">停權後對方無法登入，已有的預約不受影響</p>
           <button
             type="button"

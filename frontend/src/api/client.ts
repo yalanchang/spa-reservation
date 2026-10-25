@@ -1,4 +1,8 @@
 import axios from 'axios'
+import { useConfirm } from '@/composables/useConfirm'
+
+// 展示帳號被擋下的操作：跳出提示視窗，頁面上的錯誤 toast 用這個訊息辨識後略過（見 main.ts）
+export const NO_PERMISSION_MESSAGE = '無此權限'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 const apiClient = axios.create({
@@ -42,6 +46,16 @@ apiClient.interceptors.response.use(
     // 後台 API 需要後台登入（含驗證碼）才能用
     if (error.response?.status === 403 && error.response.data?.code === 'ADMIN_LOGIN_REQUIRED') {
       window.location.href = '/admin/login'
+    }
+
+    if (error.response?.status === 403 && error.response.data?.code === 'DEMO_BLOCKED') {
+      useConfirm()({
+        title: NO_PERMISSION_MESSAGE,
+        message: error.response.data.message,
+        confirmText: '知道了',
+        alert: true
+      })
+      return Promise.reject({ success: false, message: NO_PERMISSION_MESSAGE })
     }
 
     if (!error.response) {

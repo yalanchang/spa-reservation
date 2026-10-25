@@ -1,9 +1,33 @@
 <template>
   <div class="min-h-screen bg-gray-100 text-gray-800 lg:flex">
-    <aside class="hidden lg:flex lg:w-56 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-gray-200">
-      <div class="flex h-14 items-center border-b border-gray-200 px-5">
+    <!-- 手機：抽屜選單的半透明背景，點一下關閉 -->
+    <Transition
+      enter-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-200"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="menuOpen" class="fixed inset-0 z-40 bg-black/40 lg:hidden" @click="menuOpen = false"></div>
+    </Transition>
+
+    <!-- 選單：桌機固定在左側；手機收在右側，按漢堡鈕從右邊滑進來 -->
+    <aside
+      id="admin-menu"
+      class="fixed inset-y-0 right-0 z-50 flex w-72 max-w-[85vw] flex-col border-l border-gray-200 bg-white shadow-xl transition-transform duration-300 ease-out lg:left-0 lg:right-auto lg:w-56 lg:translate-x-0 lg:border-l-0 lg:border-r lg:shadow-none"
+      :class="menuOpen ? 'translate-x-0' : 'translate-x-full'"
+      :aria-hidden="!menuOpen && !isDesktop"
+    >
+      <div class="flex h-14 shrink-0 items-center border-b border-gray-200 px-5">
         <span class="font-semibold text-gray-900">美容預約系統</span>
         <span class="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">後台</span>
+        <button
+          type="button"
+          class="-mr-2 ml-auto flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 lg:hidden"
+          aria-label="關閉選單"
+          @click="menuOpen = false"
+        >
+          <XMarkIcon class="h-5 w-5" />
+        </button>
       </div>
 
       <nav class="flex-1 space-y-4 overflow-y-auto p-3 text-sm">
@@ -14,7 +38,7 @@
               v-for="item in group.items"
               :key="item.to"
               :to="item.to"
-              class="flex items-center gap-2.5 rounded-md px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              class="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-gray-600 hover:bg-gray-100 hover:text-gray-900 lg:py-2"
               active-class="!bg-gray-100 !text-gray-900 font-medium"
             >
               <component :is="item.icon" class="h-5 w-5 text-gray-400" />
@@ -40,29 +64,25 @@
       <header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
         <div class="flex h-14 items-center justify-between px-4 lg:px-6">
           <h1 class="font-semibold text-gray-900">{{ route.meta.title }}</h1>
-          <div class="flex items-center gap-3 text-sm lg:hidden">
-            <router-link to="/" class="text-gray-500 hover:text-gray-900">回到前台</router-link>
-            <button class="text-gray-500 hover:text-gray-900" @click="logout">登出</button>
-          </div>
-        </div>
-        <!-- 手機：下拉選單切換頁面 -->
-        <div class="px-4 pb-3 lg:hidden">
-          <select
-            :value="route.path"
-            class="admin-input"
-            aria-label="切換頁面"
-            @change="router.push(($event.target as HTMLSelectElement).value)"
+          <!-- 手機：漢堡鈕，有待辦時加紅點 -->
+          <button
+            type="button"
+            class="relative -mr-2 flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 lg:hidden"
+            aria-label="開啟選單"
+            aria-controls="admin-menu"
+            :aria-expanded="menuOpen"
+            @click="menuOpen = true"
           >
-            <optgroup v-for="group in menuGroups" :key="group.label" :label="group.label">
-              <option v-for="item in group.items" :key="item.to" :value="item.to">
-                {{ item.label }}{{ item.badge ? `（${item.badge}）` : '' }}
-              </option>
-            </optgroup>
-          </select>
+            <Bars3Icon class="h-6 w-6" />
+            <span v-if="hasBadge" class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
         </div>
       </header>
 
       <main class="flex-1 p-4 lg:p-6">
+        <p v-if="isDemo" class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
+          你正在使用<strong class="font-medium">展示帳號</strong>，可以自由操作各項功能；管理員權限與帳號資料無法變更。
+        </p>
         <router-view />
       </main>
     </div>
@@ -70,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   CalendarDaysIcon,
@@ -83,9 +103,12 @@ import {
   TicketIcon,
   MegaphoneIcon,
   ChartBarIcon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
+import { isDemoSession } from '@/utils/token'
 import { useAdminStats } from '@/composables/useAdminStats'
 
 const route = useRoute()
@@ -94,8 +117,36 @@ const authStore = useAuthStore()
 const { stats, refresh } = useAdminStats()
 
 const roleLabel = computed(() => (authStore.user?.role === 'admin' ? '管理員' : '美容師'))
+const isDemo = computed(() => isDemoSession(authStore.token))
 
 const isAdmin = computed(() => authStore.user?.role === 'admin')
+
+// ---- 手機抽屜選單：換頁、按 Esc、切到桌機寬度都會自動關閉
+const menuOpen = ref(false)
+const desktopQuery = window.matchMedia('(min-width: 1024px)')
+const isDesktop = ref(desktopQuery.matches)
+const onDesktopChange = (e: MediaQueryListEvent) => {
+  isDesktop.value = e.matches
+  if (e.matches) menuOpen.value = false
+}
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') menuOpen.value = false
+}
+watch(
+  () => route.path,
+  () => (menuOpen.value = false)
+)
+// 選單開著時鎖住背後頁面
+watch(menuOpen, (open) => (document.body.style.overflow = open ? 'hidden' : ''))
+onMounted(() => {
+  desktopQuery.addEventListener('change', onDesktopChange)
+  window.addEventListener('keydown', onKeydown)
+})
+onUnmounted(() => {
+  desktopQuery.removeEventListener('change', onDesktopChange)
+  window.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
+})
 
 // 側邊欄分組；美容師只看得到日常營運的頁面
 const menuGroups = computed(() => {
@@ -142,6 +193,8 @@ const menuGroups = computed(() => {
     }
   ]
 })
+
+const hasBadge = computed(() => menuGroups.value.some((g) => g.items.some((item) => item.badge)))
 
 const logout = async () => {
   await authStore.logout()

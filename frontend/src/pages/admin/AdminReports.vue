@@ -182,7 +182,7 @@
               <tr>
                 <th>療程</th>
                 <th class="text-right">次數</th>
-                <th class="w-2/5">營收</th>
+                <th class="w-2/5 text-right sm:text-left">營收</th>
               </tr>
             </thead>
             <tbody>
@@ -214,7 +214,7 @@
                 <th>美容師</th>
                 <th class="text-right">服務</th>
                 <th class="text-right">評分</th>
-                <th class="w-2/5">營收</th>
+                <th class="w-2/5 text-right sm:text-left">營收</th>
               </tr>
             </thead>
             <tbody>
@@ -245,7 +245,7 @@
             <thead>
               <tr>
                 <th>開始時間</th>
-                <th class="w-3/5">預約數</th>
+                <th class="w-3/5 text-right sm:text-left">預約數</th>
               </tr>
             </thead>
             <tbody>
@@ -274,7 +274,7 @@
             <thead>
               <tr>
                 <th>來源</th>
-                <th class="w-3/5">預約數</th>
+                <th class="w-3/5 text-right sm:text-left">預約數</th>
               </tr>
             </thead>
             <tbody>
@@ -405,8 +405,8 @@ const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
 // 表格裡的橫條：數字一定寫出來，長條只是輔助
 const BarCell = (props: { value: number; max: number; unit?: string }) =>
-  h('div', { class: 'flex items-center gap-2' }, [
-    h('div', { class: 'h-2 flex-1 rounded-sm bg-gray-100' }, [
+  h('div', { class: 'flex flex-col-reverse items-end gap-1 sm:flex-row sm:items-center sm:gap-2' }, [
+    h('div', { class: 'h-2 w-full rounded-sm bg-gray-100 sm:w-auto sm:flex-1' }, [
       h('div', {
         class: 'h-2 rounded-sm bg-blue-600',
         style: { width: `${props.max ? (props.value / props.max) * 100 : 0}%` }
@@ -414,7 +414,7 @@ const BarCell = (props: { value: number; max: number; unit?: string }) =>
     ]),
     h(
       'span',
-      { class: 'w-24 shrink-0 text-right tabular-nums text-gray-700' },
+      { class: 'shrink-0 text-right tabular-nums text-gray-700 sm:w-24' },
       props.unit ? `${props.value} ${props.unit}` : `NT$ ${Math.round(props.value).toLocaleString()}`
     )
   ])

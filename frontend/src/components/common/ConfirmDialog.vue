@@ -24,6 +24,7 @@
           </p>
           <div class="mt-6 flex gap-3">
             <button
+              v-if="!confirmState.options.alert"
               class="flex-1 py-2 rounded-lg border border-gray-300 text-gray-700 transition hover:font-bold"
               @click="closeConfirm(false)"
             >

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { verifyToken } from '../utils/jwt'
 import { queryOne } from '../models/db'
 import type { JwtPayload } from '../types'
+import { DEMO_ADMIN_EMAIL } from '../utils/demo'
 
 declare global {
   namespace Express {
@@ -40,6 +41,28 @@ export const optionalAuth = (req: Request, _res: Response, next: NextFunction): 
   if (authHeader?.startsWith('Bearer ')) {
     const user = verifyToken(authHeader.substring(7))
     if (user) req.user = user
+  }
+  next()
+}
+
+// 展示帳號可以照常操作後台，只擋會影響帳號安全的動作：
+// 管理員權限、停權會員、修改展示帳號自己的資料（密碼、信箱、頭像、刪除帳號）
+const DEMO_BLOCKED = [
+  /^\/api\/admin\/users/,
+  /^\/api\/admin\/customers\/\d+\/active/,
+  /^\/api\/auth\/(profile|password|email|avatar|account)/
+]
+
+export const guardDemoAccount = (req: Request, res: Response, next: NextFunction): void => {
+  const authHeader = req.headers.authorization
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || !authHeader?.startsWith('Bearer ')) return next()
+  if (!DEMO_BLOCKED.some((pattern) => pattern.test(req.path))) return next()
+  const user = verifyToken(authHeader.substring(7))
+  if (user?.demo || user?.email === DEMO_ADMIN_EMAIL) {
+    res
+      .status(403)
+      .json({ success: false, code: 'DEMO_BLOCKED', message: '展示帳號無法變更管理員權限、停權會員或修改帳號資料' })
+    return
   }
   next()
 }

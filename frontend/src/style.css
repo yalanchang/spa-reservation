@@ -196,15 +196,25 @@
   .stack-table tr {
     @apply px-4 py-3;
   }
+  /* 左欄放欄位名稱，右欄放這一格的所有內容（多行時靠右疊起來） */
   .stack-table td {
-    @apply flex items-start justify-between gap-4;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: start;
     padding: 0.25rem 0 !important;
     text-align: right !important;
     white-space: normal !important;
   }
   .stack-table td[data-label]::before {
     content: attr(data-label);
-    @apply shrink-0 pt-0.5 text-left text-xs text-gray-400;
+    grid-column: 1;
+    grid-row: 1 / span 9;
+    @apply pt-0.5 text-left text-xs text-gray-400;
+  }
+  .stack-table td[data-label] > * {
+    grid-column: 2;
+    justify-self: end;
   }
   /* 卡片標題（第一個有名稱的欄位）：不顯示欄位名稱，靠左加粗 */
   .stack-table td[data-stack-title] {
@@ -216,7 +226,8 @@
   }
   /* 沒有欄位名稱的格子（拖曳把手等）靠左；空格子不佔位 */
   .stack-table td:not([data-label]) {
-    justify-content: flex-start;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
     text-align: left !important;
   }
   .stack-table td:empty {

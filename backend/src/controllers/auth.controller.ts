@@ -1,8 +1,10 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import { queryOne, execute } from '../models/db'
 import { signToken } from '../utils/jwt'
 import type { User } from '../types'
+import { DEMO_ADMIN_EMAIL, demoLoginEnabled } from '../utils/demo'
 import { uploadAvatarImage, deleteImageByUrl } from '../config/cloudinary'
 import {
   sendVerificationCode,
@@ -316,6 +318,33 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
     sessionResponse(res, user, '登入成功', true)
   } catch (error) {
     console.error('Admin login error:', error)
+    res.status(500).json({ success: false, message: '伺服器錯誤' })
+  }
+}
+
+// 後台登入頁用來決定要不要顯示「展示帳號」按鈕
+export const adminDemoStatus = (req: Request, res: Response): void => {
+  res.json({ success: true, data: { enabled: demoLoginEnabled() } })
+}
+
+// 展示帳號一鍵登入：帳號不存在就自動建立（隨機密碼，只能從這裡登入），被停權或降級也會恢復
+export const adminDemoLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!demoLoginEnabled()) {
+      res.status(404).json({ success: false, message: '目前沒有開放展示帳號' })
+      return
+    }
+    await execute(
+      `INSERT INTO users (name, email, password, role, email_verified, is_active) VALUES (?, ?, ?, 'admin', 1, 1)
+       ON DUPLICATE KEY UPDATE role = 'admin', is_active = 1, email_verified = 1`,
+      ['展示帳號', DEMO_ADMIN_EMAIL, await bcrypt.hash(crypto.randomUUID(), 12)]
+    )
+    const user = await findActiveUser(DEMO_ADMIN_EMAIL)
+    const token = signToken({ userId: user.id, email: user.email, role: user.role, mfa: true, demo: true })
+    const { password: _, email_verified: __, is_active: ___, ...safeUser } = user
+    res.json({ success: true, message: '已用展示帳號登入', data: { token, user: safeUser } })
+  } catch (error) {
+    console.error('Admin demo login error:', error)
     res.status(500).json({ success: false, message: '伺服器錯誤' })
   }
 }

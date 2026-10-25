@@ -8,7 +8,9 @@ import {
   resetPassword,
   verifyEmail,
   resendCode,
-  adminLogin
+  adminLogin,
+  adminDemoStatus,
+  adminDemoLogin
 } from '../controllers/auth.controller'
 import {
   getProfile,
@@ -35,6 +37,8 @@ router.post('/reset-password', resetPassword)
 router.post('/verify-email', verifyEmail)
 router.post('/resend-code', resendCode)
 router.post('/admin/login', adminLogin)
+router.get('/admin/demo', adminDemoStatus)
+router.post('/admin/demo', adminDemoLogin)
 // 個人資料
 router.get('/profile', authenticate, getProfile)
 router.put('/profile', authenticate, updateProfile)

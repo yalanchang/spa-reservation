@@ -6,6 +6,7 @@ import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { reveal } from './directives/reveal'
 import { stackTable } from './directives/stackTable'
+import { NO_PERMISSION_MESSAGE } from './api/client'
 import './style.css'
 
 const app = createApp(App)
@@ -20,7 +21,9 @@ app.use(Toast, {
   draggable: false,
   closeButton: false,
   hideProgressBar: true,
-  newestOnTop: true
+  newestOnTop: true,
+  // 「無此權限」已經用提示視窗顯示，不再重複跳 toast
+  filterBeforeCreate: (toast: any) => (toast.content === NO_PERMISSION_MESSAGE ? false : toast)
 })
 app.directive('reveal', reveal)
 app.directive('stack-table', stackTable)

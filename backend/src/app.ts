@@ -13,6 +13,7 @@ import staffRoutes from './routes/staff.routes'
 import siteRoutes from './routes/site.routes'
 import couponsRoutes from './routes/coupons.routes'
 import { query } from './models/db'
+import { guardDemoAccount } from './middleware/auth.middleware'
 
 dotenv.config()
 
@@ -29,6 +30,8 @@ app.use(
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+// 展示帳號不能變更帳號權限與個人資料
+app.use(guardDemoAccount)
 
 // 路由
 app.use('/api/auth', authRoutes)
