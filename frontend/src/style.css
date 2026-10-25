@@ -67,10 +67,10 @@
     @apply shrink-0 bg-gray-50 px-3 py-2 text-gray-500;
   }
   .admin-btn {
-    @apply inline-flex min-w-[4.5rem] items-center justify-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50;
+    @apply inline-flex min-w-[4.5rem] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50;
   }
   .admin-btn-outline {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50;
+    @apply inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50;
   }
   .admin-link {
     @apply text-sm text-blue-600 hover:text-blue-800;
@@ -229,6 +229,16 @@
     grid-template-columns: minmax(0, 1fr);
     justify-items: start;
     text-align: left !important;
+  }
+  /* 操作欄的多個按鈕橫排，放不下再換行，不要一個一行疊下去 */
+  .stack-table td[data-label='操作'] {
+    @apply flex flex-wrap items-center justify-end gap-x-4 gap-y-1;
+  }
+  .stack-table td[data-label='操作']::before {
+    @apply mr-auto;
+  }
+  .stack-table td[data-label='操作'] > * {
+    margin-left: 0 !important;
   }
   .stack-table td:empty {
     display: none;

@@ -63,7 +63,8 @@
     </div>
 
     <!-- 表格 -->
-    <div class="overflow-x-auto rounded-md border border-gray-200 bg-white">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="overflow-x-auto rounded-md border border-gray-200 bg-white">
       <table v-stack-table class="w-full min-w-[960px] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
           <tr>
@@ -77,10 +78,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-if="loading">
-            <td colspan="7" class="py-12 text-gray-400"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!appointments.length">
+          <tr v-if="!appointments.length">
             <td colspan="7" class="py-12 text-center text-gray-400">沒有符合條件的預約</td>
           </tr>
           <tr v-for="appt in appointments" v-else :key="appt.id" class="align-top hover:bg-gray-50">
@@ -143,6 +141,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import ActionMenu from '@/components/common/ActionMenu.vue'
 import AdminBookingModal from '@/components/admin/AdminBookingModal.vue'
 import { downloadAppointmentsCsv } from '@/utils/adminExport'

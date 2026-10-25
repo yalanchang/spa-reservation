@@ -17,7 +17,8 @@
       </div>
     </div>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[820px]">
         <thead>
           <tr>
@@ -33,10 +34,7 @@
           </tr>
         </thead>
         <tbody ref="serviceBody">
-          <tr v-if="loading">
-            <td colspan="9" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!filtered.length">
+          <tr v-if="!filtered.length">
             <td colspan="9" class="py-12 text-center text-gray-400">沒有符合的療程</td>
           </tr>
           <tr v-for="s in filtered" v-else :key="s.id" data-sortable :data-id="s.id" :data-category="s.category_id">
@@ -187,6 +185,7 @@ import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import { useServicesStore } from '@/stores/services'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 import DragHandle from '@/components/admin/DragHandle.vue'
 import { useSortable, moveItem } from '@/composables/useSortable'

@@ -23,7 +23,8 @@
       <span class="ml-auto text-sm text-gray-500">共 {{ customers.length }} 位</span>
     </div>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[820px]">
         <thead>
           <tr>
@@ -38,10 +39,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading">
-            <td colspan="8" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!customers.length">
+          <tr v-if="!customers.length">
             <td colspan="8" class="py-12 text-center text-gray-400">沒有符合的會員</td>
           </tr>
           <tr v-for="c in customers" v-else :key="c.id">
@@ -68,7 +66,7 @@
 
     <!-- 會員詳情 -->
     <AdminModal :open="!!detail || detailLoading" :title="detail?.name || '會員資料'" wide @close="detail = null">
-      <div v-if="detailLoading" class="py-10"><LoadingSpinner /></div>
+      <AdminLoading v-if="detailLoading" compact />
       <div v-else-if="detail" class="space-y-5">
         <dl class="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
           <div v-for="item in detailFields" :key="item.label">
@@ -154,6 +152,7 @@ import apiClient from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 import { STATUS_LABELS, STATUS_CLASSES } from '@/utils/appointmentStatus'
 

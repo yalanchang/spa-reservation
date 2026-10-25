@@ -1,7 +1,8 @@
 <template>
   <div class="space-y-4">
+    <!-- 手機：期間一行、開始 ~ 結束一行、匯出一行；平板以上排成一列 -->
     <div class="flex flex-wrap items-center gap-2">
-      <select v-model="preset" class="admin-input !w-auto" aria-label="期間" @change="applyPreset">
+      <select v-model="preset" class="admin-input max-sm:basis-full sm:!w-auto" aria-label="期間" @change="applyPreset">
         <option value="this-month">本月</option>
         <option value="last-month">上個月</option>
         <option value="30">近 30 天</option>
@@ -9,16 +10,35 @@
         <option value="year">今年</option>
         <option value="custom">自訂</option>
       </select>
-      <input v-model="from" type="date" class="admin-input !w-auto" aria-label="開始日期" @change="onCustomDate" />
-      <span class="text-gray-400">~</span>
-      <input v-model="to" type="date" class="admin-input !w-auto" aria-label="結束日期" @change="onCustomDate" />
-      <button type="button" class="admin-btn-outline ml-auto" :disabled="exporting" @click="exportCsv">
+      <div class="flex min-w-0 items-center gap-2 max-sm:basis-full">
+        <input
+          v-model="from"
+          type="date"
+          class="admin-input min-w-0 max-sm:flex-1 sm:!w-auto"
+          aria-label="開始日期"
+          @change="onCustomDate"
+        />
+        <span class="text-gray-400">~</span>
+        <input
+          v-model="to"
+          type="date"
+          class="admin-input min-w-0 max-sm:flex-1 sm:!w-auto"
+          aria-label="結束日期"
+          @change="onCustomDate"
+        />
+      </div>
+      <button
+        type="button"
+        class="admin-btn-outline max-sm:basis-full sm:ml-auto"
+        :disabled="exporting"
+        @click="exportCsv"
+      >
         <LoadingSpinner v-if="exporting" size="sm" />
         <template v-else>匯出預約明細（CSV）</template>
       </button>
     </div>
 
-    <div v-if="loading" class="admin-panel py-16"><LoadingSpinner /></div>
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
 
     <template v-else-if="data">
       <!-- 摘要：一列數字，不做卡片 -->
@@ -311,7 +331,7 @@
             {{ detailSummary }}
           </p>
         </div>
-        <div v-if="detail.loading" class="py-10"><LoadingSpinner /></div>
+        <AdminLoading v-if="detail.loading" compact />
         <p v-else-if="!detail.rows.length" class="py-10 text-center text-gray-400">沒有資料</p>
         <div v-else class="max-h-[60vh] overflow-auto rounded-md border border-gray-200">
           <table v-stack-table class="admin-table min-w-[640px]">
@@ -354,7 +374,7 @@
     <AdminModal :open="!!members" title="這段期間加入的會員" wide @close="members = null">
       <div v-if="members">
         <p class="mb-3 text-xs text-gray-500">{{ from }} ~ {{ to }}，共 {{ members.rows.length }} 位</p>
-        <div v-if="members.loading" class="py-10"><LoadingSpinner /></div>
+        <AdminLoading v-if="members.loading" compact />
         <p v-else-if="!members.rows.length" class="py-10 text-center text-gray-400">這段期間沒有新會員</p>
         <div v-else class="max-h-[60vh] overflow-auto rounded-md border border-gray-200">
           <table v-stack-table class="admin-table min-w-[600px]">
@@ -391,6 +411,7 @@ import { ref, computed, onMounted, h } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 import { STATUS_LABELS, STATUS_CLASSES, formatDateWithWeekday } from '@/utils/appointmentStatus'
 import { downloadAppointmentsCsv } from '@/utils/adminExport'

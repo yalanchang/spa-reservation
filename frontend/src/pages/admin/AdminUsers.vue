@@ -38,7 +38,8 @@
     </form>
 
     <!-- 列表 -->
-    <div class="overflow-x-auto rounded-md border border-gray-200 bg-white">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="overflow-x-auto rounded-md border border-gray-200 bg-white">
       <table v-stack-table class="w-full min-w-[640px] text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
           <tr>
@@ -49,10 +50,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-if="loading">
-            <td colspan="4" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-for="user in users" v-else :key="user.id" class="hover:bg-gray-50">
+          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
             <td class="px-4 py-3 font-medium text-gray-900">
               {{ user.name }}
               <span v-if="user.id === authStore.user?.id" class="ml-1 text-xs font-normal text-gray-400">（你）</span>
@@ -92,6 +90,7 @@ import apiClient from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import ActionMenu from '@/components/common/ActionMenu.vue'
 import PasswordInput from '@/components/common/PasswordInput.vue'
 

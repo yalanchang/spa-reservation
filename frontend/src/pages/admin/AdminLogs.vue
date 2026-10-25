@@ -12,7 +12,8 @@
       <span class="ml-auto text-xs text-gray-500">顯示最近 300 筆</span>
     </div>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[720px]">
         <thead>
           <tr>
@@ -24,10 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading">
-            <td colspan="5" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!logs.length">
+          <tr v-if="!logs.length">
             <td colspan="5" class="py-12 text-center text-gray-400">沒有紀錄</td>
           </tr>
           <tr v-for="log in logs" v-else :key="log.id">
@@ -47,7 +45,7 @@
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 
 const toast = useToast()
 const logs = ref<any[]>([])

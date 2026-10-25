@@ -23,7 +23,7 @@
     </div>
 
     <div class="rounded-md border border-gray-200 bg-white">
-      <div v-if="loading" class="py-12"><LoadingSpinner /></div>
+      <AdminLoading v-if="loading" />
       <p v-else-if="!reviews.length" class="py-12 text-center text-sm text-gray-400">
         {{ filter === 'unreplied' ? '所有心得都已回覆' : '還沒有顧客心得' }}
       </p>
@@ -94,6 +94,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import { useAdminStats } from '@/composables/useAdminStats'
 import { formatDateWithWeekday } from '@/utils/appointmentStatus'

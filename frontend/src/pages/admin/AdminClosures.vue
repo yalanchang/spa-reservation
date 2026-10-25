@@ -20,7 +20,8 @@
     </form>
     <p class="text-xs text-gray-500">設為公休後，前台這天不能預約；已經預約的不會自動取消，請記得聯絡顧客</p>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[560px]">
         <thead>
           <tr>
@@ -31,10 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading">
-            <td colspan="4" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!rows.length">
+          <tr v-if="!rows.length">
             <td colspan="4" class="py-12 text-center text-gray-400">近期沒有公休日</td>
           </tr>
           <tr v-for="r in rows" v-else :key="r.closure_date">
@@ -57,7 +55,7 @@
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 

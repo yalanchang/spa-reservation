@@ -7,7 +7,8 @@
       <button type="button" class="admin-btn" @click="openForm()">新增優惠碼</button>
     </div>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[860px]">
         <thead>
           <tr>
@@ -24,10 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading">
-            <td colspan="10" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-else-if="!coupons.length">
+          <tr v-if="!coupons.length">
             <td colspan="10" class="py-12 text-center text-gray-400">還沒有優惠碼</td>
           </tr>
           <tr v-for="c in coupons" v-else :key="c.id">
@@ -211,6 +209,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 
 const AUDIENCES: Record<string, string> = {

@@ -1,11 +1,12 @@
 <template>
   <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-gray-500">班表與請假會直接影響前台可以預約的時段</p>
+    <div class="flex items-center justify-between gap-4">
+      <p class="min-w-0 text-sm text-gray-500">班表與請假會直接影響前台可以預約的時段</p>
       <button type="button" class="admin-btn" @click="openProfile()">新增美容師</button>
     </div>
 
-    <div class="admin-panel overflow-x-auto">
+    <div v-if="loading" class="admin-panel"><AdminLoading /></div>
+    <div v-else class="admin-panel overflow-x-auto">
       <table v-stack-table class="admin-table min-w-[760px]">
         <thead>
           <tr>
@@ -19,10 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading">
-            <td colspan="7" class="py-12"><LoadingSpinner /></td>
-          </tr>
-          <tr v-for="s in staff" v-else :key="s.id">
+          <tr v-for="s in staff" :key="s.id">
             <td>
               <p class="font-medium text-gray-900">{{ s.name }}</p>
               <p class="text-xs text-gray-500">{{ s.title }}</p>
@@ -114,7 +112,7 @@
       wide
       @close="scheduleStaff = null"
     >
-      <div v-if="scheduleLoading" class="py-10"><LoadingSpinner /></div>
+      <AdminLoading v-if="scheduleLoading" compact />
       <div v-else class="space-y-6">
         <section>
           <h4 class="mb-2 text-sm font-medium text-gray-900">每週班表</h4>
@@ -228,6 +226,7 @@ import { useToast } from 'vue-toastification'
 import apiClient from '@/api/client'
 import { useConfirm } from '@/composables/useConfirm'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import AdminLoading from '@/components/admin/AdminLoading.vue'
 import AdminModal from '@/components/admin/AdminModal.vue'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
